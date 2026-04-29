@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/pom.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectResources">
+    <resource url="URI&#9;File http://www.springframework.org/schema/beans" location="$PROJECT_DIR$" />
+    <resource url="http://www.springframework.org/schema/mvc/spring-mvc.xsd" location="$USER_HOME$/AppData/Local/JetBrains/IntelliJIdea2024.2/extResources/f7d22907_spring-mvc.xsd" />
+    <resource url="https://www.springframework.org/schema/beans/spring-beans-4.3.xsd" location="$USER_HOME$/AppData/Local/JetBrains/IntelliJIdea2024.2/extResources/38fbf776_spring-beans-4.3.xsd" />
+    <resource url="https://www.springframework.org/schema/context/" location="$PROJECT_DIR$" />
+    <resource url="https://www.springframework.org/schema/mvc/" location="$PROJECT_DIR$" />
+    <resource url="https://www.springframework.org/schema/tool/spring-tool-4.3.xsd" location="$USER_HOME$/AppData/Local/JetBrains/IntelliJIdea2024.2/extResources/93b79a08_spring-tool-4.3.xsd" />
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="ms-11" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+</project>
