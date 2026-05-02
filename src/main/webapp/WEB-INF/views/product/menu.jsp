@@ -18,7 +18,6 @@
         justify-content:center;
         color:white;
     }
-
     .card-food{
         border:none;
         border-radius:20px;
@@ -26,11 +25,9 @@
         box-shadow:0 10px 25px rgba(0,0,0,.1);
         transition:.3s;
     }
-
     .card-food:hover{
         transform:translateY(-10px);
     }
-
     .card-food img{
         height:200px;
         object-fit:cover;
@@ -51,26 +48,25 @@
         <div class="col-lg-4 col-md-6">
             <div class="card card-food">
 
-                <!-- FIX ẢNH -->
-                <img src="<%= p.getImage().startsWith("http") ? p.getImage() : request.getContextPath() + p.getImage() %>" onerror="this.onerror=null; this.src='<%=request.getContextPath()%>/images/default.jpg';">
+                <img src="<%= p.getImage().startsWith("http") ? p.getImage() : request.getContextPath() + p.getImage() %>"
+                     onerror="this.src='<%=request.getContextPath()%>/images/default.jpg'">
 
                 <div class="p-3">
 
                     <h5 class="fw-bold"><%=p.getName()%></h5>
 
-                    <p class="text-muted">
-                        <%=p.getDescription()%>
-                    </p>
+                    <p class="text-muted"><%=p.getDescription()%></p>
 
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between">
 
                         <span class="text-danger fw-bold">
                             <%=p.getPrice()%> đ
                         </span>
 
-                        <button class="btn btn-dark btn-sm">
-                            Đặt món
-                        </button>
+                        <a href="<%=request.getContextPath()%>/product/<%=p.getId()%>"
+                           class="btn btn-dark btn-sm">
+                            Xem
+                        </a>
 
                     </div>
 

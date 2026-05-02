@@ -396,9 +396,10 @@
 
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <div class="price">${p.price}đ</div>
-                                <button class="btn btn-dark rounded-pill px-4">
-                                    Order
-                                </button>
+                                <a href="${pageContext.request.contextPath}/product/${p.id}"
+                                   class="btn btn-dark rounded-pill px-4">
+                                    Xem
+                                </a>
                             </div>
 
                         </div>

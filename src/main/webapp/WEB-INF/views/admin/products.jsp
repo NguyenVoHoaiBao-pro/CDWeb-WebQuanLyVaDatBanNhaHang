@@ -1,5 +1,6 @@
 <%@ page import="vn.edu.hcmuaf.fit.model.Product" %>
 <%@ page import="java.util.List" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
 
 <%
     List<Product> list =

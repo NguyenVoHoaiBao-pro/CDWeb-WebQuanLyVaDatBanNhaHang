@@ -1,3 +1,4 @@
+<%@ page contentType="text/html;charset=UTF-8" %>
 <div class="card-box mx-auto" style="max-width:600px">
 
     <h3 class="mb-4">➕ Thêm sản phẩm</h3>
