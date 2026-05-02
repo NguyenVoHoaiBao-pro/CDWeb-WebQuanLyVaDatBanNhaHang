@@ -1,5 +1,5 @@
 package vn.edu.hcmuaf.fit.controller;
-
+import vn.edu.hcmuaf.fit.util.AuthUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -48,9 +48,7 @@ public class EditProductController {
             @RequestParam String category,
             HttpSession session) {
 
-        Object user = session.getAttribute("user");
-
-        if (user == null) {
+        if (!AuthUtil.isAdmin(session)) {
             return "redirect:/login";
         }
 

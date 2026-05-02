@@ -192,6 +192,28 @@ public class UserDAO {
 
         return false;
     }
+    public User findByEmail(String email) {
+
+        String sql = "SELECT * FROM users WHERE email=?";
+
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return mapUser(rs);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 
     // MAP USER
     private User mapUser(ResultSet rs) throws Exception {

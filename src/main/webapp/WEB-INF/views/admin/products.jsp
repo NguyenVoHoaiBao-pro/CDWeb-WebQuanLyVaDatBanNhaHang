@@ -1,149 +1,87 @@
-<%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="java.util.*,vn.edu.hcmuaf.fit.model.Product" %>
+<%@ page import="vn.edu.hcmuaf.fit.model.Product" %>
+<%@ page import="java.util.List" %>
 
 <%
-    String ctx = request.getContextPath();
-
     List<Product> list =
             (List<Product>) request.getAttribute("list");
+
+    if(list == null){
+        list = new java.util.ArrayList<>();
+    }
 %>
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<div class="card-box">
 
-    <title>Admin Products</title>
+    <!-- HEADER -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <h3 class="m-0">🍽 Danh sách món</h3>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-
-        body{
-            background:#f8fafc;
-            font-family:Segoe UI;
-        }
-
-        .top{
-            height:260px;
-            background:
-                    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),
-                    url('https://images.unsplash.com/photo-1504674900247-0877df9cc836') center/cover;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            color:white;
-            text-align:center;
-        }
-
-        .top h1{
-            font-size:54px;
-            font-weight:900;
-        }
-
-        .box{
-            background:white;
-            padding:30px;
-            border-radius:24px;
-            box-shadow:0 15px 35px rgba(0,0,0,.08);
-            margin-top:-55px;
-            position:relative;
-            z-index:9;
-        }
-
-        img.food{
-            width:80px;
-            height:60px;
-            object-fit:cover;
-            border-radius:10px;
-        }
-
-    </style>
-</head>
-
-<body>
-
-<section class="top">
-    <div>
-        <h1>🍽 Quản Lý Món Ăn</h1>
-        <p>Thêm / sửa / xóa món ăn</p>
+        <a href="${pageContext.request.contextPath}/admin/add-product"
+           class="btn btn-success">
+            + Thêm
+        </a>
     </div>
-</section>
 
-<div class="container pb-5">
+    <!-- TABLE -->
+    <div class="table-responsive">
 
-    <div class="box">
+        <table class="table table-hover align-middle text-center">
 
-        <div class="d-flex justify-content-between mb-4">
-
-            <h2 class="fw-bold">Danh Sách Món</h2>
-
-            <div>
-
-                <a href="<%=ctx%>/admin/add-product"
-                   class="btn btn-success">
-                    + Thêm món
-                </a>
-
-                <a href="<%=ctx%>/admin"
-                   class="btn btn-dark">
-                    Dashboard
-                </a>
-
-            </div>
-
-        </div>
-
-        <table class="table table-bordered text-center align-middle">
-
-            <tr class="table-dark">
+            <thead class="table-dark">
+            <tr>
                 <th>ID</th>
                 <th>Ảnh</th>
                 <th>Tên</th>
-                <th>Loại</th>
                 <th>Giá</th>
-                <th width="220">Thao tác</th>
+                <th width="120">Thao tác</th>
+            </tr>
+            </thead>
+
+            <tbody>
+
+            <% if(list.isEmpty()){ %>
+
+            <tr>
+                <td colspan="5" class="text-muted py-4">
+                    🚫 Chưa có sản phẩm
+                </td>
             </tr>
 
-            <%
+            <% } else {
+
                 for(Product p : list){
             %>
 
-            <tr>
+            <tr class="hover-row">
 
                 <td><%=p.getId()%></td>
 
                 <td>
-                    <img src="<%=p.getImage()%>" class="food">
+                    <img src="<%=p.getImage()%>"
+                         style="width:70px;height:55px;object-fit:cover;border-radius:10px">
                 </td>
 
-                <td><%=p.getName()%></td>
+                <td class="fw-semibold"><%=p.getName()%></td>
 
-                <td><%=p.getCategory()%></td>
-
-                <td><%=p.getPrice()%> đ</td>
+                <td class="text-success fw-bold">
+                    <%=String.format("%,.0f", p.getPrice())%> đ
+                </td>
 
                 <td>
 
-                    <a href="<%=ctx%>/admin/edit-product/<%=p.getId()%>"
-                       class="btn btn-primary btn-sm">
-                        Sửa
-                    </a>
-
-                    <a href="<%=ctx%>/admin/delete-product/<%=p.getId()%>"
+                    <a href="${pageContext.request.contextPath}/admin/delete-product/<%=p.getId()%>"
                        class="btn btn-danger btn-sm"
                        onclick="return confirm('Xóa món này?')">
-                        Xóa
+                        <i class="bi bi-trash"></i>
                     </a>
 
                 </td>
 
             </tr>
 
-            <%
-                }
-            %>
+            <% } } %>
+
+            </tbody>
 
         </table>
 
@@ -151,7 +89,32 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- EFFECT -->
+<style>
 
-</body>
-</html>
+    .hover-row{
+        transition:.2s;
+    }
+
+    .hover-row:hover{
+        background:#f1f5f9;
+        transform:scale(1.01);
+    }
+
+    @media(max-width:768px){
+
+        h3{
+            font-size:20px;
+        }
+
+        table{
+            font-size:13px;
+        }
+
+        img{
+            width:50px !important;
+            height:40px !important;
+        }
+    }
+
+</style>

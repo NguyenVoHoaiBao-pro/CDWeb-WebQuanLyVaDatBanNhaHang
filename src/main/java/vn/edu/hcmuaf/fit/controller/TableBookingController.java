@@ -56,8 +56,20 @@ public class TableBookingController {
         r.setReservationTime(reservationTime);
         r.setNumberOfPeople(numberOfPeople);
 
-        reservationDAO.insert(r);
 
+        reservationDAO.insert(r);
+        RestaurantTable table = null;
+
+        for (RestaurantTable t : tableDAO.getAll()) {
+            if (t.getId() == tableId) {
+                table = t;
+                break;
+            }
+        }
+
+        if (table == null || !"AVAILABLE".equals(table.getStatus())) {
+            return "redirect:/tables?error=full";
+        }
         tableDAO.updateStatus(tableId, "RESERVED");
 
         return "redirect:/tables?success=1";

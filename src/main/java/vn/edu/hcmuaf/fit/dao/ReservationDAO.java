@@ -141,6 +141,24 @@ public class ReservationDAO {
         return false;
     }
 
-    public void updateBooking(int id, String reservationTime, int numberOfPeople) {
+    public boolean updateBooking(int id, String reservationTime, int numberOfPeople) {
+
+        String sql = "UPDATE reservations SET reservation_time=?, number_of_people=? WHERE id=?";
+
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            ps.setString(1, reservationTime);
+            ps.setInt(2, numberOfPeople);
+            ps.setInt(3, id);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }

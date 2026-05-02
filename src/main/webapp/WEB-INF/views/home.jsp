@@ -352,52 +352,6 @@
 
 <body>
 <jsp:include page="layout/header.jsp"/>
-<!-- NAVBAR -->
-
-<%--<nav class="navbar navbar-expand-lg navbar-dark fixed-top">--%>
-<%--    <div class="container">--%>
-
-<%--        <a class="navbar-brand" href="<%=ctx%>/">🍽 LUXURY FOOD</a>--%>
-
-<%--        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#menuNav">--%>
-<%--            <span class="navbar-toggler-icon"></span>--%>
-<%--        </button>--%>
-
-<%--        <div class="collapse navbar-collapse" id="menuNav">--%>
-
-<%--            <ul class="navbar-nav mx-auto">--%>
-<%--                <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>--%>
-<%--                <li class="nav-item"><a class="nav-link" href="#menu">Menu</a></li>--%>
-<%--                <li class="nav-item"><a class="nav-link" href="#service">Service</a></li>--%>
-<%--                <li class="nav-item"><a class="nav-link" href="#review">Review</a></li>--%>
-<%--                <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>--%>
-<%--            </ul>--%>
-
-<%--            <div class="d-flex align-items-center gap-2">--%>
-
-<%--                <% if(u==null){ %>--%>
-
-<%--                <a href="<%=ctx%>/login" class="btn btn-outline-light btn-nav">Login</a>--%>
-<%--                <a href="<%=ctx%>/register" class="btn btn-warning btn-nav">Register</a>--%>
-
-<%--                <% }else{ %>--%>
-
-<%--                <div class="user-badge">👋 <%=u.getUsername()%></div>--%>
-
-<%--                <% if("ADMIN".equals(u.getRole())){ %>--%>
-<%--                <a href="<%=ctx%>/admin" class="btn btn-danger btn-nav">Admin</a>--%>
-<%--                <% } %>--%>
-
-<%--                <a href="<%=ctx%>/logout" class="btn btn-outline-light btn-nav">Logout</a>--%>
-
-<%--                <% } %>--%>
-
-<%--            </div>--%>
-
-<%--        </div>--%>
-<%--    </div>--%>
-<%--</nav>--%>
-
 <!-- HERO -->
 
 <section class="hero" id="home">

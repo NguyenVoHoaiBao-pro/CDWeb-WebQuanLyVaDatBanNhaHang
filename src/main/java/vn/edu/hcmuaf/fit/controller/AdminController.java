@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import vn.edu.hcmuaf.fit.dao.*;
 import vn.edu.hcmuaf.fit.model.*;
+import vn.edu.hcmuaf.fit.util.AuthUtil;
 
 import javax.servlet.http.HttpSession;
 
@@ -18,40 +19,40 @@ public class AdminController {
     ReservationDAO reservationDAO = new ReservationDAO();
     AdminDAO adminDAO = new AdminDAO();
 
-    private boolean isAdmin(HttpSession session) {
-        User u = (User) session.getAttribute("user");
-        return u != null && "ADMIN".equals(u.getRole());
-    }
 
     @GetMapping("")
     public String dashboard(Model model, HttpSession session) {
 
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
 
         model.addAttribute("totalUsers", adminDAO.countUsers());
         model.addAttribute("totalProducts", adminDAO.countProducts());
         model.addAttribute("totalTables", adminDAO.countTables());
         model.addAttribute("totalReservations", adminDAO.countReservations());
 
-        return "admin/dashboard";
+        model.addAttribute("page", "dashboard.jsp");
+        return "admin/layout";
     }
 
     @GetMapping("/products")
     public String products(Model model, HttpSession session) {
 
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
 
         model.addAttribute("list", productDAO.getAll());
 
-        return "admin/products";
+        model.addAttribute("page", "products.jsp"); // 🔥 QUAN TRỌNG
+
+        return "admin/layout"; // 🔥 CHỈ TRẢ VỀ LAYOUT
     }
 
     @GetMapping("/add-product")
-    public String showAddProduct(HttpSession session) {
+    public String showAddProduct(Model model, HttpSession session) {
 
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
 
-        return "admin/add-product";
+        model.addAttribute("page", "add-product.jsp");
+        return "admin/layout";
     }
 
     @PostMapping("/add-product")
@@ -61,10 +62,16 @@ public class AdminController {
             @RequestParam String description,
             @RequestParam String image,
             @RequestParam String category,
+            Model model,
             HttpSession session
     ) {
 
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
+
+        if (name == null || name.trim().isEmpty() || price <= 0) {
+            model.addAttribute("page", "add-product.jsp");
+            return "admin/layout";
+        }
 
         Product p = new Product();
         p.setName(name);
@@ -81,9 +88,13 @@ public class AdminController {
     @GetMapping("/delete-product/{id}")
     public String deleteProduct(@PathVariable int id, HttpSession session) {
 
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
 
-        productDAO.delete(id);
+        Product p = productDAO.findById(id);
+
+        if (p != null) {
+            productDAO.delete(id);
+        }
 
         return "redirect:/admin/products";
     }
@@ -91,17 +102,17 @@ public class AdminController {
     @GetMapping("/users")
     public String users(Model model, HttpSession session) {
 
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
 
         model.addAttribute("list", userDAO.getAll());
-
-        return "admin/users";
+        model.addAttribute("page", "users.jsp");
+        return "admin/layout";
     }
 
     @GetMapping("/delete-user/{id}")
     public String deleteUser(@PathVariable int id, HttpSession session) {
 
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
 
         userDAO.delete(id);
 
@@ -111,9 +122,13 @@ public class AdminController {
     @GetMapping("/change-role/{id}")
     public String changeRole(@PathVariable int id, HttpSession session) {
 
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
 
-        userDAO.changeRole(id);
+        User current = (User) session.getAttribute("user");
+
+        if (current != null && current.getId() != id) {
+            userDAO.changeRole(id);
+        }
 
         return "redirect:/admin/users";
     }
@@ -121,11 +136,11 @@ public class AdminController {
     @GetMapping("/tables")
     public String tables(Model model, HttpSession session) {
 
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
 
         model.addAttribute("list", tableDAO.getAll());
-
-        return "admin/tables";
+        model.addAttribute("page", "tables.jsp");
+        return "admin/layout";
     }
 
     @GetMapping("/change-table/{id}/{status}")
@@ -135,7 +150,11 @@ public class AdminController {
             HttpSession session
     ) {
 
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
+
+        if (!status.equals("AVAILABLE") && !status.equals("RESERVED")) {
+            return "redirect:/admin/tables";
+        }
 
         tableDAO.updateStatus(id, status);
 
@@ -145,11 +164,11 @@ public class AdminController {
     @GetMapping("/reservations")
     public String reservations(Model model, HttpSession session) {
 
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
 
         model.addAttribute("list", reservationDAO.getAll());
-
-        return "admin/reservations";
+        model.addAttribute("page", "reservations.jsp");
+        return "admin/layout";
     }
 
     @GetMapping("/reservation/{id}/{status}")
@@ -159,11 +178,63 @@ public class AdminController {
             HttpSession session
     ) {
 
-        if (!isAdmin(session)) return "redirect:/login";
+        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
+
+        if (!status.equals("PENDING") &&
+                !status.equals("CONFIRMED") &&
+                !status.equals("DONE") &&
+                !status.equals("CANCELLED")) {
+            return "redirect:/admin/reservations";
+        }
 
         reservationDAO.updateStatus(id, status);
 
         return "redirect:/admin/reservations";
     }
+    @GetMapping("/add-table")
+    public String addTablePage(Model model, HttpSession session) {
+
+        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
+
+        model.addAttribute("page", "add-table.jsp");
+        return "admin/layout";
+    }
+
+    @PostMapping("/add-table")
+    public String addTable(
+            @RequestParam String name,
+            @RequestParam int capacity,
+            Model model,
+            HttpSession session
+    ) {
+        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
+
+        if (name == null || name.trim().isEmpty() || capacity <= 0) {
+            model.addAttribute("page", "add-table.jsp");
+            return "admin/layout";
+        }
+
+        tableDAO.insert(name, capacity);
+
+        return "redirect:/admin/tables";
+    }
+    @GetMapping("/search-product")
+    public String searchProduct(
+            @RequestParam(required = false) String keyword,
+            Model model,
+            HttpSession session) {
+
+        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
+
+        if (keyword == null || keyword.trim().isEmpty()) {
+            model.addAttribute("list", productDAO.getAll());
+        } else {
+            model.addAttribute("list", productDAO.search(keyword));
+        }
+
+        model.addAttribute("page", "products.jsp");
+        return "admin/layout";
+    }
+
 
 }
