@@ -1,3 +1,5 @@
+<!-- FILE: WEB-INF/views/product/detail.jsp (VIẾT LẠI FULL CHUẨN) -->
+
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -7,190 +9,206 @@
     <meta charset="UTF-8">
     <title>${product.name}</title>
 
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
         body{
             background:#f8f9fa;
         }
-
-        .card{
-            border-radius:15px;
+        .detail-box{
+            background:#fff;
+            border-radius:24px;
+            overflow:hidden;
+            box-shadow:0 12px 35px rgba(0,0,0,.08);
         }
-
         .product-img{
-            height:400px;
-            object-fit:cover;
             width:100%;
+            height:460px;
+            object-fit:cover;
+        }
+        .price{
+            font-size:34px;
+            font-weight:800;
+            color:#dc3545;
+        }
+        .tag{
+            background:#f1f3f5;
+            display:inline-block;
+            padding:8px 14px;
+            border-radius:20px;
+            font-size:14px;
         }
         .card-hover{
-            border-radius:15px;
+            border:none;
+            border-radius:18px;
             overflow:hidden;
-            transition: all 0.3s ease;
-            position: relative;
+            transition:.3s;
+            box-shadow:0 8px 20px rgba(0,0,0,.08);
         }
-
-        /* 🔥 Phóng to */
         .card-hover:hover{
-            transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-
-        /* ✨ Hiệu ứng lóa sáng */
-        .card-hover::before{
-            content:"";
-            position:absolute;
-            top:0;
-            left:-100%;
-            width:100%;
-            height:100%;
-            background:linear-gradient(
-                    120deg,
-                    transparent,
-                    rgba(255,255,255,0.4),
-                    transparent
-            );
-            transition:0.5s;
-        }
-
-        .card-hover:hover::before{
-            left:100%;
+            transform:translateY(-8px);
         }
         .card-hover img{
-            transition:0.3s;
+            height:180px;
+            object-fit:cover;
         }
-
-        .card-hover:hover img{
-            transform: scale(1.1);
-        }
-
-
     </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
 <jsp:include page="/WEB-INF/views/layout/header.jsp"/>
 
-<div class="container mt-5">
+<div class="container py-5">
 
-    <div class="row">
+    <c:choose>
 
-        <!-- IMAGE -->
-        <div class="col-md-6">
+        <c:when test="${product == null}">
 
-            <c:choose>
-                <c:when test="${product.image != null && product.image.startsWith('http')}">
-                    <img src="${product.image}"
-                         class="product-img rounded shadow"
-                         onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/images/default.jpg'">
-                </c:when>
+            <div class="text-center py-5">
+                <h2>Không tìm thấy món ăn</h2>
 
-                <c:otherwise>
-                    <img src="${pageContext.request.contextPath}${product.image}"
-                         class="product-img rounded shadow"
-                         onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/images/default.jpg'">
-                </c:otherwise>
-            </c:choose>
-
-        </div>
-
-        <!-- INFO -->
-        <div class="col-md-6">
-
-            <h2 class="fw-bold">${product.name}</h2>
-
-            <h3 class="text-danger">${product.price} đ</h3>
-
-            <p class="text-muted">${product.description}</p>
-
-            <div class="mt-3">
-                <a href="${pageContext.request.contextPath}/cart/add/${product.id}"
-                   class="btn btn-success me-2">
-                    🛒 Đặt món
+                <a href="${pageContext.request.contextPath}/products"
+                   class="btn btn-dark mt-3">
+                    Quay lại thực đơn
                 </a>
-
-                <button class="btn btn-warning">⭐ Đánh giá</button>
             </div>
 
-            <hr>
+        </c:when>
 
-            <!-- ĐẶT BÀN -->
-            <form action="${pageContext.request.contextPath}/reserve" method="post">
+        <c:otherwise>
 
-                <input name="tableId" class="form-control mb-2" placeholder="ID bàn">
+            <div class="detail-box">
 
-                <input name="time" type="datetime-local" class="form-control mb-2">
+                <div class="row g-0">
 
-                <input name="people" type="number" class="form-control mb-2" placeholder="Số người">
+                    <!-- IMAGE -->
+                    <div class="col-lg-6">
 
-                <button class="btn btn-primary w-100">
-                    📅 Đặt bàn
-                </button>
+                        <c:choose>
 
-            </form>
-
-        </div>
-    </div>
-
-    <!-- GỢI Ý -->
-    <h4 class="mt-5">🔥 Món gợi ý</h4>
-
-    <div class="row">
-
-        <c:forEach var="p" items="${suggest}">
-
-            <c:if test="${p.id != product.id}">
-
-                <div class="col-md-3 mb-3">
-                    <div class="card card-hover p-2 shadow-sm">
-
-                    <c:choose>
-                            <c:when test="${p.image != null && p.image.startsWith('http')}">
-                                <img src="${p.image}"
-                                     class="w-100"
-                                     style="height:150px; object-fit:cover;"
-                                     onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/images/default.jpg'">
+                            <c:when test="${product.image != null && product.image.startsWith('http')}">
+                                <img src="${product.image}"
+                                     class="product-img"
+                                     onerror="this.src='${pageContext.request.contextPath}/assets/images/default.jpg'">
                             </c:when>
 
                             <c:otherwise>
-                                <img src="${pageContext.request.contextPath}${p.image}"
-                                     class="w-100"
-                                     style="height:150px; object-fit:cover;"
-                                     onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/images/default.jpg'">
+                                <img src="${pageContext.request.contextPath}${product.image}"
+                                     class="product-img"
+                                     onerror="this.src='${pageContext.request.contextPath}/assets/images/default.jpg'">
                             </c:otherwise>
+
                         </c:choose>
 
-                        <h6 class="mt-2">${p.name}</h6>
+                    </div>
 
-                        <div class="d-flex justify-content-between align-items-center mt-2">
+                    <!-- INFO -->
+                    <div class="col-lg-6 p-5">
 
-                            <span class="text-danger fw-bold">
-                                ${p.price} đ
-                            </span>
+                        <div class="tag mb-3">
+                                ${product.category}
+                        </div>
 
-                            <a href="${pageContext.request.contextPath}/product/${p.id}"
-                               class="btn btn-sm btn-dark">
-                                Xem
+                        <h1 class="fw-bold mb-3">
+                                ${product.name}
+                        </h1>
+
+                        <div class="price mb-4">
+                                ${product.price} đ
+                        </div>
+
+                        <p class="text-muted mb-4" style="line-height:1.8">
+                                ${product.description}
+                        </p>
+
+                        <div class="d-grid gap-3">
+
+                            <a href="${pageContext.request.contextPath}/cart/add?id=${product.id}"
+                               class="btn btn-danger btn-lg">
+                                🛒 Thêm vào giỏ hàng
+                            </a>
+
+                            <a href="${pageContext.request.contextPath}/products"
+                               class="btn btn-outline-dark">
+                                ← Quay lại thực đơn
                             </a>
 
                         </div>
 
-
                     </div>
+
                 </div>
 
-            </c:if>
+            </div>
 
-        </c:forEach>
+            <!-- GỢI Ý -->
+            <h3 class="fw-bold mt-5 mb-4">🔥 Món gợi ý</h3>
 
-    </div>
+            <div class="row g-4">
+
+                <c:forEach var="p" items="${suggest}">
+
+                    <c:if test="${p.id != product.id}">
+
+                        <div class="col-lg-3 col-md-6">
+
+                            <div class="card card-hover">
+
+                                <c:choose>
+
+                                    <c:when test="${p.image != null && p.image.startsWith('http')}">
+                                        <img src="${p.image}"
+                                             onerror="this.src='${pageContext.request.contextPath}/assets/images/default.jpg'">
+                                    </c:when>
+
+                                    <c:otherwise>
+                                        <img src="${pageContext.request.contextPath}${p.image}"
+                                             onerror="this.src='${pageContext.request.contextPath}/assets/images/default.jpg'">
+                                    </c:otherwise>
+
+                                </c:choose>
+
+                                <div class="card-body">
+
+                                    <h6 class="fw-bold">${p.name}</h6>
+
+                                    <div class="text-danger fw-bold mb-3">
+                                            ${p.price} đ
+                                    </div>
+
+                                    <div class="d-grid gap-2">
+
+                                        <a href="${pageContext.request.contextPath}/product/${p.id}"
+                                           class="btn btn-dark btn-sm">
+                                            Xem
+                                        </a>
+
+                                        <a href="${pageContext.request.contextPath}/cart/add?id=${p.id}"
+                                           class="btn btn-danger btn-sm">
+                                            Thêm
+                                        </a>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </c:if>
+
+                </c:forEach>
+
+            </div>
+
+        </c:otherwise>
+
+    </c:choose>
 
 </div>
 
-<!-- FOOTER -->
 <jsp:include page="/WEB-INF/views/layout/footer.jsp"/>
 
 </body>

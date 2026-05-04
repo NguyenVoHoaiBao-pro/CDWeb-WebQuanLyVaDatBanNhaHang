@@ -1,121 +1,147 @@
-<%@ page import="vn.edu.hcmuaf.fit.model.Product" %>
-<%@ page import="java.util.List" %>
+<!-- FILE: /views/admin/products.jsp -->
+
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="java.util.*,vn.edu.hcmuaf.fit.model.Product" %>
 
 <%
-    List<Product> list =
-            (List<Product>) request.getAttribute("list");
-
-    if(list == null){
-        list = new java.util.ArrayList<>();
-    }
+    List<Product> list = (List<Product>) request.getAttribute("list");
+    if(list == null) list = new ArrayList<Product>();
 %>
 
-<div class="card-box">
+<jsp:include page="../layout/admin-header.jsp"/>
 
-    <!-- HEADER -->
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-        <h3 class="m-0">🍽 Danh sách món</h3>
+<style>
+    .page-box{
+        background:#fff;
+        border-radius:20px;
+        padding:30px;
+        box-shadow:0 10px 30px rgba(0,0,0,.08);
+    }
+    .table img{
+        width:80px;
+        height:60px;
+        object-fit:cover;
+        border-radius:12px;
+    }
+    .table tbody tr{
+        transition:.2s;
+    }
+    .table tbody tr:hover{
+        background:#f8f9fa;
+        transform:scale(1.01);
+    }
+    .badge-price{
+        background:#e8fff0;
+        color:#198754;
+        padding:8px 12px;
+        border-radius:20px;
+        font-weight:700;
+    }
+</style>
 
-        <a href="${pageContext.request.contextPath}/admin/add-product"
-           class="btn btn-success">
-            + Thêm
-        </a>
-    </div>
+<div class="container py-5">
 
-    <!-- TABLE -->
-    <div class="table-responsive">
+    <div class="page-box">
 
-        <table class="table table-hover align-middle text-center">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
 
-            <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Ảnh</th>
-                <th>Tên</th>
-                <th>Giá</th>
-                <th width="120">Thao tác</th>
-            </tr>
-            </thead>
+            <div>
+                <h2 class="fw-bold mb-1">🍽 Quản Lý Sản Phẩm</h2>
+                <small class="text-muted">
+                    Tổng món ăn: <%=list.size()%>
+                </small>
+            </div>
 
-            <tbody>
+            <a href="<%=request.getContextPath()%>/admin/add-product"
+               class="btn btn-success">
+                + Thêm món mới
+            </a>
 
-            <% if(list.isEmpty()){ %>
+        </div>
 
-            <tr>
-                <td colspan="5" class="text-muted py-4">
-                    🚫 Chưa có sản phẩm
-                </td>
-            </tr>
+        <div class="table-responsive">
 
-            <% } else {
+            <table class="table table-bordered align-middle text-center">
 
-                for(Product p : list){
-            %>
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Ảnh</th>
+                    <th>Tên món</th>
+                    <th>Danh mục</th>
+                    <th>Giá</th>
+                    <th width="180">Thao tác</th>
+                </tr>
+                </thead>
 
-            <tr class="hover-row">
+                <tbody>
 
-                <td><%=p.getId()%></td>
+                <% if(list.isEmpty()){ %>
 
-                <td>
-                    <img src="<%=p.getImage()%>"
-                         style="width:70px;height:55px;object-fit:cover;border-radius:10px">
-                </td>
+                <tr>
+                    <td colspan="6" class="py-4 text-muted">
+                        Chưa có sản phẩm nào
+                    </td>
+                </tr>
 
-                <td class="fw-semibold"><%=p.getName()%></td>
+                <% } else {
+                    for(Product p : list){
+                %>
 
-                <td class="text-success fw-bold">
-                    <%=String.format("%,.0f", p.getPrice())%> đ
-                </td>
+                <tr>
 
-                <td>
+                    <td><%=p.getId()%></td>
 
-                    <a href="${pageContext.request.contextPath}/admin/delete-product/<%=p.getId()%>"
-                       class="btn btn-danger btn-sm"
-                       onclick="return confirm('Xóa món này?')">
-                        <i class="bi bi-trash"></i>
-                    </a>
+                    <td>
+                        <img src="<%=p.getImage()%>"
+                             onerror="this.src='<%=request.getContextPath()%>/images/default.jpg'">
+                    </td>
 
-                </td>
+                    <td class="fw-bold">
+                        <%=p.getName()%>
+                    </td>
 
-            </tr>
+                    <td>
+                        <%=p.getCategory()%>
+                    </td>
 
-            <% } } %>
+                    <td>
+                        <span class="badge-price">
+                            <%=String.format("%,.0f",p.getPrice())%> đ
+                        </span>
+                    </td>
 
-            </tbody>
+                    <td>
 
-        </table>
+                        <div class="d-flex gap-2 justify-content-center">
+
+                            <a href="<%=request.getContextPath()%>/admin/edit-product/<%=p.getId()%>"
+                               class="btn btn-warning btn-sm">
+                                Sửa
+                            </a>
+
+                            <a href="<%=request.getContextPath()%>/admin/delete-product/<%=p.getId()%>"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Bạn muốn xóa món này?')">
+                                Xóa
+                            </a>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                <% }} %>
+
+                </tbody>
+
+            </table>
+
+        </div>
 
     </div>
 
 </div>
 
-<!-- EFFECT -->
-<style>
-
-    .hover-row{
-        transition:.2s;
-    }
-
-    .hover-row:hover{
-        background:#f1f5f9;
-        transform:scale(1.01);
-    }
-
-    @media(max-width:768px){
-
-        h3{
-            font-size:20px;
-        }
-
-        table{
-            font-size:13px;
-        }
-
-        img{
-            width:50px !important;
-            height:40px !important;
-        }
-    }
-
-</style>
+<jsp:include page="../layout/admin-footer.jsp"/>

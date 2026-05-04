@@ -1,8 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%
-    String pageFile = (String) request.getAttribute("page");
-    if(pageFile == null) pageFile = "dashboard.jsp";
-%>
+<%--<%--%>
+<%--    String pageFile = (String) request.getAttribute("page");--%>
+<%--    if(pageFile == null) pageFile = "dashboard.jsp";--%>
+<%--%>--%>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -168,7 +168,8 @@
     </div>
 
     <!-- LOAD PAGE -->
-    <jsp:include page="<%=pageFile%>" />
+<%--    <jsp:include page="<%=pageFile%>" />--%>
+    <jsp:include page="${page}" />
 
 </div>
 

@@ -1,0 +1,197 @@
+<!-- FILE: WEB-INF/views/product/checkout.jsp -->
+<!-- TƯƠNG THÍCH controller CheckoutController của bạn -->
+
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ page import="java.util.*" %>
+<%@ page import="vn.edu.hcmuaf.fit.model.Product" %>
+<%@ page import="vn.edu.hcmuaf.fit.model.RestaurantTable" %>
+
+<jsp:include page="../layout/header.jsp"/>
+
+<%
+    List<Product> cart =
+            (List<Product>) request.getAttribute("list");
+    List<RestaurantTable> tables =
+            (List<RestaurantTable>) request.getAttribute("tables");
+
+    if(cart == null) cart = new ArrayList<Product>();
+    if(tables == null) tables = new ArrayList<RestaurantTable>();
+
+    double total = 0;
+    for(Product p : cart){
+        total += p.getPrice() * p.getQuantity();
+    }
+%>
+
+<style>
+    body{
+        background:#f8f9fa;
+    }
+
+    .box{
+        background:#fff;
+        padding:30px;
+        border-radius:20px;
+        box-shadow:0 10px 30px rgba(0,0,0,.08);
+    }
+
+    .order-item{
+        border-bottom:1px solid #eee;
+        padding:12px 0;
+    }
+
+    .total{
+        font-size:26px;
+        font-weight:800;
+        color:#dc3545;
+    }
+</style>
+
+<div class="container py-5">
+
+    <h2 class="fw-bold mb-4">📅 Đặt bàn & Thanh toán</h2>
+
+    <div class="row g-4">
+
+        <!-- LEFT -->
+        <div class="col-lg-7">
+
+            <div class="box">
+
+                <form method="post"
+                      action="<%=request.getContextPath()%>/checkout">
+
+                    <div class="mb-3">
+                        <label class="form-label">Họ tên</label>
+                        <input type="text"
+                               name="name"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Số điện thoại</label>
+                        <input type="text"
+                               name="phone"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Thời gian đến</label>
+                            <input type="datetime-local"
+                                   name="time"
+                                   class="form-control"
+                                   required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Số người</label>
+                            <input type="number"
+                                   name="people"
+                                   min="1"
+                                   class="form-control"
+                                   required>
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Chọn bàn</label>
+
+                        <select name="tableId"
+                                class="form-select"
+                                required>
+
+                            <option value="">-- Chọn bàn --</option>
+
+                            <% for(RestaurantTable t : tables){ %>
+
+                            <option value="<%=t.getId()%>">
+                                <%=t.getName()%> -
+                                <%=t.getCapacity()%> người -
+                                <%=t.getStatus()%>
+                            </option>
+
+                            <% } %>
+
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Thanh toán</label>
+
+                        <select name="payment"
+                                class="form-select">
+
+                            <option value="COD">Trả sau khi ăn</option>
+                            <option value="DEPOSIT">Đặt cọc trước</option>
+
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Ghi chú</label>
+                        <textarea name="note"
+                                  rows="4"
+                                  class="form-control"></textarea>
+                    </div>
+
+                    <button class="btn btn-danger w-100 btn-lg">
+                        Xác nhận đặt bàn
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="col-lg-5">
+
+            <div class="box">
+
+                <h4 class="mb-4">🛒 Đơn hàng</h4>
+
+                <% for(Product p : cart){ %>
+
+                <div class="order-item d-flex justify-content-between">
+
+                    <div>
+                        <div class="fw-bold"><%=p.getName()%></div>
+                        <small>x <%=p.getQuantity()%></small>
+                    </div>
+
+                    <div>
+                        <%=String.format("%,.0f",
+                                p.getPrice()*p.getQuantity())%> đ
+                    </div>
+
+                </div>
+
+                <% } %>
+
+                <hr>
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <span>Tổng cộng:</span>
+
+                    <span class="total">
+<%=String.format("%,.0f",total)%> đ
+</span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<jsp:include page="../layout/footer.jsp"/>

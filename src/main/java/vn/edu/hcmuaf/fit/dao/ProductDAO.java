@@ -1,34 +1,28 @@
 package vn.edu.hcmuaf.fit.dao;
 
 import vn.edu.hcmuaf.fit.model.Product;
+
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProductDAO {
 
+    // LẤY TẤT CẢ MÓN ĂN
     public List<Product> getAll() {
+
         List<Product> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM products ORDER BY id DESC";
 
         try (
                 Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement("SELECT * FROM products");
+                PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()
         ) {
+
             while (rs.next()) {
-                Product p = new Product();
-
-                p.setId(rs.getInt("id"));
-                p.setName(rs.getString("name"));
-                p.setPrice(rs.getDouble("price"));
-                p.setDescription(rs.getString("description"));
-                String image = rs.getString("image");
-                if (image == null || image.isEmpty()) {
-                    image = "default.jpg";
-                }
-                p.setImage(image);
-                p.setCategory(rs.getString("category"));
-
-                list.add(p);
+                list.add(mapProduct(rs));
             }
 
         } catch (Exception e) {
@@ -38,8 +32,7 @@ public class ProductDAO {
         return list;
     }
 
-
-
+    // THÊM MÓN
     public boolean insert(Product p) {
 
         String sql =
@@ -65,6 +58,7 @@ public class ProductDAO {
         return false;
     }
 
+    // CẬP NHẬT
     public boolean update(Product p) {
 
         String sql =
@@ -91,12 +85,14 @@ public class ProductDAO {
         return false;
     }
 
+    // XOÁ
     public boolean delete(int id) {
+
+        String sql = "DELETE FROM products WHERE id=?";
 
         try (
                 Connection conn = DBConnection.getConnection();
-                PreparedStatement ps =
-                        conn.prepareStatement("DELETE FROM products WHERE id=?")
+                PreparedStatement ps = conn.prepareStatement(sql)
         ) {
 
             ps.setInt(1, id);
@@ -109,6 +105,8 @@ public class ProductDAO {
 
         return false;
     }
+
+    // TÌM THEO ID
     public Product findById(int id) {
 
         String sql = "SELECT * FROM products WHERE id=?";
@@ -119,21 +117,11 @@ public class ProductDAO {
         ) {
 
             ps.setInt(1, id);
+
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                Product p = new Product();
-                p.setId(rs.getInt("id"));
-                p.setName(rs.getString("name"));
-                p.setPrice(rs.getDouble("price"));
-                p.setDescription(rs.getString("description"));
-                String image = rs.getString("image");
-                if (image == null || image.isEmpty()) {
-                    image = "default.jpg";
-                }
-                p.setImage(image);
-                p.setCategory(rs.getString("category"));
-                return p;
+                return mapProduct(rs);
             }
 
         } catch (Exception e) {
@@ -142,6 +130,8 @@ public class ProductDAO {
 
         return null;
     }
+
+    // THEO DANH MỤC
     public List<Product> findByCategory(String category) {
 
         List<Product> list = new ArrayList<>();
@@ -158,19 +148,7 @@ public class ProductDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                Product p = new Product();
-                p.setId(rs.getInt("id"));
-                p.setName(rs.getString("name"));
-                p.setPrice(rs.getDouble("price"));
-                p.setDescription(rs.getString("description"));
-                String image = rs.getString("image");
-                if (image == null || image.isEmpty()) {
-                    image = "default.jpg";
-                }
-                p.setImage(image);
-                p.setCategory(rs.getString("category"));
-
-                list.add(p);
+                list.add(mapProduct(rs));
             }
 
         } catch (Exception e) {
@@ -179,6 +157,8 @@ public class ProductDAO {
 
         return list;
     }
+
+    // TÌM KIẾM
     public List<Product> search(String keyword) {
 
         List<Product> list = new ArrayList<>();
@@ -195,22 +175,7 @@ public class ProductDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                Product p = new Product();
-
-                p.setId(rs.getInt("id"));
-                p.setName(rs.getString("name"));
-                p.setPrice(rs.getDouble("price"));
-                p.setDescription(rs.getString("description"));
-
-                String image = rs.getString("image");
-                if (image == null || image.isEmpty()) {
-                    image = "default.jpg";
-                }
-                p.setImage(image);
-
-                p.setCategory(rs.getString("category"));
-
-                list.add(p);
+                list.add(mapProduct(rs));
             }
 
         } catch (Exception e) {
@@ -220,4 +185,48 @@ public class ProductDAO {
         return list;
     }
 
+    // TOP MÓN NỔI BẬT
+    public List<Product> getTop6() {
+
+        List<Product> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM products ORDER BY RAND() LIMIT 6";
+
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()
+        ) {
+
+            while (rs.next()) {
+                list.add(mapProduct(rs));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    // MAP OBJECT
+    private Product mapProduct(ResultSet rs) throws SQLException {
+
+        Product p = new Product();
+
+        p.setId(rs.getInt("id"));
+        p.setName(rs.getString("name"));
+        p.setPrice(rs.getDouble("price"));
+        p.setDescription(rs.getString("description"));
+
+        String image = rs.getString("image");
+        if (image == null || image.trim().isEmpty()) {
+            image = "default.jpg";
+        }
+
+        p.setImage(image);
+        p.setCategory(rs.getString("category"));
+
+        return p;
+    }
 }

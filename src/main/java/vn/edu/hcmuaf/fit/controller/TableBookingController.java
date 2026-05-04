@@ -15,32 +15,44 @@ import java.util.List;
 @Controller
 public class TableBookingController {
 
-    ReservationDAO reservationDAO = new ReservationDAO();
-    TableDAO tableDAO = new TableDAO();
+    private ReservationDAO reservationDAO = new ReservationDAO();
+    private TableDAO tableDAO = new TableDAO();
 
     // ==========================
-    // PAGE BOOK TABLE
+    // PAGE: FORM ĐẶT BÀN
+    // URL: /table-booking?tableId=1
     // ==========================
-    @GetMapping("/tables")
-    public String tables(Model model) {
+    @GetMapping("/table-booking")
+    public String bookingPage(
+            @RequestParam(required = false) Integer tableId,
+            Model model,
+            HttpSession session
+    ) {
+        User user = (User) session.getAttribute("user");
 
-        List<RestaurantTable> list = tableDAO.getAll();
+        if (user == null) {
+            return "redirect:/login";
+        }
 
-        model.addAttribute("list", list);
+        // nếu không có tableId → quay về danh sách bàn
+        if (tableId == null) {
+            return "redirect:/tables";
+        }
 
-        return "tables";
+        model.addAttribute("tableId", tableId);
+
+        return "table-booking"; // cần file table-booking.jsp
     }
 
     // ==========================
-    // BOOK NOW
+    // ACTION: ĐẶT BÀN
     // ==========================
     @PostMapping("/book-table")
     public String bookTable(
             @RequestParam int tableId,
             @RequestParam String reservationTime,
             @RequestParam int numberOfPeople,
-            HttpSession session,
-            Model model
+            HttpSession session
     ) {
 
         User user = (User) session.getAttribute("user");
@@ -49,15 +61,7 @@ public class TableBookingController {
             return "redirect:/login";
         }
 
-        Reservation r = new Reservation();
-
-        r.setUserId(user.getId());
-        r.setTableId(tableId);
-        r.setReservationTime(reservationTime);
-        r.setNumberOfPeople(numberOfPeople);
-
-
-        reservationDAO.insert(r);
+        // ===== CHECK BÀN =====
         RestaurantTable table = null;
 
         for (RestaurantTable t : tableDAO.getAll()) {
@@ -67,11 +71,46 @@ public class TableBookingController {
             }
         }
 
+        // ❌ bàn không tồn tại hoặc đã được đặt
         if (table == null || !"AVAILABLE".equals(table.getStatus())) {
             return "redirect:/tables?error=full";
         }
+
+        // ===== TẠO BOOKING =====
+        Reservation r = new Reservation();
+        r.setUserId(user.getId());
+        r.setTableId(tableId);
+        r.setReservationTime(reservationTime);
+        r.setNumberOfPeople(numberOfPeople);
+
+        // ✔ đúng: check xong mới insert
+        int reservationId = reservationDAO.insertAndGetId(r);
+
+// lưu session
+        session.setAttribute("currentReservation", reservationId);
+
+// update bàn
         tableDAO.updateStatus(tableId, "RESERVED");
 
-        return "redirect:/tables?success=1";
+// chuyển qua cart
+        return "redirect:/cart";
+    }
+
+    // ==========================
+    // PAGE: LỊCH SỬ ĐẶT BÀN
+    // ==========================
+    @GetMapping("/my-booking")
+    public String myBooking(HttpSession session, Model model){
+
+        User u = (User) session.getAttribute("user");
+
+        if(u == null){
+            return "redirect:/login";
+        }
+
+        model.addAttribute("list",
+                reservationDAO.getByUser(u.getId()));
+
+        return "my-booking";
     }
 }

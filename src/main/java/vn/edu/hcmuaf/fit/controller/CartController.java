@@ -1,8 +1,12 @@
+// FILE: src/main/java/vn/edu/hcmuaf/fit/controller/CartController.java
+// VIẾT LẠI FULL để chạy với cart.jsp mới
+
 package vn.edu.hcmuaf.fit.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 import vn.edu.hcmuaf.fit.dao.CartDAO;
 import vn.edu.hcmuaf.fit.model.User;
 
@@ -14,29 +18,136 @@ public class CartController {
 
     CartDAO dao = new CartDAO();
 
-    @GetMapping("/add/{id}")
-    public String add(@PathVariable int id, HttpSession session) {
+    // ==========================
+    // VIEW CART
+    // /cart
+    // ==========================
+    @GetMapping("")
+    public String cart(Model model, HttpSession session){
 
         User u = (User) session.getAttribute("user");
 
-        if (u == null) return "redirect:/login";
+        if(u == null){
+            return "redirect:/login";
+        }
 
-        dao.add(u.getId(), id);
+        Integer reservationId =
+                (Integer) session.getAttribute("currentReservation");
+
+        // 🔥 FIX: nếu mất session → lấy lại từ DB
+        if(reservationId == null){
+
+            reservationId = dao.getLatestReservationId(u.getId());
+
+            if(reservationId != null){
+                session.setAttribute("currentReservation", reservationId);
+            }
+        }
+
+        // vẫn null → chưa đặt bàn thật
+        if(reservationId == null){
+            model.addAttribute("error", "Bạn chưa đặt bàn!");
+            return "product/cart";
+        }
+
+        dao.clearOld();
+
+        model.addAttribute("list",
+                dao.getCart(u.getId(), reservationId));
+
+        model.addAttribute("reservationId", reservationId);
+
+        return "product/cart";
+    }
+
+    // ==========================
+    // ADD ITEM
+    // /cart/add/5
+    // ==========================
+    @GetMapping("/add/{id}")
+    public String add(@PathVariable int id, HttpSession session){
+
+        User u = (User) session.getAttribute("user");
+        Integer reservationId =
+                (Integer) session.getAttribute("currentReservation");
+
+        if(u == null){
+            return "redirect:/login";
+        }
+
+        if(reservationId == null){
+            System.out.println("❌ CHƯA CÓ RESERVATION");
+            return "redirect:/tables";
+        }
+
+        System.out.println("ADD CART WITH RESERVATION = " + reservationId);
+
+        dao.add(u.getId(), id, reservationId);
 
         return "redirect:/cart";
     }
 
-    @GetMapping("")
-    public String cart(Model model, HttpSession session) {
+    // ==========================
+    // INCREASE
+    // ==========================
+    @GetMapping("/increase/{id}")
+    public String increase(@PathVariable int id, HttpSession session){
 
         User u = (User) session.getAttribute("user");
+        Integer reservationId = (Integer) session.getAttribute("currentReservation");
 
-        if (u == null) return "redirect:/login";
+        if(u == null) return "redirect:/login";
 
-        dao.clearOld();
+        dao.increase(u.getId(), id, reservationId);
 
-        model.addAttribute("list", dao.getCart(u.getId()));
+        return "redirect:/cart";
+    }
 
-        return "product/cart"; // ✅ FIX Ở ĐÂY
+    // ==========================
+    // DECREASE
+    // ==========================
+    @GetMapping("/decrease/{id}")
+    public String decrease(@PathVariable int id, HttpSession session){
+
+        User u = (User) session.getAttribute("user");
+        Integer reservationId = (Integer) session.getAttribute("currentReservation");
+
+        if(u == null) return "redirect:/login";
+
+        dao.decrease(u.getId(), id, reservationId);
+
+        return "redirect:/cart";
+    }
+
+    // ==========================
+    // REMOVE ONE
+    // ==========================
+    @GetMapping("/remove/{id}")
+    public String remove(@PathVariable int id, HttpSession session){
+
+        User u = (User) session.getAttribute("user");
+        Integer reservationId = (Integer) session.getAttribute("currentReservation");
+
+        if(u == null) return "redirect:/login";
+
+        dao.remove(u.getId(), id, reservationId);
+
+        return "redirect:/cart";
+    }
+
+    // ==========================
+    // CLEAR ALL
+    // ==========================
+    @GetMapping("/clear")
+    public String clear(HttpSession session){
+
+        User u = (User) session.getAttribute("user");
+        Integer reservationId = (Integer) session.getAttribute("currentReservation");
+
+        if(u == null) return "redirect:/login";
+
+        dao.clear(u.getId(), reservationId);
+
+        return "redirect:/cart";
     }
 }

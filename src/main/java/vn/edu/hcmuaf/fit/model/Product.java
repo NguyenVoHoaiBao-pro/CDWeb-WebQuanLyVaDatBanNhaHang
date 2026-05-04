@@ -8,6 +8,9 @@ public class Product {
     private String image;
     private String category;
 
+    // 🔥 THÊM DÒNG NÀY
+    private int quantity;
+
     // getter setter
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -26,4 +29,13 @@ public class Product {
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    // 🔥 THÊM GET/SET
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
 }

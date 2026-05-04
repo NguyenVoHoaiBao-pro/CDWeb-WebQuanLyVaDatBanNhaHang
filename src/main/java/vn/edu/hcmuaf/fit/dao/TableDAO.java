@@ -1,84 +1,28 @@
-//package vn.edu.hcmuaf.fit.dao;
-//
-//import vn.edu.hcmuaf.fit.model.RestaurantTable;
-//
-//import java.sql.*;
-//import java.util.ArrayList;
-//import java.util.List;
-//
-//public class TableDAO {
-//
-//    public List<RestaurantTable> getAll() {
-//        List<RestaurantTable> list = new ArrayList<>();
-//        String sql = "SELECT * FROM restaurant_tables";
-//
-//        try (Connection conn = DBConnection.getConnection();
-//             Statement st = conn.createStatement();
-//             ResultSet rs = st.executeQuery(sql)) {
-//
-//            while (rs.next()) {
-//                RestaurantTable t = new RestaurantTable();
-//                t.setId(rs.getInt("id"));
-//                t.setName(rs.getString("name"));
-//                t.setFloor(rs.getInt("floor"));
-//                t.setStatus(rs.getString("status"));
-//                list.add(t);
-//            }
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        return list;
-//    }
-//
-//    public void insert(String name, int floor) {
-//        String sql = "INSERT INTO restaurant_tables(name, floor, status) VALUES (?, ?, 'AVAILABLE')";
-//
-//        try (Connection conn = DBConnection.getConnection();
-//             PreparedStatement ps = conn.prepareStatement(sql)) {
-//
-//            ps.setString(1, name);
-//            ps.setInt(2, floor);
-//            ps.executeUpdate();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    public void updateStatus(int id, String status) {
-//        String sql = "UPDATE restaurant_tables SET status=? WHERE id=?";
-//
-//        try (Connection conn = DBConnection.getConnection();
-//             PreparedStatement ps = conn.prepareStatement(sql)) {
-//
-//            ps.setString(1, status);
-//            ps.setInt(2, id);
-//            ps.executeUpdate();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//}
+// FILE: src/main/java/vn/edu/hcmuaf/fit/dao/TableDAO.java
+// FULL CHUẨN - GIỮ CODE CỦA BẠN + THÊM findById()
+
 package vn.edu.hcmuaf.fit.dao;
 
 import vn.edu.hcmuaf.fit.model.RestaurantTable;
+
 import java.sql.*;
 import java.util.*;
 
 public class TableDAO {
 
+    // ==========================
     // GET ALL TABLES
+    // ==========================
     public List<RestaurantTable> getAll() {
 
         List<RestaurantTable> list = new ArrayList<>();
 
+        String sql =
+                "SELECT * FROM restaurant_tables ORDER BY id";
+
         try (
                 Connection conn = DBConnection.getConnection();
-                PreparedStatement ps =
-                        conn.prepareStatement("SELECT * FROM restaurant_tables ORDER BY id");
+                PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()
         ) {
 
@@ -101,7 +45,45 @@ public class TableDAO {
         return list;
     }
 
+    // ==========================
+    // FIND BY ID
+    // ==========================
+    public RestaurantTable findById(int id) {
+
+        String sql =
+                "SELECT * FROM restaurant_tables WHERE id=?";
+
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, id);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                RestaurantTable t = new RestaurantTable();
+
+                t.setId(rs.getInt("id"));
+                t.setName(rs.getString("name"));
+                t.setCapacity(rs.getInt("capacity"));
+                t.setStatus(rs.getString("status"));
+
+                return t;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    // ==========================
     // ADD TABLE
+    // ==========================
     public boolean insert(String name, int capacity) {
 
         String sql =
@@ -125,15 +107,17 @@ public class TableDAO {
         return false;
     }
 
+    // ==========================
     // UPDATE STATUS
+    // ==========================
     public boolean updateStatus(int id, String status) {
+
+        String sql =
+                "UPDATE restaurant_tables SET status=? WHERE id=?";
 
         try (
                 Connection conn = DBConnection.getConnection();
-                PreparedStatement ps =
-                        conn.prepareStatement(
-                                "UPDATE restaurant_tables SET status=? WHERE id=?"
-                        )
+                PreparedStatement ps = conn.prepareStatement(sql)
         ) {
 
             ps.setString(1, status);
@@ -148,15 +132,17 @@ public class TableDAO {
         return false;
     }
 
+    // ==========================
     // DELETE TABLE
+    // ==========================
     public boolean delete(int id) {
+
+        String sql =
+                "DELETE FROM restaurant_tables WHERE id=?";
 
         try (
                 Connection conn = DBConnection.getConnection();
-                PreparedStatement ps =
-                        conn.prepareStatement(
-                                "DELETE FROM restaurant_tables WHERE id=?"
-                        )
+                PreparedStatement ps = conn.prepareStatement(sql)
         ) {
 
             ps.setInt(1, id);

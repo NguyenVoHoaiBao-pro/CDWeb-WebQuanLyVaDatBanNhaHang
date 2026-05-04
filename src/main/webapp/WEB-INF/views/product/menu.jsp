@@ -1,85 +1,204 @@
+<!-- FILE: WEB-INF/views/product/menu.jsp -->
+<!-- FIX FULL theo controller hiện tại của bạn -->
+
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.*,vn.edu.hcmuaf.fit.model.Product" %>
 
 <jsp:include page="../layout/header.jsp"/>
 
 <%
-    List<Product> list = (List<Product>) request.getAttribute("list");
-    if(list == null) list = new ArrayList<>();
+    List<Product> list =
+            (List<Product>) request.getAttribute("list");
+
+    if(list == null){
+        list = new ArrayList<Product>();
+    }
 %>
 
 <style>
+    body{
+        background:#f8f9fa;
+    }
+
     .hero{
-        height:300px;
-        background:linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.6)),
-        url('https://images.unsplash.com/photo-1504674900247-0877df9cc836') center/cover;
+        height:320px;
+        background:
+                linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),
+                url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4')
+                center/cover;
         display:flex;
-        align-items:center;
         justify-content:center;
-        color:white;
+        align-items:center;
+        color:#fff;
+        text-align:center;
     }
-    .card-food{
+
+    .hero h1{
+        font-size:48px;
+        font-weight:800;
+    }
+
+    .food-card{
         border:none;
-        border-radius:20px;
+        border-radius:18px;
         overflow:hidden;
-        box-shadow:0 10px 25px rgba(0,0,0,.1);
+        box-shadow:0 10px 30px rgba(0,0,0,.08);
         transition:.3s;
+        height:100%;
     }
-    .card-food:hover{
-        transform:translateY(-10px);
+
+    .food-card:hover{
+        transform:translateY(-8px);
     }
-    .card-food img{
-        height:200px;
+
+    .food-card img{
+        height:220px;
         object-fit:cover;
+    }
+
+    .price{
+        font-size:20px;
+        font-weight:700;
+        color:#dc3545;
+    }
+
+    .desc{
+        height:72px;
+        overflow:hidden;
+        color:#777;
+    }
+
+    .filter-box{
+        background:#fff;
+        padding:22px;
+        border-radius:20px;
+        box-shadow:0 10px 25px rgba(0,0,0,.06);
+        margin-top:-40px;
+        position:relative;
+        z-index:2;
     }
 </style>
 
+<!-- HERO -->
 <section class="hero">
-    <h1 class="fw-bold">🍽 THỰC ĐƠN NHÀ HÀNG</h1>
+    <div>
+        <h1>🍽 THỰC ĐƠN NHÀ HÀNG</h1>
+        <p>Chọn món ngon cho bữa ăn tuyệt vời của bạn</p>
+    </div>
 </section>
 
 <div class="container py-5">
+
+    <!-- SEARCH / FILTER -->
+    <div class="filter-box mb-5">
+
+        <form action="<%=request.getContextPath()%>/menu" method="get">
+
+            <div class="row g-3">
+
+                <div class="col-md-5">
+                    <input type="text"
+                           name="keyword"
+                           class="form-control"
+                           placeholder="Tìm món ăn...">
+                </div>
+
+                <div class="col-md-4">
+                    <select name="category" class="form-select">
+
+                        <option value="">Tất cả danh mục</option>
+                        <option value="MÓN KHAI VỊ">Món khai vị</option>
+                        <option value="MÓN CHÍNH">Món chính</option>
+                        <option value="MÓN NƯỚC">Món nước</option>
+                        <option value="MÓN ĂN NHẸ">Món ăn nhẹ</option>
+                        <option value="MÓN TRÁNG MIÊNG & ĐỒ UỐNG">Tráng miệng</option>
+
+                    </select>
+                </div>
+
+                <div class="col-md-3 d-grid">
+                    <button class="btn btn-dark">
+                        Tìm kiếm
+                    </button>
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- TOP BAR -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2 class="fw-bold">Danh sách món ăn</h2>
+
+        <a href="<%=request.getContextPath()%>/cart"
+           class="btn btn-danger">
+            🛒 Giỏ hàng
+        </a>
+
+    </div>
+
+    <!-- PRODUCT LIST -->
     <div class="row g-4">
 
-        <%
-            for(Product p : list){
-        %>
+        <% if(list.isEmpty()){ %>
+
+        <div class="col-12 text-center py-5">
+            <h4>Không có món ăn phù hợp</h4>
+        </div>
+
+        <% } %>
+
+        <% for(Product p : list){ %>
 
         <div class="col-lg-4 col-md-6">
-            <div class="card card-food">
 
-                <img src="<%= p.getImage().startsWith("http") ? p.getImage() : request.getContextPath() + p.getImage() %>"
+            <div class="card food-card">
+
+                <img src="<%=p.getImage()%>"
                      onerror="this.src='<%=request.getContextPath()%>/images/default.jpg'">
 
-                <div class="p-3">
+                <div class="card-body d-flex flex-column">
 
                     <h5 class="fw-bold"><%=p.getName()%></h5>
 
-                    <p class="text-muted"><%=p.getDescription()%></p>
+                    <p class="desc"><%=p.getDescription()%></p>
 
-                    <div class="d-flex justify-content-between">
+                    <div class="mt-auto">
 
-                        <span class="text-danger fw-bold">
-                            <%=p.getPrice()%> đ
-                        </span>
+                        <div class="price mb-3">
+                            <%=String.format("%,.0f",p.getPrice())%> đ
+                        </div>
 
-                        <a href="<%=request.getContextPath()%>/product/<%=p.getId()%>"
-                           class="btn btn-dark btn-sm">
-                            Xem
-                        </a>
+                        <div class="d-grid gap-2">
+
+                            <a href="<%=request.getContextPath()%>/product/<%=p.getId()%>"
+                               class="btn btn-dark">
+                                Xem chi tiết
+                            </a>
+
+                            <!-- FIX ĐÚNG ROUTE -->
+                            <a href="<%=request.getContextPath()%>/cart/add/<%=p.getId()%>"
+                               class="btn btn-danger">
+                                🛒 Thêm vào giỏ
+                            </a>
+
+                        </div>
 
                     </div>
 
                 </div>
 
             </div>
+
         </div>
 
-        <%
-            }
-        %>
+        <% } %>
 
     </div>
+
 </div>
 
 <jsp:include page="../layout/footer.jsp"/>
