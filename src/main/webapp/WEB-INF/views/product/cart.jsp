@@ -17,40 +17,6 @@
     double total = 0;
 %>
 
-<style>
-    body{
-        background:#f8f9fa;
-    }
-
-    .cart-box{
-        background:#fff;
-        border-radius:20px;
-        padding:30px;
-        box-shadow:0 10px 30px rgba(0,0,0,.08);
-    }
-
-    .cart-img{
-        width:90px;
-        height:70px;
-        object-fit:cover;
-        border-radius:10px;
-    }
-
-    .total-box{
-        background:#111;
-        color:#fff;
-        padding:25px;
-        border-radius:20px;
-    }
-
-    .qty-btn{
-        width:34px;
-        height:34px;
-        border:none;
-        border-radius:8px;
-    }
-</style>
-
 <div class="container py-5">
 
     <h2 class="fw-bold mb-3">🛒 Giỏ hàng của bạn</h2>

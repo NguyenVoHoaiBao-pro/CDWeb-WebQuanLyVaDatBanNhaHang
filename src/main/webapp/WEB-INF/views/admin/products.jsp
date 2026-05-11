@@ -8,36 +8,6 @@
     if(list == null) list = new ArrayList<Product>();
 %>
 
-<jsp:include page="../layout/admin-header.jsp"/>
-
-<style>
-    .page-box{
-        background:#fff;
-        border-radius:20px;
-        padding:30px;
-        box-shadow:0 10px 30px rgba(0,0,0,.08);
-    }
-    .table img{
-        width:80px;
-        height:60px;
-        object-fit:cover;
-        border-radius:12px;
-    }
-    .table tbody tr{
-        transition:.2s;
-    }
-    .table tbody tr:hover{
-        background:#f8f9fa;
-        transform:scale(1.01);
-    }
-    .badge-price{
-        background:#e8fff0;
-        color:#198754;
-        padding:8px 12px;
-        border-radius:20px;
-        font-weight:700;
-    }
-</style>
 
 <div class="container py-5">
 
@@ -63,7 +33,7 @@
 
             <table class="table table-bordered align-middle text-center">
 
-                <thead class="table-dark">
+                <thead>
                 <tr>
                     <th>ID</th>
                     <th>Ảnh</th>
@@ -143,5 +113,3 @@
     </div>
 
 </div>
-
-<jsp:include page="../layout/admin-footer.jsp"/>

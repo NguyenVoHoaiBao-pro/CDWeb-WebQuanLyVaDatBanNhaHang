@@ -10,49 +10,9 @@
     <title>${product.name}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+          href="${pageContext.request.contextPath}/css/style.css">
 
-    <style>
-        body{
-            background:#f8f9fa;
-        }
-        .detail-box{
-            background:#fff;
-            border-radius:24px;
-            overflow:hidden;
-            box-shadow:0 12px 35px rgba(0,0,0,.08);
-        }
-        .product-img{
-            width:100%;
-            height:460px;
-            object-fit:cover;
-        }
-        .price{
-            font-size:34px;
-            font-weight:800;
-            color:#dc3545;
-        }
-        .tag{
-            background:#f1f3f5;
-            display:inline-block;
-            padding:8px 14px;
-            border-radius:20px;
-            font-size:14px;
-        }
-        .card-hover{
-            border:none;
-            border-radius:18px;
-            overflow:hidden;
-            transition:.3s;
-            box-shadow:0 8px 20px rgba(0,0,0,.08);
-        }
-        .card-hover:hover{
-            transform:translateY(-8px);
-        }
-        .card-hover img{
-            height:180px;
-            object-fit:cover;
-        }
-    </style>
 </head>
 
 <body>
@@ -145,13 +105,13 @@
             <!-- GỢI Ý -->
             <h3 class="fw-bold mt-5 mb-4">🔥 Món gợi ý</h3>
 
-            <div class="row g-4">
+            <div class="suggest-grid">
 
                 <c:forEach var="p" items="${suggest}">
 
                     <c:if test="${p.id != product.id}">
 
-                        <div class="col-lg-3 col-md-6">
+                        <div>
 
                             <div class="card card-hover">
 
@@ -169,7 +129,7 @@
 
                                 </c:choose>
 
-                                <div class="card-body">
+                                <div class="card-body d-flex flex-column">
 
                                     <h6 class="fw-bold">${p.name}</h6>
 

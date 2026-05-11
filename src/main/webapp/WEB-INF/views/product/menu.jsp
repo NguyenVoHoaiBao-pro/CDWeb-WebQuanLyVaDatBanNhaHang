@@ -15,70 +15,6 @@
     }
 %>
 
-<style>
-    body{
-        background:#f8f9fa;
-    }
-
-    .hero{
-        height:320px;
-        background:
-                linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),
-                url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4')
-                center/cover;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        color:#fff;
-        text-align:center;
-    }
-
-    .hero h1{
-        font-size:48px;
-        font-weight:800;
-    }
-
-    .food-card{
-        border:none;
-        border-radius:18px;
-        overflow:hidden;
-        box-shadow:0 10px 30px rgba(0,0,0,.08);
-        transition:.3s;
-        height:100%;
-    }
-
-    .food-card:hover{
-        transform:translateY(-8px);
-    }
-
-    .food-card img{
-        height:220px;
-        object-fit:cover;
-    }
-
-    .price{
-        font-size:20px;
-        font-weight:700;
-        color:#dc3545;
-    }
-
-    .desc{
-        height:72px;
-        overflow:hidden;
-        color:#777;
-    }
-
-    .filter-box{
-        background:#fff;
-        padding:22px;
-        border-radius:20px;
-        box-shadow:0 10px 25px rgba(0,0,0,.06);
-        margin-top:-40px;
-        position:relative;
-        z-index:2;
-    }
-</style>
-
 <!-- HERO -->
 <section class="hero">
     <div>
@@ -153,9 +89,9 @@
 
         <% for(Product p : list){ %>
 
-        <div class="col-lg-4 col-md-6">
-
-            <div class="card food-card">
+<%--        <div class="col-lg-4 col-md-6">--%>
+        <div class="col-custom-5 col-md-6 col-sm-12">
+            <div class="food-card">
 
                 <img src="<%=p.getImage()%>"
                      onerror="this.src='<%=request.getContextPath()%>/images/default.jpg'">

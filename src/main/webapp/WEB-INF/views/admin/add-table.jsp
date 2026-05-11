@@ -3,8 +3,6 @@
 <h2 class="mb-4 fw-bold">➕ Add New Table</h2>
 
 <div class="card-box" style="max-width:500px;">
-
-    ```
     <form action="${pageContext.request.contextPath}/admin/add-table"
           method="post">
 
@@ -40,6 +38,4 @@
         </div>
 
     </form>
-    ```
-
 </div>

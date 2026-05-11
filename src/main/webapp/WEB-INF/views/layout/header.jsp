@@ -14,26 +14,13 @@
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-        body{
-            padding-top:70px;
-            background:#f8f9fa;
-        }
-        .navbar-brand{font-weight:bold;}
-        .btn-nav{border-radius:20px;}
-        .user-badge{
-            background:#ffc107;
-            padding:5px 12px;
-            border-radius:20px;
-            font-weight:bold;
-        }
-    </style>
+    <link rel="stylesheet"
+          href="<%=ctx%>/css/style.css">
 </head>
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow">
+<nav class="navbar navbar-expand-lg navbar-dark luxury-nav fixed-top">
     <div class="container">
 
         <a class="navbar-brand" href="<%=ctx%>/">🍽 LUXURY FOOD</a>

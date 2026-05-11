@@ -23,30 +23,6 @@
     }
 %>
 
-<style>
-    body{
-        background:#f8f9fa;
-    }
-
-    .box{
-        background:#fff;
-        padding:30px;
-        border-radius:20px;
-        box-shadow:0 10px 30px rgba(0,0,0,.08);
-    }
-
-    .order-item{
-        border-bottom:1px solid #eee;
-        padding:12px 0;
-    }
-
-    .total{
-        font-size:26px;
-        font-weight:800;
-        color:#dc3545;
-    }
-</style>
-
 <div class="container py-5">
 
     <h2 class="fw-bold mb-4">📅 Đặt bàn & Thanh toán</h2>
