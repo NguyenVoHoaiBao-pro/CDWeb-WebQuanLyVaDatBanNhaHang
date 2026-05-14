@@ -7,6 +7,8 @@ public class Product {
     private String description;
     private String image;
     private String category;
+    private String aiKeywords;
+    private String aiDescription;
 
     // 🔥 THÊM DÒNG NÀY
     private int quantity;
@@ -37,5 +39,20 @@ public class Product {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+    public String getAiKeywords() {
+        return aiKeywords;
+    }
+
+    public void setAiKeywords(String aiKeywords) {
+        this.aiKeywords = aiKeywords;
+    }
+
+    public String getAiDescription() {
+        return aiDescription;
+    }
+
+    public void setAiDescription(String aiDescription) {
+        this.aiDescription = aiDescription;
     }
 }

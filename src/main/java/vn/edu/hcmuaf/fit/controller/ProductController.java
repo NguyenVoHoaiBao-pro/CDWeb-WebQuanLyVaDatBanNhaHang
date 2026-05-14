@@ -97,4 +97,5 @@ public class ProductController {
 
         return "product/detail";
     }
+
 }

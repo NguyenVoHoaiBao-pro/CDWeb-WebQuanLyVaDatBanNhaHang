@@ -36,7 +36,10 @@ public class ProductDAO {
     public boolean insert(Product p) {
 
         String sql =
-                "INSERT INTO products(name,price,description,image,category) VALUES(?,?,?,?,?)";
+                "INSERT INTO products(" +
+                        "name,price,description,image,category," +
+                        "ai_keywords,ai_description" +
+                        ") VALUES(?,?,?,?,?,?,?)";
 
         try (
                 Connection conn = DBConnection.getConnection();
@@ -48,6 +51,9 @@ public class ProductDAO {
             ps.setString(3, p.getDescription());
             ps.setString(4, p.getImage());
             ps.setString(5, p.getCategory());
+
+            ps.setString(6, p.getAiKeywords());
+            ps.setString(7, p.getAiDescription());
 
             return ps.executeUpdate() > 0;
 
@@ -62,7 +68,10 @@ public class ProductDAO {
     public boolean update(Product p) {
 
         String sql =
-                "UPDATE products SET name=?,price=?,description=?,image=?,category=? WHERE id=?";
+                "UPDATE products SET " +
+                        "name=?,price=?,description=?,image=?,category=?," +
+                        "ai_keywords=?,ai_description=? " +
+                        "WHERE id=?";
 
         try (
                 Connection conn = DBConnection.getConnection();
@@ -74,7 +83,11 @@ public class ProductDAO {
             ps.setString(3, p.getDescription());
             ps.setString(4, p.getImage());
             ps.setString(5, p.getCategory());
-            ps.setInt(6, p.getId());
+
+            ps.setString(6, p.getAiKeywords());
+            ps.setString(7, p.getAiDescription());
+
+            ps.setInt(8, p.getId());
 
             return ps.executeUpdate() > 0;
 
@@ -117,6 +130,7 @@ public class ProductDAO {
         ) {
 
             ps.setInt(1, id);
+
 
             ResultSet rs = ps.executeQuery();
 
@@ -216,6 +230,13 @@ public class ProductDAO {
 
         p.setId(rs.getInt("id"));
         p.setName(rs.getString("name"));
+        p.setAiKeywords(
+                rs.getString("ai_keywords")
+        );
+
+        p.setAiDescription(
+                rs.getString("ai_description")
+        );
         p.setPrice(rs.getDouble("price"));
         p.setDescription(rs.getString("description"));
 

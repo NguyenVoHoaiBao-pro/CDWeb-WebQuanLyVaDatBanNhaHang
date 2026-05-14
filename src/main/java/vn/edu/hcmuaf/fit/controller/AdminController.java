@@ -62,23 +62,35 @@ public class AdminController {
             @RequestParam String description,
             @RequestParam String image,
             @RequestParam String category,
+
+            @RequestParam(required = false) String aiKeywords,
+            @RequestParam(required = false) String aiDescription,
+
             Model model,
             HttpSession session
     ) {
 
-        if (!AuthUtil.isAdmin(session)) return "redirect:/login";
+        if (!AuthUtil.isAdmin(session))
+            return "redirect:/login";
 
         if (name == null || name.trim().isEmpty() || price <= 0) {
+
             model.addAttribute("page", "add-product.jsp");
+
             return "admin/layout";
         }
 
         Product p = new Product();
+
         p.setName(name);
         p.setPrice(price);
         p.setDescription(description);
         p.setImage(image);
         p.setCategory(category);
+
+        // AI
+        p.setAiKeywords(aiKeywords);
+        p.setAiDescription(aiDescription);
 
         productDAO.insert(p);
 
@@ -95,6 +107,61 @@ public class AdminController {
         if (p != null) {
             productDAO.delete(id);
         }
+
+        return "redirect:/admin/products";
+    }
+    @GetMapping("/edit-product/{id}")
+    public String editProduct(
+            @PathVariable int id,
+            Model model,
+            HttpSession session
+    ) {
+
+        if (!AuthUtil.isAdmin(session))
+            return "redirect:/login";
+
+        Product p = productDAO.findById(id);
+
+        model.addAttribute("product", p);
+
+        model.addAttribute("page", "edit-product.jsp");
+
+        return "admin/layout";
+    }
+    @PostMapping("/update-product")
+    public String updateProduct(
+
+            @RequestParam int id,
+            @RequestParam String name,
+            @RequestParam double price,
+            @RequestParam String description,
+            @RequestParam String image,
+            @RequestParam String category,
+
+            @RequestParam(required = false) String aiKeywords,
+            @RequestParam(required = false) String aiDescription,
+
+            HttpSession session
+    ) {
+
+        if (!AuthUtil.isAdmin(session))
+            return "redirect:/login";
+
+        Product p = new Product();
+
+        p.setId(id);
+
+        p.setName(name);
+        p.setPrice(price);
+        p.setDescription(description);
+        p.setImage(image);
+        p.setCategory(category);
+
+        // AI
+        p.setAiKeywords(aiKeywords);
+        p.setAiDescription(aiDescription);
+
+        productDAO.update(p);
 
         return "redirect:/admin/products";
     }
