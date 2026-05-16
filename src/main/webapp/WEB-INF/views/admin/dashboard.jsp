@@ -13,14 +13,14 @@
         border-radius: 16px;
         padding: 20px;
         background: white;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
         transition: 0.3s;
         height: 100%;
     }
 
     .card-stat:hover {
         transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
     }
 
     .stat-icon {
@@ -54,8 +54,9 @@
     <div class="col-6 col-md-3">
         <div class="card-stat text-center">
             <div class="stat-icon text-primary">👤</div>
-            <div>Users</div>
-            <div class="stat-number text-primary"><%=totalUsers%></div>
+            <div>Người dùng</div>
+            <div class="stat-number text-primary"><%=totalUsers%>
+            </div>
         </div>
     </div>
 
@@ -63,8 +64,9 @@
     <div class="col-6 col-md-3">
         <div class="card-stat text-center">
             <div class="stat-icon text-success">🍽</div>
-            <div>Products</div>
-            <div class="stat-number text-success"><%=totalProducts%></div>
+            <div>Sản phẩm</div>
+            <div class="stat-number text-success"><%=totalProducts%>
+            </div>
         </div>
     </div>
 
@@ -72,8 +74,9 @@
     <div class="col-6 col-md-3">
         <div class="card-stat text-center">
             <div class="stat-icon text-warning">🪑</div>
-            <div>Tables</div>
-            <div class="stat-number text-warning"><%=totalTables%></div>
+            <div>Bàn</div>
+            <div class="stat-number text-warning"><%=totalTables%>
+            </div>
         </div>
     </div>
 
@@ -81,8 +84,9 @@
     <div class="col-6 col-md-3">
         <div class="card-stat text-center">
             <div class="stat-icon text-danger">📅</div>
-            <div>Reservations</div>
-            <div class="stat-number text-danger"><%=totalReservations%></div>
+            <div>Bàn đã đặt</div>
+            <div class="stat-number text-danger"><%=totalReservations%>
+            </div>
         </div>
     </div>
 
@@ -90,35 +94,34 @@
 
 <hr class="my-4">
 
-<h4 class="fw-bold mb-3">⚡ Quick Actions</h4>
+<h4 class="fw-bold mb-3">⚡ Phím tắt</h4>
 
 <div class="row g-3">
 
     <div class="col-6 col-md-3">
-        <a href="${pageContext.request.contextPath}/admin/products"
-           class="btn btn-primary w-100 quick-btn">
-            🍽 Products
+        <a href="${pageContext.request.contextPath}/admin/users"
+           class="btn btn-success w-100 quick-btn">
+            👤 Quản lý người dùng
         </a>
     </div>
 
     <div class="col-6 col-md-3">
-        <a href="${pageContext.request.contextPath}/admin/users"
-           class="btn btn-success w-100 quick-btn">
-            👤 Users
+        <a href="${pageContext.request.contextPath}/admin/products"
+           class="btn btn-primary w-100 quick-btn">
+            🍽 Quản lý sản phẩm
         </a>
     </div>
-
     <div class="col-6 col-md-3">
         <a href="${pageContext.request.contextPath}/admin/tables"
            class="btn btn-warning w-100 quick-btn">
-            🪑 Tables
+            🪑 Quản lý bàn đã đặt
         </a>
     </div>
 
     <div class="col-6 col-md-3">
         <a href="${pageContext.request.contextPath}/admin/reservations"
            class="btn btn-danger w-100 quick-btn">
-            📅 Reservations
+            📅 Quản lý đặt bàn
         </a>
     </div>
 

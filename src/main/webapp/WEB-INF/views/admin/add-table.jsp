@@ -1,13 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 
-<h2 class="mb-4 fw-bold">➕ Add New Table</h2>
+<h2 class="mb-4 fw-bold">➕ Thêm bàn mới</h2>
 
 <div class="card-box" style="max-width:500px;">
     <form action="${pageContext.request.contextPath}/admin/add-table"
           method="post">
 
         <div class="mb-3">
-            <label class="form-label">Table Name</label>
+            <label class="form-label">Tên bàn</label>
             <input type="text"
                    name="name"
                    class="form-control"
@@ -16,7 +16,7 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Capacity</label>
+            <label class="form-label">Sức chứa</label>
             <input type="number"
                    name="capacity"
                    class="form-control"
@@ -27,12 +27,12 @@
         <div class="d-flex gap-2">
 
             <button class="btn btn-success">
-                Save
+                Lưu
             </button>
 
             <a href="${pageContext.request.contextPath}/admin/tables"
                class="btn btn-secondary">
-                Back
+               Quay lại
             </a>
 
         </div>

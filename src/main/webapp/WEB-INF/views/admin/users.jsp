@@ -1,74 +1,87 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="java.util.*,vn.edu.hcmuaf.fit.model.User" %>
+    <%@ page import="java.util.*,vn.edu.hcmuaf.fit.model.User" %>
 
-<%
-    List<User> list = (List<User>) request.getAttribute("list");
-%>
+        <% List<User> list = (List<User>) request.getAttribute("list");
+                %>
 
-<h2 class="mb-4 fw-bold">👤 Manage Users</h2>
+                <h2 class="mb-4 fw-bold">👤 Quản lý người dùng</h2>
 
-<div class="card-box">
+                <div class="card-box">
 
-    <table class="table table-bordered table-hover text-center align-middle">
+                    <table id="userTable" class="table table-bordered table-hover text-center align-middle">
 
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Username</th>
-            <th>Full Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th width="220">Action</th>
-        </tr>
-        </thead>
 
-        <tbody>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Họ tên</th>
+                                <th>Email</th>
+                                <th>Quyền</th>
+                                <th width="220">Action</th>
+                            </tr>
+                        </thead>
 
-        <%
-            if(list != null){
-                for(User u : list){
-        %>
+                        <tbody>
 
-        <tr>
+                            <% if(list !=null){ for(User u : list){ %>
 
-            <td><%=u.getId()%></td>
+                                <tr>
 
-            <td><%=u.getUsername()%></td>
+                                    <td>
+                                        <%=u.getId()%>
+                                    </td>
 
-            <td><%=u.getFullName()%></td>
+                                    <td>
+                                        <%=u.getUsername()%>
+                                    </td>
 
-            <td><%=u.getEmail()%></td>
+                                    <td>
+                                        <%=u.getFullName()%>
+                                    </td>
 
-            <td>
-            <span class="badge bg-primary">
-                <%=u.getRole()%>
-            </span>
-            </td>
+                                    <td>
+                                        <%=u.getEmail()%>
+                                    </td>
 
-            <td>
+                                    <td>
+                                        <span class="badge bg-primary">
+                                            <%=u.getRole()%>
+                                        </span>
+                                    </td>
 
-                <a href="${pageContext.request.contextPath}/admin/change-role/<%=u.getId()%>"
-                   class="btn btn-warning btn-sm">
-                    Change Role
-                </a>
+                                    <td>
 
-                <a href="${pageContext.request.contextPath}/admin/delete-user/<%=u.getId()%>"
-                   class="btn btn-danger btn-sm"
-                   onclick="return confirm('Delete this user?')">
-                    Delete
-                </a>
+                                        <a href="${pageContext.request.contextPath}/admin/change-role/<%=u.getId()%>"
+                                            class="btn btn-warning btn-sm">
+                                            Đổi quyền
+                                        </a>
 
-            </td>
+                                        <a href="${pageContext.request.contextPath}/admin/delete-user/<%=u.getId()%>"
+                                            class="btn btn-danger btn-sm" onclick="return confirm('Xóa user này?')">
+                                            Xóa user
+                                        </a>
 
-        </tr>
+                                    </td>
 
-        <%
-                }
-            }
-        %>
+                                </tr>
 
-        </tbody>
+                                <% } } %>
 
-    </table>
+                        </tbody>
 
-</div>
+                    </table>
+
+                </div>
+
+                <script>
+                    $(document).ready(function () {
+                        $('#userTable').DataTable({
+                            "language": {
+                                "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json"
+                            },
+                            "pageLength": 10,
+                            "order": [[0, "asc"]]
+                        });
+                    });
+                </script>

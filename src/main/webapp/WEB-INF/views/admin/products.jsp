@@ -31,7 +31,8 @@
 
         <div class="table-responsive">
 
-            <table class="table table-bordered align-middle text-center">
+            <table id="productTable" class="table table-bordered align-middle text-center">
+
 
                 <thead>
                 <tr>
@@ -113,3 +114,16 @@
     </div>
 
 </div>
+
+<script>
+    $(document).ready(function() {
+        $('#productTable').DataTable({
+            "language": {
+                "url": "https://cdn.datatables.net/plug-ins/1.13.6/i18n/vi.json"
+            },
+            "pageLength": 10,
+            "order": [[0, "asc"]]
+        });
+    });
+</script>
+
