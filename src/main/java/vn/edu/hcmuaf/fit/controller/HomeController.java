@@ -12,7 +12,7 @@ import java.util.List;
 @Controller
 public class HomeController {
 
-    ProductDAO dao = new ProductDAO();
+    private final ProductDAO dao = new ProductDAO();
 
     @GetMapping("/")
     public String home(Model model) {
