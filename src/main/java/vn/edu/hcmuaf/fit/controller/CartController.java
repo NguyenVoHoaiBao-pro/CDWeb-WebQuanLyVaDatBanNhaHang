@@ -82,6 +82,16 @@ public class CartController {
 
         System.out.println("ADD CART WITH RESERVATION = " + reservationId);
 
+        boolean valid =
+                dao.isReservationValid(reservationId);
+
+        if(!valid){
+
+            session.removeAttribute("currentReservation");
+
+            return "redirect:/tables";
+        }
+
         dao.add(u.getId(), id, reservationId);
 
         return "redirect:/cart";
@@ -94,9 +104,15 @@ public class CartController {
     public String increase(@PathVariable int id, HttpSession session){
 
         User u = (User) session.getAttribute("user");
-        Integer reservationId = (Integer) session.getAttribute("currentReservation");
+        Integer reservationId =
+                (Integer) session.getAttribute("currentReservation");
 
         if(u == null) return "redirect:/login";
+
+        if(!dao.isReservationValid(reservationId)){
+            session.removeAttribute("currentReservation");
+            return "redirect:/tables";
+        }
 
         dao.increase(u.getId(), id, reservationId);
 
@@ -113,6 +129,10 @@ public class CartController {
         Integer reservationId = (Integer) session.getAttribute("currentReservation");
 
         if(u == null) return "redirect:/login";
+        if(!dao.isReservationValid(reservationId)){
+            session.removeAttribute("currentReservation");
+            return "redirect:/tables";
+        }
 
         dao.decrease(u.getId(), id, reservationId);
 
@@ -129,6 +149,10 @@ public class CartController {
         Integer reservationId = (Integer) session.getAttribute("currentReservation");
 
         if(u == null) return "redirect:/login";
+        if(!dao.isReservationValid(reservationId)){
+            session.removeAttribute("currentReservation");
+            return "redirect:/tables";
+        }
 
         dao.remove(u.getId(), id, reservationId);
 
@@ -145,6 +169,10 @@ public class CartController {
         Integer reservationId = (Integer) session.getAttribute("currentReservation");
 
         if(u == null) return "redirect:/login";
+        if(!dao.isReservationValid(reservationId)){
+            session.removeAttribute("currentReservation");
+            return "redirect:/tables";
+        }
 
         dao.clear(u.getId(), reservationId);
 

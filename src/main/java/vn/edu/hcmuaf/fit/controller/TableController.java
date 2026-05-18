@@ -73,25 +73,25 @@ public class TableController {
     // ==============================
     // ADMIN: ĐỔI TRẠNG THÁI
     // ==============================
-    @GetMapping("/admin/tables/status/{id}")
-    public String status(
-            @PathVariable int id,
-            @RequestParam String value,
-            HttpSession session
-    ) {
-
-        if (!AuthUtil.isAdmin(session)) {
-            return "redirect:/login";
-        }
-
-        if (!value.equals("AVAILABLE") && !value.equals("RESERVED")) {
-            return "redirect:/admin/tables";
-        }
-
-        dao.updateStatus(id, value);
-
-        return "redirect:/admin/tables";
-    }
+//    @GetMapping("/admin/tables/status/{id}")
+//    public String status(
+//            @PathVariable int id,
+//            @RequestParam String value,
+//            HttpSession session
+//    ) {
+//
+//        if (!AuthUtil.isAdmin(session)) {
+//            return "redirect:/login";
+//        }
+//
+//        if (!value.equals("AVAILABLE") && !value.equals("RESERVED")) {
+//            return "redirect:/admin/tables";
+//        }
+//
+//        dao.updateStatus(id, value);
+//
+//        return "redirect:/admin/tables";
+//    }
 
     // ==============================
     // ADMIN: XÓA BÀN

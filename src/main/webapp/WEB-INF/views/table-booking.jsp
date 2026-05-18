@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c"
+           uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%
   String ctx = request.getContextPath();
@@ -48,6 +50,11 @@
           <h2 class="title">📅 Đặt bàn</h2>
           <p class="text-muted">Hoàn tất thông tin để giữ chỗ</p>
         </div>
+        <c:if test="${error != null}">
+          <div class="alert alert-danger text-center">
+              ${error}
+          </div>
+        </c:if>
 
         <% if(tableId == null){ %>
 

@@ -10,6 +10,9 @@ public class CartDAO {
 
     // THÊM GIỎ HÀNG (nếu tồn tại thì +1)
     public void add(int userId, int productId, int reservationId) {
+        if (!isReservationValid(reservationId)) {
+            return;
+        }
 
         String checkSql = "SELECT quantity FROM cart WHERE user_id=? AND product_id=? AND reservation_id=?";
         String insertSql = "INSERT INTO cart(user_id, product_id, quantity, reservation_id) VALUES(?,?,1,?)";
@@ -103,19 +106,82 @@ public class CartDAO {
     }
 
     // GIẢM SỐ LƯỢNG
-    public void decrease(int userId, int productId, int reservationId) {
+//    public void decrease(int userId, int productId, int reservationId) {
+//
+//        String sql = "UPDATE cart SET quantity = quantity - 1 WHERE user_id=? AND product_id=? AND reservation_id=? AND quantity > 1";
+//
+//        try (Connection conn = DBConnection.getConnection();
+//             PreparedStatement ps = conn.prepareStatement(sql)) {
+//
+//            ps.setInt(1, userId);
+//            ps.setInt(2, productId);
+//            ps.setInt(3, reservationId);
+//            ps.executeUpdate();
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+    public void decrease(
+            int userId,
+            int productId,
+            int reservationId
+    ){
 
-        String sql = "UPDATE cart SET quantity = quantity - 1 WHERE user_id=? AND product_id=? AND reservation_id=? AND quantity > 1";
+        try(
+                Connection conn =
+                        DBConnection.getConnection()
+        ){
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+            String checkSql =
+                    "SELECT quantity FROM cart " +
+                            "WHERE user_id=? " +
+                            "AND product_id=? " +
+                            "AND reservation_id=?";
 
-            ps.setInt(1, userId);
-            ps.setInt(2, productId);
-            ps.setInt(3, reservationId);
-            ps.executeUpdate();
+            PreparedStatement check =
+                    conn.prepareStatement(checkSql);
 
-        } catch (Exception e) {
+            check.setInt(1, userId);
+            check.setInt(2, productId);
+            check.setInt(3, reservationId);
+
+            ResultSet rs = check.executeQuery();
+
+            if(rs.next()){
+
+                int quantity =
+                        rs.getInt("quantity");
+
+                if(quantity <= 1){
+
+                    remove(
+                            userId,
+                            productId,
+                            reservationId
+                    );
+
+                }else{
+
+                    String updateSql =
+                            "UPDATE cart " +
+                                    "SET quantity=quantity-1 " +
+                                    "WHERE user_id=? " +
+                                    "AND product_id=? " +
+                                    "AND reservation_id=?";
+
+                    PreparedStatement update =
+                            conn.prepareStatement(updateSql);
+
+                    update.setInt(1, userId);
+                    update.setInt(2, productId);
+                    update.setInt(3, reservationId);
+
+                    update.executeUpdate();
+                }
+            }
+
+        }catch(Exception e){
             e.printStackTrace();
         }
     }
@@ -158,12 +224,31 @@ public class CartDAO {
     // XÓA CART CŨ
     public void clearOld() {
 
-        String sql = "DELETE FROM cart WHERE created_at < NOW() - INTERVAL 1 DAY";
+        String deleteCart =
+                "DELETE c FROM cart c " +
+                        "JOIN reservations r ON c.reservation_id = r.id " +
+                        "WHERE r.status='PENDING' " +
+                        "AND r.expired_at < NOW()";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String expireReservation =
+                "UPDATE reservations " +
+                        "SET status='EXPIRED' " +
+                        "WHERE status='PENDING' " +
+                        "AND expired_at < NOW()";
 
-            ps.executeUpdate();
+        try (
+                Connection conn = DBConnection.getConnection()
+        ) {
+
+            PreparedStatement ps1 =
+                    conn.prepareStatement(deleteCart);
+
+            ps1.executeUpdate();
+
+            PreparedStatement ps2 =
+                    conn.prepareStatement(expireReservation);
+
+            ps2.executeUpdate();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -171,10 +256,19 @@ public class CartDAO {
     }
     public Integer getLatestReservationId(int userId) {
 
-        String sql = "SELECT id FROM reservations WHERE user_id=? ORDER BY id DESC LIMIT 1";
+        String sql =
+                "SELECT id " +
+                        "FROM reservations " +
+                        "WHERE user_id=? " +
+                        "AND status='PENDING' " +
+                        "AND expired_at > NOW() " +
+                        "ORDER BY id DESC " +
+                        "LIMIT 1";
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
 
             ps.setInt(1, userId);
 
@@ -189,5 +283,31 @@ public class CartDAO {
         }
 
         return null;
+    }
+    public boolean isReservationValid(int reservationId){
+
+        String sql =
+                "SELECT * FROM reservations " +
+                        "WHERE id=? " +
+                        "AND status='PENDING' " +
+                        "AND expired_at > NOW()";
+
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps =
+                        conn.prepareStatement(sql)
+        ) {
+
+            ps.setInt(1, reservationId);
+
+            ResultSet rs = ps.executeQuery();
+
+            return rs.next();
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }

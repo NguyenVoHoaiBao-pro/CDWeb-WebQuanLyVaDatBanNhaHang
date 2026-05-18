@@ -216,24 +216,39 @@ public class ReservationDAO {
 //    }
     public int insertAndGetId(Reservation r) {
 
-        String sql = "INSERT INTO reservations(user_id,table_id,reservation_time,number_of_people,status) VALUES(?,?,?,?,?)";
+
+        String sql =
+                "INSERT INTO reservations(" +
+                        "user_id," +
+                        "table_id," +
+                        "reservation_time," +
+                        "number_of_people," +
+                        "status," +
+                        "expired_at" +
+                        ") VALUES(?,?,?,?,?,DATE_ADD(NOW(), INTERVAL 1 DAY))";
 
         try (
                 Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+                PreparedStatement ps =
+                        conn.prepareStatement(
+                                sql,
+                                Statement.RETURN_GENERATED_KEYS
+                        )
         ) {
 
             ps.setInt(1, r.getUserId());
             ps.setInt(2, r.getTableId());
             ps.setString(3, r.getReservationTime());
             ps.setInt(4, r.getNumberOfPeople());
+
+            // CHƯA XÁC NHẬN
             ps.setString(5, "PENDING");
 
             ps.executeUpdate();
 
             ResultSet rs = ps.getGeneratedKeys();
 
-            if (rs.next()) {
+            if(rs.next()){
                 return rs.getInt(1);
             }
 
@@ -242,5 +257,107 @@ public class ReservationDAO {
         }
 
         return 0;
+    }
+    public boolean isTableBooked(
+            int tableId,
+            String reservationTime
+    ){
+
+        String sql =
+                "SELECT * FROM reservations " +
+                        "WHERE table_id=? " +
+                        "AND ABS(TIMESTAMPDIFF(MINUTE, reservation_time, ?)) < 120 " +
+                        "AND (" +
+                        "status='CONFIRMED' " +
+                        "OR status='WAITING_PAYMENT' " +
+                        "OR (" +
+                        "status='PENDING' " +
+                        "AND expired_at > NOW()" +
+                        ")" +
+                        ")";
+
+        try(
+                Connection conn =
+                        DBConnection.getConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(sql)
+        ){
+
+            ps.setInt(1, tableId);
+            ps.setString(2, reservationTime);
+
+            ResultSet rs = ps.executeQuery();
+
+            return rs.next();
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    public Reservation findById(int id){
+
+        String sql =
+                "SELECT * FROM reservations WHERE id=?";
+
+        try(
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps =
+                        conn.prepareStatement(sql)
+        ){
+
+            ps.setInt(1, id);
+
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()){
+
+                Reservation r = new Reservation();
+
+                r.setId(rs.getInt("id"));
+                r.setUserId(rs.getInt("user_id"));
+                r.setTableId(rs.getInt("table_id"));
+                r.setReservationTime(
+                        rs.getString("reservation_time")
+                );
+                r.setNumberOfPeople(
+                        rs.getInt("number_of_people")
+                );
+
+                r.setStatus(rs.getString("status"));
+
+                return r;
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+    public void clearFinishedTables(){
+
+        String sql =
+                "UPDATE restaurant_tables t " +
+                        "JOIN reservations r " +
+                        "ON t.id = r.table_id " +
+                        "SET t.status='AVAILABLE' " +
+                        "WHERE r.status='DONE'";
+
+        try(
+                Connection conn =
+                        DBConnection.getConnection();
+
+                PreparedStatement ps =
+                        conn.prepareStatement(sql)
+        ){
+
+            ps.executeUpdate();
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
     }
 }

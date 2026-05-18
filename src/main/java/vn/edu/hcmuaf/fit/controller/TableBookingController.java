@@ -10,6 +10,7 @@ import vn.edu.hcmuaf.fit.model.RestaurantTable;
 import vn.edu.hcmuaf.fit.model.User;
 
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -52,7 +53,8 @@ public class TableBookingController {
             @RequestParam int tableId,
             @RequestParam String reservationTime,
             @RequestParam int numberOfPeople,
-            HttpSession session
+            HttpSession session,
+            Model model
     ) {
 
         User user = (User) session.getAttribute("user");
@@ -62,35 +64,135 @@ public class TableBookingController {
         }
 
         // ===== CHECK BÀN =====
-        RestaurantTable table = null;
+//        RestaurantTable table = null;
+//
+//        for (RestaurantTable t : tableDAO.getAll()) {
+//            if (t.getId() == tableId) {
+//                table = t;
+//                break;
+//            }
+//        }
+//
+//        // ❌ bàn không tồn tại hoặc đã được đặt
+//        if (table == null || !"AVAILABLE".equals(table.getStatus())) {
+//            return "redirect:/tables?error=full";
+//        }
+        RestaurantTable table =
+                tableDAO.findById(tableId);
 
-        for (RestaurantTable t : tableDAO.getAll()) {
-            if (t.getId() == tableId) {
-                table = t;
-                break;
-            }
+        if(table == null){
+            return "redirect:/tables?error=notfound";
         }
 
-        // ❌ bàn không tồn tại hoặc đã được đặt
-        if (table == null || !"AVAILABLE".equals(table.getStatus())) {
-            return "redirect:/tables?error=full";
+// check sức chứa
+        if(numberOfPeople > table.getCapacity()){
+
+            model.addAttribute(
+                    "error",
+                    "Số người vượt quá sức chứa của bàn"
+            );
+
+            model.addAttribute("tableId", tableId);
+
+            return "table-booking";
         }
 
-        // ===== TẠO BOOKING =====
+// check reservation thực sự
+        boolean booked =
+                reservationDAO.isTableBooked(
+                        tableId,
+                        reservationTime
+                );
+
+        if(booked){
+
+            model.addAttribute(
+                    "error",
+                    "Bàn này đã được đặt trong thời gian đó"
+            );
+
+            model.addAttribute("tableId", tableId);
+
+            return "table-booking";
+        }
+
+        // ==========================
+// CHECK TIME
+// ==========================
+        LocalDateTime now = LocalDateTime.now();
+
+        LocalDateTime bookingTime;
+
+        try{
+            bookingTime =
+                    LocalDateTime.parse(reservationTime);
+        }catch (Exception e){
+            return "redirect:/tables?error=format";
+        }
+
+        if(bookingTime.isBefore(now)){
+            model.addAttribute(
+                    "error",
+                    "Không thể đặt thời gian trong quá khứ"
+            );
+
+            model.addAttribute("tableId", tableId);
+
+            return "table-booking";
+        }
+
+        if(bookingTime.isAfter(now.plusDays(7))){
+
+            model.addAttribute(
+                    "error",
+                    "Chỉ được đặt bàn tối đa trước 7 ngày"
+            );
+
+            model.addAttribute("tableId", tableId);
+
+            return "table-booking";
+        }
+
+// ==========================
+// CHECK PEOPLE
+// ==========================
+        if(numberOfPeople <= 0){
+
+            model.addAttribute(
+                    "error",
+                    "Số người không hợp lệ"
+            );
+
+            model.addAttribute("tableId", tableId);
+
+            return "table-booking";
+        }
+
+// ==========================
+// TẠO BOOKING
+// ==========================
         Reservation r = new Reservation();
+
         r.setUserId(user.getId());
         r.setTableId(tableId);
         r.setReservationTime(reservationTime);
         r.setNumberOfPeople(numberOfPeople);
 
-        // ✔ đúng: check xong mới insert
-        int reservationId = reservationDAO.insertAndGetId(r);
+        int reservationId =
+                reservationDAO.insertAndGetId(r);
+
+        if(reservationId == 0){
+            return "redirect:/tables?error=insert";
+        }
 
 // lưu session
-        session.setAttribute("currentReservation", reservationId);
+        session.setAttribute(
+                "currentReservation",
+                reservationId
+        );
 
 // update bàn
-        tableDAO.updateStatus(tableId, "RESERVED");
+//        tableDAO.updateStatus(tableId, "RESERVED");
 
 // chuyển qua cart
         return "redirect:/cart";
