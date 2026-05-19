@@ -5,6 +5,8 @@ import vn.edu.hcmuaf.fit.model.RestaurantTable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RestaurantTableDAO {
 
@@ -41,5 +43,35 @@ public class RestaurantTableDAO {
         }
 
         return null;
+    }
+    public List<RestaurantTable> getAll() {
+
+        List<RestaurantTable> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM restaurant_tables ORDER BY id ASC";
+
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()
+        ) {
+
+            while (rs.next()) {
+
+                RestaurantTable t = new RestaurantTable();
+
+                t.setId(rs.getInt("id"));
+                t.setName(rs.getString("name"));
+                t.setCapacity(rs.getInt("capacity"));
+                t.setStatus(rs.getString("status"));
+
+                list.add(t);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 }

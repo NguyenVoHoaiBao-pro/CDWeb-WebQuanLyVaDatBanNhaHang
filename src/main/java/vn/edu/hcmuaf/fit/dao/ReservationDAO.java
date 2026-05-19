@@ -360,4 +360,47 @@ public class ReservationDAO {
             e.printStackTrace();
         }
     }
+    public List<String> getFoodsByReservation(
+            int reservationId
+    ){
+
+        List<String> list = new ArrayList<>();
+
+        try(Connection conn =
+                    DBConnection.getConnection()){
+
+            String sql =
+                    "SELECT " +
+                            "p.name, " +
+                            "od.quantity " +
+                            "FROM order_details od " +
+                            "JOIN orders o " +
+                            "ON od.order_id = o.id " +
+                            "JOIN products p " +
+                            "ON od.product_id = p.id " +
+                            "WHERE o.reservation_id=?";
+
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
+
+            ps.setInt(1, reservationId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+
+                String item =
+                        rs.getString("name")
+                                + " x "
+                                + rs.getInt("quantity");
+
+                list.add(item);
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }

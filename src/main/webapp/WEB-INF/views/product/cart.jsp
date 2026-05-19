@@ -182,7 +182,6 @@
 
                 <div class="d-flex justify-content-between mb-3">
                     <span>Phí phục vụ:</span>
-                    <span>0 đ</span>
                 </div>
 
                 <hr>
@@ -203,6 +202,12 @@
                 </a>
 
             </div>
+<%--            <div class="cart-total">--%>
+<%--                <h3>--%>
+<%--                    Tổng tiền:--%>
+<%--                    ${total} VNĐ--%>
+<%--                </h3>--%>
+<%--            </div>--%>
 
         </div>
 

@@ -1,9 +1,12 @@
 package vn.edu.hcmuaf.fit.dao;
 
+import vn.edu.hcmuaf.fit.model.Order;
+import vn.edu.hcmuaf.fit.model.OrderDetail;
 import vn.edu.hcmuaf.fit.model.Product;
 import vn.edu.hcmuaf.fit.model.Reservation;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDAO {
@@ -55,6 +58,14 @@ public class OrderDAO {
             double total = 0;
 
             for(Product p : cart){
+
+                // KHÔNG CHO > 5
+                if(p.getQuantity() > 5){
+
+                    conn.rollback();
+
+                    return 0;
+                }
 
                 total +=
                         p.getPrice() * p.getQuantity();
@@ -224,5 +235,166 @@ public class OrderDAO {
         }
 
         return 0;
+    }
+    public Order getBill(int reservationId){
+
+        Order order = null;
+
+        try(
+                Connection conn =
+                        DBConnection.getConnection()
+        ){
+
+            String sql =
+                    "SELECT * FROM orders " +
+                            "WHERE reservation_id=? " +
+                            "ORDER BY id DESC LIMIT 1";
+
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
+
+            ps.setInt(1, reservationId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()){
+
+                order = new Order();
+
+                order.setId(rs.getInt("id"));
+
+                order.setUserId(
+                        rs.getInt("user_id")
+                );
+
+                order.setReservationId(
+                        rs.getInt("reservation_id")
+                );
+
+                order.setTotal(
+                        rs.getDouble("total")
+                );
+
+                order.setPaymentStatus(
+                        rs.getString("payment_status")
+                );
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return order;
+    }
+    public List<OrderDetail> getBillDetails(
+            int reservationId
+    ){
+
+        List<OrderDetail> list =
+                new ArrayList<>();
+
+        try(
+                Connection conn =
+                        DBConnection.getConnection()
+        ){
+
+            String sql =
+                    "SELECT " +
+                            "od.*, " +
+                            "p.name " +
+                            "FROM order_details od " +
+                            "JOIN orders o " +
+                            "ON od.order_id = o.id " +
+                            "JOIN products p " +
+                            "ON od.product_id = p.id " +
+                            "WHERE o.reservation_id=?";
+
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
+
+            ps.setInt(1, reservationId);
+
+            ResultSet rs =
+                    ps.executeQuery();
+
+            while(rs.next()){
+
+                OrderDetail d =
+                        new OrderDetail();
+
+                d.setId(
+                        rs.getInt("id")
+                );
+
+                d.setOrderId(
+                        rs.getInt("order_id")
+                );
+
+                d.setProductId(
+                        rs.getInt("product_id")
+                );
+
+                d.setQuantity(
+                        rs.getInt("quantity")
+                );
+
+                d.setPrice(
+                        rs.getDouble("price")
+                );
+
+                // tên món
+                d.setProductName(
+                        rs.getString("name")
+                );
+
+                list.add(d);
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    public Order getByReservationId(int reservationId){
+
+        String sql =
+                "SELECT * FROM orders WHERE reservation_id=?";
+
+        try(
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ){
+
+            ps.setInt(1, reservationId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()){
+
+                Order o = new Order();
+
+                o.setId(rs.getInt("id"));
+
+                o.setUserId(rs.getInt("user_id"));
+
+                o.setReservationId(
+                        rs.getInt("reservation_id")
+                );
+
+                o.setTotal(rs.getDouble("total"));
+
+                o.setPaymentStatus(
+                        rs.getString("payment_status")
+                );
+
+                return o;
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

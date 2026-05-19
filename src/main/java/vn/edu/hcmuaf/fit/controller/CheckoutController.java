@@ -8,7 +8,7 @@ import vn.edu.hcmuaf.fit.dao.OrderDAO;
 import vn.edu.hcmuaf.fit.dao.ReservationDAO;
 import vn.edu.hcmuaf.fit.model.Reservation;
 import vn.edu.hcmuaf.fit.model.User;
-
+import vn.edu.hcmuaf.fit.dao.RestaurantTableDAO;
 import javax.servlet.http.HttpSession;
 
 @Controller
@@ -17,6 +17,7 @@ public class CheckoutController {
     CartDAO cartDAO = new CartDAO();
     OrderDAO orderDAO = new OrderDAO();
     ReservationDAO reservationDAO = new ReservationDAO();
+    RestaurantTableDAO tableDAO = new RestaurantTableDAO();
 
     private User getUser(HttpSession session){
         return (User) session.getAttribute("user");
@@ -60,6 +61,10 @@ public class CheckoutController {
         model.addAttribute(
                 "list",
                 cartDAO.getCart(u.getId(), reservationId)
+        );
+        model.addAttribute(
+                "tables",
+                tableDAO.getAll()
         );
 
         model.addAttribute("reservation", reservation);

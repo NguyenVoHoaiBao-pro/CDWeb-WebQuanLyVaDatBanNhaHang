@@ -38,62 +38,55 @@
                       action="<%=request.getContextPath()%>/checkout">
 
                     <div class="mb-3">
-                        <label class="form-label">Họ tên</label>
+
+                        <label class="form-label">
+                            Mã đặt bàn
+                        </label>
+
                         <input type="text"
-                               name="name"
                                class="form-control"
-                               required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Số điện thoại</label>
-                        <input type="text"
-                               name="phone"
-                               class="form-control"
-                               required>
-                    </div>
-
-                    <div class="row">
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Thời gian đến</label>
-                            <input type="datetime-local"
-                                   name="time"
-                                   class="form-control"
-                                   required>
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Số người</label>
-                            <input type="number"
-                                   name="people"
-                                   min="1"
-                                   class="form-control"
-                                   required>
-                        </div>
+                               value="#${reservation.id}"
+                               readonly>
 
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Chọn bàn</label>
 
-                        <select name="tableId"
-                                class="form-select"
-                                required>
+                        <label class="form-label">
+                            Bàn
+                        </label>
 
-                            <option value="">-- Chọn bàn --</option>
+                        <input type="text"
+                               class="form-control"
+                               value="Bàn #${reservation.tableId}"
+                               readonly>
 
-                            <% for(RestaurantTable t : tables){ %>
+                    </div>
 
-                            <option value="<%=t.getId()%>">
-                                <%=t.getName()%> -
-                                <%=t.getCapacity()%> người -
-                                <%=t.getStatus()%>
-                            </option>
+                    <div class="mb-3">
 
-                            <% } %>
+                        <label class="form-label">
+                            Thời gian đến
+                        </label>
 
-                        </select>
+                        <input type="text"
+                               class="form-control"
+                               value="${reservation.reservationTime}"
+                               readonly>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Số người
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               value="${reservation.numberOfPeople}"
+                               readonly>
+
                     </div>
 
                     <div class="mb-3">

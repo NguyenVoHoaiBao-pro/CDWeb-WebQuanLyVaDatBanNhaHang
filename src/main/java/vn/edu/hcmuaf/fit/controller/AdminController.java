@@ -8,6 +8,8 @@ import vn.edu.hcmuaf.fit.model.*;
 import vn.edu.hcmuaf.fit.util.AuthUtil;
 
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/admin")
@@ -235,7 +237,27 @@ public class AdminController {
 
         model.addAttribute("list", reservationDAO.getAll());
         model.addAttribute("page", "reservations.jsp");
+        model.addAttribute(
+                "foods",
+                reservationDAO
+        );
+        OrderDAO orderDAO = new OrderDAO();
+
+        Map<Integer, Order> orderMap = new HashMap<>();
+
+        for (Reservation r : reservationDAO.getAll()) {
+
+            Order order = orderDAO.getBill(r.getId());
+
+            if(order != null){
+                orderMap.put(r.getId(), order);
+            }
+        }
+
+        model.addAttribute("orderMap", orderMap);
         return "admin/layout";
+
+
     }
 
     @GetMapping("/reservation/{id}/{status}")

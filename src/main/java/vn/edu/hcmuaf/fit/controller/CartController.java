@@ -23,39 +23,65 @@ public class CartController {
     // /cart
     // ==========================
     @GetMapping("")
-    public String cart(Model model, HttpSession session){
+    public String cart(Model model, HttpSession session) {
 
         User u = (User) session.getAttribute("user");
 
-        if(u == null){
+        if (u == null) {
             return "redirect:/login";
         }
 
         Integer reservationId =
                 (Integer) session.getAttribute("currentReservation");
 
-        // 🔥 FIX: nếu mất session → lấy lại từ DB
-        if(reservationId == null){
+        // FIX LOST SESSION
+        if (reservationId == null) {
 
-            reservationId = dao.getLatestReservationId(u.getId());
+            reservationId =
+                    dao.getLatestReservationId(u.getId());
 
-            if(reservationId != null){
-                session.setAttribute("currentReservation", reservationId);
+            if (reservationId != null) {
+                session.setAttribute(
+                        "currentReservation",
+                        reservationId
+                );
             }
         }
 
-        // vẫn null → chưa đặt bàn thật
-        if(reservationId == null){
-            model.addAttribute("error", "Bạn chưa đặt bàn!");
+        // CHƯA ĐẶT BÀN
+        if (reservationId == null) {
+
+            model.addAttribute(
+                    "error",
+                    "Bạn chưa đặt bàn!"
+            );
+
             return "product/cart";
         }
 
         dao.clearOld();
 
-        model.addAttribute("list",
-                dao.getCart(u.getId(), reservationId));
+        model.addAttribute(
+                "list",
+                dao.getCart(
+                        u.getId(),
+                        reservationId
+                )
+        );
 
-        model.addAttribute("reservationId", reservationId);
+        // TOTAL
+        model.addAttribute(
+                "total",
+                dao.getTotal(
+                        u.getId(),
+                        reservationId
+                )
+        );
+
+        model.addAttribute(
+                "reservationId",
+                reservationId
+        );
 
         return "product/cart";
     }
@@ -65,17 +91,17 @@ public class CartController {
     // /cart/add/5
     // ==========================
     @GetMapping("/add/{id}")
-    public String add(@PathVariable int id, HttpSession session){
+    public String add(@PathVariable int id, HttpSession session) {
 
         User u = (User) session.getAttribute("user");
         Integer reservationId =
                 (Integer) session.getAttribute("currentReservation");
 
-        if(u == null){
+        if (u == null) {
             return "redirect:/login";
         }
 
-        if(reservationId == null){
+        if (reservationId == null) {
             System.out.println("❌ CHƯA CÓ RESERVATION");
             return "redirect:/tables";
         }
@@ -85,7 +111,7 @@ public class CartController {
         boolean valid =
                 dao.isReservationValid(reservationId);
 
-        if(!valid){
+        if (!valid) {
 
             session.removeAttribute("currentReservation");
 
@@ -101,15 +127,15 @@ public class CartController {
     // INCREASE
     // ==========================
     @GetMapping("/increase/{id}")
-    public String increase(@PathVariable int id, HttpSession session){
+    public String increase(@PathVariable int id, HttpSession session) {
 
         User u = (User) session.getAttribute("user");
         Integer reservationId =
                 (Integer) session.getAttribute("currentReservation");
 
-        if(u == null) return "redirect:/login";
+        if (u == null) return "redirect:/login";
 
-        if(!dao.isReservationValid(reservationId)){
+        if (!dao.isReservationValid(reservationId)) {
             session.removeAttribute("currentReservation");
             return "redirect:/tables";
         }
@@ -123,13 +149,13 @@ public class CartController {
     // DECREASE
     // ==========================
     @GetMapping("/decrease/{id}")
-    public String decrease(@PathVariable int id, HttpSession session){
+    public String decrease(@PathVariable int id, HttpSession session) {
 
         User u = (User) session.getAttribute("user");
         Integer reservationId = (Integer) session.getAttribute("currentReservation");
 
-        if(u == null) return "redirect:/login";
-        if(!dao.isReservationValid(reservationId)){
+        if (u == null) return "redirect:/login";
+        if (!dao.isReservationValid(reservationId)) {
             session.removeAttribute("currentReservation");
             return "redirect:/tables";
         }
@@ -143,13 +169,13 @@ public class CartController {
     // REMOVE ONE
     // ==========================
     @GetMapping("/remove/{id}")
-    public String remove(@PathVariable int id, HttpSession session){
+    public String remove(@PathVariable int id, HttpSession session) {
 
         User u = (User) session.getAttribute("user");
         Integer reservationId = (Integer) session.getAttribute("currentReservation");
 
-        if(u == null) return "redirect:/login";
-        if(!dao.isReservationValid(reservationId)){
+        if (u == null) return "redirect:/login";
+        if (!dao.isReservationValid(reservationId)) {
             session.removeAttribute("currentReservation");
             return "redirect:/tables";
         }
@@ -163,13 +189,13 @@ public class CartController {
     // CLEAR ALL
     // ==========================
     @GetMapping("/clear")
-    public String clear(HttpSession session){
+    public String clear(HttpSession session) {
 
         User u = (User) session.getAttribute("user");
         Integer reservationId = (Integer) session.getAttribute("currentReservation");
 
-        if(u == null) return "redirect:/login";
-        if(!dao.isReservationValid(reservationId)){
+        if (u == null) return "redirect:/login";
+        if (!dao.isReservationValid(reservationId)) {
             session.removeAttribute("currentReservation");
             return "redirect:/tables";
         }

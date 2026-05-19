@@ -27,21 +27,40 @@ public class CartDAO {
 
             ResultSet rs = check.executeQuery();
 
-            if (rs.next()) {
+            if(rs.next()){
 
-                PreparedStatement update = conn.prepareStatement(updateSql);
-                update.setInt(1, userId);
-                update.setInt(2, productId);
-                update.setInt(3, reservationId);
-                update.executeUpdate();
+                int qty = rs.getInt("quantity");
 
-            } else {
+                // MAX 5
+                if(qty >= 5){
+                    return;
+                }
 
-                PreparedStatement insert = conn.prepareStatement(insertSql);
-                insert.setInt(1, userId);
-                insert.setInt(2, productId);
-                insert.setInt(3, reservationId);
-                insert.executeUpdate();
+                String update =
+                        "UPDATE cart SET quantity = quantity + 1 " +
+                                "WHERE user_id=? AND product_id=? AND reservation_id=?";
+
+                PreparedStatement ups = conn.prepareStatement(update);
+
+                ups.setInt(1, userId);
+                ups.setInt(2, productId);
+                ups.setInt(3, reservationId);
+
+                ups.executeUpdate();
+
+            }else{
+
+                String insert =
+                        "INSERT INTO cart(user_id,product_id,quantity,reservation_id) " +
+                                "VALUES(?,?,1,?)";
+
+                PreparedStatement ins = conn.prepareStatement(insert);
+
+                ins.setInt(1, userId);
+                ins.setInt(2, productId);
+                ins.setInt(3, reservationId);
+
+                ins.executeUpdate();
             }
 
         } catch (Exception e) {
@@ -55,10 +74,20 @@ public class CartDAO {
         List<Product> list = new ArrayList<>();
 
         String sql =
-                "SELECT p.*, c.quantity " +
+                "SELECT " +
+                        "p.id AS product_id, " +
+                        "p.name, " +
+                        "p.price, " +
+                        "p.image, " +
+                        "p.description, " +
+                        "p.category, " +
+                        "c.quantity " +
                         "FROM cart c " +
-                        "JOIN products p ON c.product_id = p.id " +
-                        "WHERE c.user_id=? AND c.reservation_id=?";
+                        "JOIN products p " +
+                        "ON c.product_id = p.id " +
+                        "WHERE c.user_id=? " +
+                        "AND c.reservation_id=?";
+
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -66,16 +95,25 @@ public class CartDAO {
             ps.setInt(1, userId);
             ps.setInt(2, reservationId);
 
+
             ResultSet rs = ps.executeQuery();
 
-            while (rs.next()) {
+            while(rs.next()){
 
                 Product p = new Product();
-                p.setId(rs.getInt("id"));
+
+                p.setId(rs.getInt("product_id"));
                 p.setName(rs.getString("name"));
                 p.setPrice(rs.getDouble("price"));
                 p.setImage(rs.getString("image"));
+
+                // QUAN TRỌNG
                 p.setQuantity(rs.getInt("quantity"));
+                System.out.println(
+                        p.getName() + " | qty = " + p.getQuantity()
+                );
+
+
 
                 list.add(p);
             }
@@ -88,19 +126,46 @@ public class CartDAO {
     }
 
     // TĂNG SỐ LƯỢNG
-    public void increase(int userId, int productId, int reservationId) {
+    public void increase(int userId, int productId, int reservationId){
 
-        String sql = "UPDATE cart SET quantity = quantity + 1 WHERE user_id=? AND product_id=? AND reservation_id=?";
+        try(Connection conn = DBConnection.getConnection()){
 
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+            String checkSql =
+                    "SELECT quantity FROM cart " +
+                            "WHERE user_id=? AND product_id=? AND reservation_id=?";
+
+            PreparedStatement check = conn.prepareStatement(checkSql);
+
+            check.setInt(1, userId);
+            check.setInt(2, productId);
+            check.setInt(3, reservationId);
+
+            ResultSet rs = check.executeQuery();
+
+            if(rs.next()){
+
+                int qty = rs.getInt("quantity");
+
+                // GIỚI HẠN MAX = 5
+                if(qty >= 5){
+                    return;
+                }
+            }
+
+            String sql =
+                    "UPDATE cart " +
+                            "SET quantity = quantity + 1 " +
+                            "WHERE user_id=? AND product_id=? AND reservation_id=?";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
 
             ps.setInt(1, userId);
             ps.setInt(2, productId);
             ps.setInt(3, reservationId);
+
             ps.executeUpdate();
 
-        } catch (Exception e) {
+        }catch(Exception e){
             e.printStackTrace();
         }
     }
@@ -309,5 +374,34 @@ public class CartDAO {
         }
 
         return false;
+    }
+    public double getTotal(int userId, int reservationId){
+
+        double total = 0;
+
+        try(Connection conn = DBConnection.getConnection()){
+
+            String sql =
+                    "SELECT SUM(c.quantity * p.price) total " +
+                            "FROM cart c " +
+                            "JOIN products p ON c.product_id = p.id " +
+                            "WHERE c.user_id=? AND c.reservation_id=?";
+
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ps.setInt(1, userId);
+            ps.setInt(2, reservationId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()){
+                total = rs.getDouble("total");
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return total;
     }
 }
