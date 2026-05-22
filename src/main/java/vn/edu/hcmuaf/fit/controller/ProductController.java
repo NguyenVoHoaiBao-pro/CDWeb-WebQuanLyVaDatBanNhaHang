@@ -17,12 +17,6 @@ public class ProductController {
 
     private ProductDAO dao = new ProductDAO();
 
-    // =====================================
-    // MENU CHÍNH
-    // /menu
-    // /menu?category=MÓN CHÍNH
-    // /menu?keyword=bò
-    // =====================================
     @GetMapping("/menu")
     public String menu(
             @RequestParam(required = false) String category,
@@ -56,9 +50,6 @@ public class ProductController {
         return "product/menu";
     }
 
-    // =====================================
-    // ALIAS /products -> dùng chung
-    // =====================================
     @GetMapping("/products")
     public String products(
             @RequestParam(required = false) String category,
@@ -68,10 +59,6 @@ public class ProductController {
         return menu(category, keyword, model);
     }
 
-    // =====================================
-    // CHI TIẾT MÓN
-    // /product/5
-    // =====================================
     @GetMapping("/product/{id}")
     public String detail(@PathVariable int id,
                          Model model) {

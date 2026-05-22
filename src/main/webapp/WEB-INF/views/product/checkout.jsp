@@ -1,5 +1,4 @@
 <!-- FILE: WEB-INF/views/product/checkout.jsp -->
-<!-- TƯƠNG THÍCH controller CheckoutController của bạn -->
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.*" %>

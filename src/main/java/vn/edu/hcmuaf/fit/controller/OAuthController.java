@@ -31,9 +31,6 @@ public class OAuthController {
 
     UserDAO userDAO = new UserDAO();
 
-    // =====================================================
-    // GOOGLE LOGIN
-    // =====================================================
     @GetMapping("/oauth/google")
     public String googleLogin() {
 
@@ -117,9 +114,6 @@ public class OAuthController {
         return "redirect:/login?error=google_failed";
     }
 
-    // =====================================================
-    // FACEBOOK LOGIN
-    // =====================================================
     @GetMapping("/oauth/facebook")
     public String facebookLogin() {
 

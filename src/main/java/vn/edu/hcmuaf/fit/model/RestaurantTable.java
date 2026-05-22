@@ -1,5 +1,3 @@
-// FILE: src/main/java/vn/edu/hcmuaf/fit/model/RestaurantTable.java
-// FIX CHUẨN THEO DATABASE capacity, KHÔNG dùng floor
 
 package vn.edu.hcmuaf.fit.model;
 
@@ -9,6 +7,9 @@ public class RestaurantTable {
     private String name;
     private int capacity;
     private String status;
+    private int floorNumber;
+    private int positionX;
+    private int positionY;
 
     public RestaurantTable() {
     }
@@ -22,10 +23,6 @@ public class RestaurantTable {
         this.capacity = capacity;
         this.status = status;
     }
-
-    // =====================
-    // GETTER / SETTER
-    // =====================
 
     public int getId() {
         return id;
@@ -59,15 +56,35 @@ public class RestaurantTable {
         this.status = status;
     }
 
-    // =====================
-    // GIỮ TƯƠNG THÍCH CODE CŨ
-    // nếu file khác còn gọi setFloor()
-    // =====================
     public void setFloor(int floor) {
-        this.capacity = floor;
+        this.floorNumber = floor;
     }
 
     public int getFloor() {
-        return this.capacity;
+        return this.floorNumber;
+    }
+
+    public int getPositionY() {
+        return positionY;
+    }
+
+    public void setPositionY(int positionY) {
+        this.positionY = positionY;
+    }
+
+    public int getPositionX() {
+        return positionX;
+    }
+
+    public void setPositionX(int positionX) {
+        this.positionX = positionX;
+    }
+
+    public int getFloorNumber() {
+        return floorNumber;
+    }
+
+    public void setFloorNumber(int floorNumber) {
+        this.floorNumber = floorNumber;
     }
 }

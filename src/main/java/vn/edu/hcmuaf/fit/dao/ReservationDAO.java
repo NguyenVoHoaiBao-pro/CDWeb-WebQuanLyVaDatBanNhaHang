@@ -1,32 +1,3 @@
-//package vn.edu.hcmuaf.fit.dao;
-//
-//import vn.edu.hcmuaf.fit.model.Reservation;
-//
-//import java.sql.Connection;
-//import java.sql.PreparedStatement;
-//
-//public class ReservationDAO {
-//
-//    public boolean insert(Reservation r) {
-//        String sql = "INSERT INTO reservations(user_id, table_id, reservation_time, number_of_people, status) VALUES (?, ?, ?, ?, ?)";
-//
-//        try (Connection conn = DBConnection.getConnection();
-//             PreparedStatement ps = conn.prepareStatement(sql)) {
-//
-//            ps.setInt(1, r.getUserId());
-//            ps.setInt(2, r.getTableId());
-//            ps.setString(3, r.getReservationTime());
-//            ps.setInt(4, r.getNumberOfPeople());
-//            ps.setString(5, "PENDING");
-//
-//            return ps.executeUpdate() > 0;
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return false;
-//    }
-//}
 package vn.edu.hcmuaf.fit.dao;
 
 import vn.edu.hcmuaf.fit.model.Reservation;

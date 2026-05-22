@@ -1,5 +1,4 @@
 <!-- FILE: WEB-INF/views/product/menu.jsp -->
-<!-- FIX FULL theo controller hiện tại của bạn -->
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.*,vn.edu.hcmuaf.fit.model.Product" %>

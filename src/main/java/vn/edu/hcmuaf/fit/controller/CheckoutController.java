@@ -23,9 +23,6 @@ public class CheckoutController {
         return (User) session.getAttribute("user");
     }
 
-    // ==========================
-    // VIEW CHECKOUT
-    // ==========================
     @GetMapping("/checkout")
     public String checkout(
             Model model,
@@ -72,9 +69,6 @@ public class CheckoutController {
         return "product/checkout";
     }
 
-    // ==========================
-    // SUBMIT CHECKOUT
-    // ==========================
     @PostMapping("/checkout")
     public String submit(
 

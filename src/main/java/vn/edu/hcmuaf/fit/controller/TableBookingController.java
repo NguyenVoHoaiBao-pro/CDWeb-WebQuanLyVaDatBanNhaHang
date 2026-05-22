@@ -63,20 +63,7 @@ public class TableBookingController {
             return "redirect:/login";
         }
 
-        // ===== CHECK BÀN =====
-//        RestaurantTable table = null;
-//
-//        for (RestaurantTable t : tableDAO.getAll()) {
-//            if (t.getId() == tableId) {
-//                table = t;
-//                break;
-//            }
-//        }
-//
-//        // ❌ bàn không tồn tại hoặc đã được đặt
-//        if (table == null || !"AVAILABLE".equals(table.getStatus())) {
-//            return "redirect:/tables?error=full";
-//        }
+
         RestaurantTable table =
                 tableDAO.findById(tableId);
 
@@ -116,9 +103,6 @@ public class TableBookingController {
             return "table-booking";
         }
 
-        // ==========================
-// CHECK TIME
-// ==========================
         LocalDateTime now = LocalDateTime.now();
 
         LocalDateTime bookingTime;
@@ -153,9 +137,6 @@ public class TableBookingController {
             return "table-booking";
         }
 
-// ==========================
-// CHECK PEOPLE
-// ==========================
         if(numberOfPeople <= 0){
 
             model.addAttribute(
@@ -168,9 +149,6 @@ public class TableBookingController {
             return "table-booking";
         }
 
-// ==========================
-// TẠO BOOKING
-// ==========================
         Reservation r = new Reservation();
 
         r.setUserId(user.getId());
@@ -185,22 +163,15 @@ public class TableBookingController {
             return "redirect:/tables?error=insert";
         }
 
-// lưu session
+
         session.setAttribute(
                 "currentReservation",
                 reservationId
         );
 
-// update bàn
-//        tableDAO.updateStatus(tableId, "RESERVED");
-
-// chuyển qua cart
         return "redirect:/cart";
     }
 
-    // ==========================
-    // PAGE: LỊCH SỬ ĐẶT BÀN
-    // ==========================
     @GetMapping("/my-booking")
     public String myBooking(HttpSession session, Model model){
 

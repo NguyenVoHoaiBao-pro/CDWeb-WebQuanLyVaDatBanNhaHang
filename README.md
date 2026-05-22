@@ -23,9 +23,6 @@ Hệ thống quản lý nhà hàng và đặt bàn trực tuyến
 | Nguyễn Võ Hoài Bảo | 22130022 |
 | Lê Bá Khánh Duy | 22130058 |
 
-## Giảng viên hướng dẫn
-
-LÊ PHI HÙNG
 
 ---
 

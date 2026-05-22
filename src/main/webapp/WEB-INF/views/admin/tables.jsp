@@ -23,6 +23,7 @@
                 <th>ID</th>
                 <th>Tên bàn</th>
                 <th>Sức chứa</th>
+                <th>Tầng</th>
                 <th>Trạng thái</th>
                 <th width="250">Thao tác</th>
             </tr>
@@ -36,20 +37,40 @@
                 <td><%=t.getName()%></td>
                 <td><%=t.getCapacity()%> người</td>
                 <td>
+
+                    <%
+                        if(t.getFloorNumber() == 0){
+                            out.print("Tầng Trệt");
+                        }else{
+                            out.print("Tầng " + t.getFloorNumber());
+                        }
+                    %>
+
+                </td>
+                <td>
                     <span class="badge 
                         <%= "AVAILABLE".equals(t.getStatus()) ? "bg-success" : "bg-warning text-dark" %>">
                         <%= "AVAILABLE".equals(t.getStatus()) ? "Còn trống" : "Đã đặt" %>
                     </span>
                 </td>
-                <td>
+                <td class="d-flex gap-2 justify-content-center flex-wrap">
+
                     <a href="${pageContext.request.contextPath}/admin/change-table/<%=t.getId()%>/AVAILABLE"
                        class="btn btn-success btn-sm">
-                        Set còn trống
+                        Còn trống
                     </a>
+
                     <a href="${pageContext.request.contextPath}/admin/change-table/<%=t.getId()%>/RESERVED"
                        class="btn btn-warning btn-sm">
-                        Set đã đặt
+                        Đã đặt
                     </a>
+
+                    <a href="${pageContext.request.contextPath}/admin/tables/delete/<%=t.getId()%>"
+                       class="btn btn-danger btn-sm"
+                       onclick="return confirm('Bạn có chắc muốn xóa bàn này?')">
+                        Xóa
+                    </a>
+
                 </td>
             </tr>
             <% }

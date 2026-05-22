@@ -1,5 +1,5 @@
-// FILE: src/main/java/vn/edu/hcmuaf/fit/controller/CartController.java
-// VIẾT LẠI FULL để chạy với cart.jsp mới
+//src/main/java/vn/edu/hcmuaf/fit/controller/CartController.java
+
 
 package vn.edu.hcmuaf.fit.controller;
 
@@ -18,10 +18,6 @@ public class CartController {
 
     CartDAO dao = new CartDAO();
 
-    // ==========================
-    // VIEW CART
-    // /cart
-    // ==========================
     @GetMapping("")
     public String cart(Model model, HttpSession session) {
 
@@ -86,10 +82,6 @@ public class CartController {
         return "product/cart";
     }
 
-    // ==========================
-    // ADD ITEM
-    // /cart/add/5
-    // ==========================
     @GetMapping("/add/{id}")
     public String add(@PathVariable int id, HttpSession session) {
 
@@ -123,9 +115,6 @@ public class CartController {
         return "redirect:/cart";
     }
 
-    // ==========================
-    // INCREASE
-    // ==========================
     @GetMapping("/increase/{id}")
     public String increase(@PathVariable int id, HttpSession session) {
 
@@ -145,9 +134,6 @@ public class CartController {
         return "redirect:/cart";
     }
 
-    // ==========================
-    // DECREASE
-    // ==========================
     @GetMapping("/decrease/{id}")
     public String decrease(@PathVariable int id, HttpSession session) {
 
@@ -165,9 +151,6 @@ public class CartController {
         return "redirect:/cart";
     }
 
-    // ==========================
-    // REMOVE ONE
-    // ==========================
     @GetMapping("/remove/{id}")
     public String remove(@PathVariable int id, HttpSession session) {
 
@@ -185,9 +168,6 @@ public class CartController {
         return "redirect:/cart";
     }
 
-    // ==========================
-    // CLEAR ALL
-    // ==========================
     @GetMapping("/clear")
     public String clear(HttpSession session) {
 

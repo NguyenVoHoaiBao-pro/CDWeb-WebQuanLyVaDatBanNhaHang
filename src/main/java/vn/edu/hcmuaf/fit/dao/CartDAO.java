@@ -171,22 +171,7 @@ public class CartDAO {
     }
 
     // GIẢM SỐ LƯỢNG
-//    public void decrease(int userId, int productId, int reservationId) {
-//
-//        String sql = "UPDATE cart SET quantity = quantity - 1 WHERE user_id=? AND product_id=? AND reservation_id=? AND quantity > 1";
-//
-//        try (Connection conn = DBConnection.getConnection();
-//             PreparedStatement ps = conn.prepareStatement(sql)) {
-//
-//            ps.setInt(1, userId);
-//            ps.setInt(2, productId);
-//            ps.setInt(3, reservationId);
-//            ps.executeUpdate();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+
     public void decrease(
             int userId,
             int productId,

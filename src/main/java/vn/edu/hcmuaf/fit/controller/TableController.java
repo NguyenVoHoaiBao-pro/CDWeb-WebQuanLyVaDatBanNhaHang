@@ -13,47 +13,32 @@ import javax.servlet.http.HttpSession;
 public class TableController {
 
     private TableDAO dao = new TableDAO();
-
-    // ==============================
-    // USER: XEM DANH SÁCH BÀN
-    // URL: /tables
-    // ==============================
     @GetMapping("/tables")
     public String tables(Model model) {
 
-        model.addAttribute("list", dao.getAll());
+        model.addAttribute(
+                "groundTables",
+                dao.getByFloor(0)
+        );
 
-        // 👉 phải tồn tại file:
-        // /WEB-INF/views/table/list.jsp
+        model.addAttribute(
+                "floor1Tables",
+                dao.getByFloor(1)
+        );
+
+        model.addAttribute(
+                "floor2Tables",
+                dao.getByFloor(2)
+        );
+
         return "table/list";
     }
 
-    // ==============================
-    // ADMIN: QUẢN LÝ BÀN
-    // URL: /admin/tables
-    // ==============================
-//    @GetMapping("/admin/tables")
-//    public String adminTables(Model model, HttpSession session) {
-//
-//        if (!AuthUtil.isAdmin(session)) {
-//            return "redirect:/login";
-//        }
-//
-//        model.addAttribute("list", dao.getAll());
-//
-//        // 👉 dùng layout giống AdminController
-//        model.addAttribute("page", "tables.jsp");
-//
-//        return "admin/layout";
-//    }
-
-    // ==============================
-    // ADMIN: THÊM BÀN
-    // ==============================
     @PostMapping("/admin/tables/add")
     public String add(
             @RequestParam String name,
             @RequestParam int capacity,
+            @RequestParam int floorNumber,
             HttpSession session
     ) {
 
@@ -65,37 +50,10 @@ public class TableController {
             return "redirect:/admin/tables?error=1";
         }
 
-        dao.insert(name, capacity);
+        dao.insert(name, capacity, floorNumber);
 
         return "redirect:/admin/tables?success=1";
     }
-
-    // ==============================
-    // ADMIN: ĐỔI TRẠNG THÁI
-    // ==============================
-//    @GetMapping("/admin/tables/status/{id}")
-//    public String status(
-//            @PathVariable int id,
-//            @RequestParam String value,
-//            HttpSession session
-//    ) {
-//
-//        if (!AuthUtil.isAdmin(session)) {
-//            return "redirect:/login";
-//        }
-//
-//        if (!value.equals("AVAILABLE") && !value.equals("RESERVED")) {
-//            return "redirect:/admin/tables";
-//        }
-//
-//        dao.updateStatus(id, value);
-//
-//        return "redirect:/admin/tables";
-//    }
-
-    // ==============================
-    // ADMIN: XÓA BÀN
-    // ==============================
     @GetMapping("/admin/tables/delete/{id}")
     public String delete(
             @PathVariable int id,

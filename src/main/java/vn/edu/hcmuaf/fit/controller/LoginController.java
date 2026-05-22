@@ -28,10 +28,10 @@ public class LoginController {
 
         if (user != null) {
 
-            session.setAttribute("user", user); // 🔥 lưu session
+            session.setAttribute("user", user);
 
             if ("ADMIN".equals(user.getRole())) {
-                return "redirect:/admin"; // 🔥 vào admin
+                return "redirect:/admin";
             }
 
             return "redirect:/";
@@ -47,10 +47,7 @@ public class LoginController {
     public String showRegister() {
         return "register";
     }
-//    @GetMapping("/")
-//    public String home() {
-//        return "home";
-//    }
+
     @PostMapping("/register")
     public String register(@RequestParam String username,
                            @RequestParam String password,

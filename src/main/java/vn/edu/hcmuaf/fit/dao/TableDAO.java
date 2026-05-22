@@ -1,6 +1,3 @@
-// FILE: src/main/java/vn/edu/hcmuaf/fit/dao/TableDAO.java
-// FULL CHUẨN - GIỮ CODE CỦA BẠN + THÊM findById()
-
 package vn.edu.hcmuaf.fit.dao;
 
 import vn.edu.hcmuaf.fit.model.RestaurantTable;
@@ -10,9 +7,6 @@ import java.util.*;
 
 public class TableDAO {
 
-    // ==========================
-    // GET ALL TABLES
-    // ==========================
     public List<RestaurantTable> getAll() {
 
         List<RestaurantTable> list = new ArrayList<>();
@@ -34,6 +28,7 @@ public class TableDAO {
                 t.setName(rs.getString("name"));
                 t.setCapacity(rs.getInt("capacity"));
                 t.setStatus(rs.getString("status"));
+                t.setFloorNumber(rs.getInt("floor_number"));
 
                 list.add(t);
             }
@@ -45,9 +40,6 @@ public class TableDAO {
         return list;
     }
 
-    // ==========================
-    // FIND BY ID
-    // ==========================
     public RestaurantTable findById(int id) {
 
         String sql =
@@ -70,6 +62,7 @@ public class TableDAO {
                 t.setName(rs.getString("name"));
                 t.setCapacity(rs.getInt("capacity"));
                 t.setStatus(rs.getString("status"));
+                t.setFloorNumber(rs.getInt("floor_number"));
 
                 return t;
             }
@@ -81,13 +74,12 @@ public class TableDAO {
         return null;
     }
 
-    // ==========================
-    // ADD TABLE
-    // ==========================
-    public boolean insert(String name, int capacity) {
+    public boolean insert(String name,
+                          int capacity,
+                          int floorNumber) {
 
         String sql =
-                "INSERT INTO restaurant_tables(name,capacity,status) VALUES(?,?,?)";
+                "INSERT INTO restaurant_tables(name,capacity,status,floor_number) VALUES(?,?,?,?)";
 
         try (
                 Connection conn = DBConnection.getConnection();
@@ -97,6 +89,7 @@ public class TableDAO {
             ps.setString(1, name);
             ps.setInt(2, capacity);
             ps.setString(3, "AVAILABLE");
+            ps.setInt(4, floorNumber);
 
             return ps.executeUpdate() > 0;
 
@@ -107,9 +100,6 @@ public class TableDAO {
         return false;
     }
 
-    // ==========================
-    // UPDATE STATUS
-    // ==========================
     public boolean updateStatus(int id, String status) {
 
         String sql =
@@ -132,9 +122,6 @@ public class TableDAO {
         return false;
     }
 
-    // ==========================
-    // DELETE TABLE
-    // ==========================
     public boolean delete(int id) {
 
         String sql =
@@ -154,5 +141,47 @@ public class TableDAO {
         }
 
         return false;
+    }
+    public List<RestaurantTable> getByFloor(int floor){
+
+        List<RestaurantTable> list =
+                new ArrayList<>();
+
+        String sql =
+                "SELECT * FROM restaurant_tables " +
+                        "WHERE floor_number=? " +
+                        "ORDER BY id LIMIT 10";
+
+        try(
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ){
+
+            ps.setInt(1, floor);
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+
+                RestaurantTable t =
+                        new RestaurantTable();
+
+                t.setId(rs.getInt("id"));
+                t.setName(rs.getString("name"));
+                t.setCapacity(rs.getInt("capacity"));
+                t.setStatus(rs.getString("status"));
+
+                t.setFloorNumber(
+                        rs.getInt("floor_number")
+                );
+
+                list.add(t);
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return list;
     }
 }

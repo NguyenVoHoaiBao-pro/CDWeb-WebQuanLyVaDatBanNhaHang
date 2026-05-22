@@ -23,6 +23,30 @@
                    min="1"
                    required>
         </div>
+        <div class="mb-3">
+
+            <label class="form-label">
+                Tầng
+            </label>
+
+            <select name="floorNumber"
+                    class="form-select">
+
+                <option value="0">
+                    Tầng Trệt
+                </option>
+
+                <option value="1">
+                    Tầng 1
+                </option>
+
+                <option value="2">
+                    Tầng 2
+                </option>
+
+            </select>
+
+        </div>
 
         <div class="d-flex gap-2">
 

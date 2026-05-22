@@ -293,6 +293,7 @@ public class AdminController {
     public String addTable(
             @RequestParam String name,
             @RequestParam int capacity,
+            @RequestParam int floorNumber,
             Model model,
             HttpSession session
     ) {
@@ -303,7 +304,7 @@ public class AdminController {
             return "admin/layout";
         }
 
-        tableDAO.insert(name, capacity);
+        tableDAO.insert(name, capacity, floorNumber);
 
         return "redirect:/admin/tables";
     }

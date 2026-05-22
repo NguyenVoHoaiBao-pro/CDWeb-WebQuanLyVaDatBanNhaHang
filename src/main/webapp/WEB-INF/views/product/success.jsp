@@ -1,5 +1,5 @@
 <!-- FILE: WEB-INF/views/product/success.jsp -->
-<!-- TRANG THÀNH CÔNG -->
+
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
