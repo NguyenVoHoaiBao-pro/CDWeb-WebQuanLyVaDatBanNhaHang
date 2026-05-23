@@ -3,6 +3,8 @@ package vn.edu.hcmuaf.fit.dao;
 import vn.edu.hcmuaf.fit.model.DailyRevenue;
 import vn.edu.hcmuaf.fit.model.DashboardStats;
 import vn.edu.hcmuaf.fit.model.TopProductStat;
+import vn.edu.hcmuaf.fit.dao.ReservationDAO;
+import vn.edu.hcmuaf.fit.dao.ReservationAnalyticsDAO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -69,6 +71,10 @@ public class DashboardDAO {
         loadReservationBreakdown(stats, year, month);
         stats.setDailyRevenue(buildDailySeries(year, month));
         stats.setTopProducts(loadTopProducts(year, month, 5));
+
+        ReservationDAO reservationDAO = new ReservationDAO();
+        reservationDAO.expirePendingReservations();
+        stats.setReservationAnalytics(new ReservationAnalyticsDAO().loadTodayAnalytics());
 
         return stats;
     }

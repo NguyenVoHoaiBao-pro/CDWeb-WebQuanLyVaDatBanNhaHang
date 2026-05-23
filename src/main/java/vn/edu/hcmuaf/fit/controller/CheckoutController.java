@@ -10,6 +10,7 @@ import vn.edu.hcmuaf.fit.model.Product;
 import vn.edu.hcmuaf.fit.model.Reservation;
 import vn.edu.hcmuaf.fit.model.User;
 import vn.edu.hcmuaf.fit.dao.RestaurantTableDAO;
+import vn.edu.hcmuaf.fit.util.AuthUtil;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -32,11 +33,11 @@ public class CheckoutController {
             HttpSession session
     ){
 
-        User u = getUser(session);
-
-        if(u == null){
-            return "redirect:/login";
+        String gate = AuthUtil.requireVerified(session);
+        if (gate != null) {
+            return gate;
         }
+        User u = getUser(session);
 
         Integer reservationId =
                 (Integer) session.getAttribute("currentReservation");
@@ -85,11 +86,11 @@ public class CheckoutController {
             HttpSession session
     ){
 
-        User u = getUser(session);
-
-        if(u == null){
-            return "redirect:/login";
+        String gate = AuthUtil.requireVerified(session);
+        if (gate != null) {
+            return gate;
         }
+        User u = getUser(session);
 
         Integer reservationId =
                 (Integer) session.getAttribute("currentReservation");
@@ -106,6 +107,12 @@ public class CheckoutController {
             session.removeAttribute("currentReservation");
 
             return "redirect:/tables";
+        }
+
+        if (payment != null && (payment.startsWith("SIMULATE_"))) {
+            session.setAttribute("checkoutNote", note != null ? note : "");
+            String method = payment.replace("SIMULATE_", "");
+            return "redirect:/payment/simulate?method=" + method;
         }
 
         int orderId =

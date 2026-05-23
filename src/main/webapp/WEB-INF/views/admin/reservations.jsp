@@ -41,7 +41,12 @@
                 <td><%= r.getId() %></td>
                 <td>#<%= r.getUserId() %></td>
                 <td>Bàn #<%= r.getTableId() %></td>
-                <td><%= r.getReservationTime() %></td>
+                <td class="text-start small">
+                    <%= r.getReservationStartTime() != null ? r.getReservationStartTime() : r.getReservationTime() %>
+                    <% if (r.getReservationEndTime() != null) { %>
+                    <br><span class="text-muted">→ <%= r.getReservationEndTime() %></span>
+                    <% } %>
+                </td>
                 <td><%= r.getNumberOfPeople() %></td>
                 <td class="text-start">
                     <%
@@ -71,7 +76,7 @@
                             badge = "bg-success";
                             text = "Đã xác nhận";
                         }
-                        if ("DONE".equals(r.getStatus())) {
+                        if ("DONE".equals(r.getStatus()) || "COMPLETED".equals(r.getStatus())) {
                             badge = "bg-primary";
                             text = "Hoàn thành";
                         }

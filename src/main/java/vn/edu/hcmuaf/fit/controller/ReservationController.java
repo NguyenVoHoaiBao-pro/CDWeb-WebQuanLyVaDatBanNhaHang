@@ -3,12 +3,11 @@ package vn.edu.hcmuaf.fit.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
-import vn.edu.hcmuaf.fit.dao.ReservationDAO;
-import vn.edu.hcmuaf.fit.dao.RestaurantTableDAO;
-import vn.edu.hcmuaf.fit.dao.TableDAO;
-import vn.edu.hcmuaf.fit.model.Reservation;
-import vn.edu.hcmuaf.fit.model.RestaurantTable;
+import vn.edu.hcmuaf.fit.model.ReservationValidationResult;
 import vn.edu.hcmuaf.fit.model.User;
+import vn.edu.hcmuaf.fit.service.ReservationAvailabilityService;
+import vn.edu.hcmuaf.fit.util.AuthUtil;
+import vn.edu.hcmuaf.fit.util.ReservationRules;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
@@ -16,14 +15,15 @@ import java.time.LocalDateTime;
 @Controller
 public class ReservationController {
 
-    ReservationDAO dao = new ReservationDAO();
-    TableDAO tableDAO = new TableDAO();
+    private final ReservationAvailabilityService availabilityService = new ReservationAvailabilityService();
 
     @GetMapping("/reserve")
     public String showForm(HttpSession session) {
-        if (session.getAttribute("user") == null) {
-            return "redirect:/login";
+        String gate = AuthUtil.requireVerified(session);
+        if (gate != null) {
+            return gate;
         }
+        availabilityService.expirePendingReservations();
         return "reserve";
     }
 
@@ -35,115 +35,43 @@ public class ReservationController {
             HttpSession session,
             Model model) {
 
+        String gate = AuthUtil.requireVerified(session);
+        if (gate != null) {
+            return gate;
+        }
         User user = (User) session.getAttribute("user");
 
-        if (user == null) {
-            return "redirect:/login";
+        LocalDateTime start = ReservationRules.parseDateTime(time);
+        if (start == null) {
+            try {
+                start = LocalDateTime.parse(time);
+            } catch (Exception e) {
+                model.addAttribute("error", "Định dạng thời gian không hợp lệ");
+                return "reserve";
+            }
         }
 
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime reservationTime;
+        LocalDateTime end = start.plusHours(ReservationRules.SLOT_DURATION_HOURS);
+        String startIso = ReservationRules.toIsoLocal(start);
+        String endIso = ReservationRules.toIsoLocal(end);
 
-        try {
-            reservationTime = LocalDateTime.parse(time);
-        } catch (Exception e) {
-            model.addAttribute("error", "Định dạng thời gian không hợp lệ");
+        ReservationValidationResult validation = availabilityService.validateBooking(
+                tableId, startIso, endIso, people, 0);
+
+        if (!validation.isValid()) {
+            model.addAttribute("error", validation.getMessage());
             return "reserve";
         }
 
-        // =========================
-        // CHECK QUÁ KHỨ
-        // =========================
-        if (reservationTime.isBefore(now)) {
-
-            model.addAttribute(
-                    "error",
-                    "Không thể đặt bàn trong quá khứ"
-            );
-
-            return "reserve";
-        }
-
-        // =========================
-        // CHECK > 7 NGÀY
-        // =========================
-        if (reservationTime.isAfter(now.plusDays(7))) {
-
-            model.addAttribute(
-                    "error",
-                    "Chỉ được đặt trước tối đa 7 ngày"
-            );
-
-            return "reserve";
-        }
-
-        // =========================
-        // CHECK BÀN ĐÃ ĐƯỢC ĐẶT
-        // =========================
-        RestaurantTableDAO restaurantTableDAO = new RestaurantTableDAO();
-
-        RestaurantTable table = restaurantTableDAO.findById(tableId);
-
-        if(table == null){
-
-            model.addAttribute(
-                    "error",
-                    "Bàn không tồn tại"
-            );
-
-            return "reserve";
-        }
-
-        if(people > table.getCapacity()){
-
-            model.addAttribute(
-                    "error",
-                    "Số người vượt quá sức chứa của bàn"
-            );
-
-            return "reserve";
-        }
-        boolean booked =
-                dao.isTableBooked(tableId, time);
-
-        if (booked) {
-
-            model.addAttribute(
-                    "error",
-                    "Bàn này đã được đặt"
-            );
-
-            return "reserve";
-        }
-
-        Reservation r = new Reservation();
-
-        r.setUserId(user.getId());
-        r.setTableId(tableId);
-        r.setReservationTime(time);
-        r.setNumberOfPeople(people);
-
-        int reservationId =
-                dao.insertAndGetId(r);
+        int reservationId = availabilityService.createBooking(
+                user.getId(), tableId, startIso, endIso, people);
 
         if (reservationId == 0) {
-
-            model.addAttribute(
-                    "error",
-                    "Đặt bàn thất bại"
-            );
-
+            model.addAttribute("error", "Đặt bàn thất bại — khung giờ không còn trống");
             return "reserve";
         }
 
-        // LƯU SESSION
-        tableDAO.updateStatus(tableId, "RESERVED");
-
-        session.setAttribute(
-                "currentReservation",
-                reservationId
-        );
-
+        session.setAttribute("currentReservation", reservationId);
         return "redirect:/cart";
     }
 }

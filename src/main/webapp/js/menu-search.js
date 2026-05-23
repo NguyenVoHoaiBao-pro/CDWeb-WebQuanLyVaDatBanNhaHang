@@ -43,8 +43,8 @@
       '        <div class="price mb-3">' + price + "</div>" +
       '        <div class="d-grid gap-2">' +
       '          <a href="' + ctx + "/product/" + p.id + '" class="btn btn-dark btn-sm">Xem chi tiết</a>' +
-      '          <a href="' + ctx + "/cart/add/" + p.id + '" class="btn btn-primary-custom btn-sm">' +
-      '            <i class="bi bi-cart-plus"></i> Thêm vào giỏ</a>' +
+      '          <button type="button" class="btn btn-primary-custom btn-sm" data-add-cart="' + p.id + '">' +
+      '            <i class="bi bi-cart-plus"></i> Thêm vào giỏ</button>' +
       "        </div>" +
       "      </div>" +
       "    </div>" +

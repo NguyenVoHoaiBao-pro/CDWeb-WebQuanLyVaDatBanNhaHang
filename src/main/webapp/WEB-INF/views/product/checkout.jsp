@@ -2,6 +2,7 @@
 <%@ page import="java.util.*" %>
 <%@ page import="vn.edu.hcmuaf.fit.model.Product" %>
 <%@ page import="vn.edu.hcmuaf.fit.model.RestaurantTable" %>
+<%@ page import="vn.edu.hcmuaf.fit.util.DateUtil" %>
 
 <%
     String ctx = request.getContextPath();
@@ -46,7 +47,12 @@
 
                     <div class="mb-3">
                         <label class="form-label">Thời gian đến</label>
-                        <input type="text" class="form-control" value="${reservation.reservationTime}" readonly>
+                        <%
+                            vn.edu.hcmuaf.fit.model.Reservation res = (vn.edu.hcmuaf.fit.model.Reservation) request.getAttribute("reservation");
+                            String timeShow = res != null ? DateUtil.formatDateTimeRange(
+                                    res.getReservationStartTime(), res.getReservationEndTime()) : "";
+                        %>
+                        <input type="text" class="form-control" value="<%= timeShow %>" readonly>
                     </div>
 
                     <div class="mb-3">
@@ -56,10 +62,13 @@
 
                     <div class="mb-3">
                         <label class="form-label">Thanh toán</label>
-                        <select name="payment" class="form-select">
-                            <option value="COD">Trả sau khi ăn</option>
-                            <option value="DEPOSIT">Đặt cọc trước</option>
+                        <select name="payment" class="form-select" id="paymentMethod">
+                            <option value="COD">Trả sau khi ăn (tại quầy)</option>
+                            <option value="DEPOSIT">Đặt cọc trước (tại quầy)</option>
+                            <option value="SIMULATE_MOMO">MoMo — thanh toán giả lập</option>
+                            <option value="SIMULATE_VNPAY">VNPay — thanh toán giả lập</option>
                         </select>
+                        <small class="text-muted d-block mt-1">MoMo/VNPay chỉ mô phỏng giao diện, không trừ tiền thật.</small>
                     </div>
 
                     <div class="mb-4">

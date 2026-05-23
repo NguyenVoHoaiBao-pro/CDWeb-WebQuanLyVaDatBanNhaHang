@@ -43,7 +43,8 @@
 .kpi-card {
   position: relative;
   overflow: hidden;
-  padding: 1.35rem 1.25rem;
+  padding: 1.35rem 3.25rem 1.35rem 1.25rem;
+  min-height: 118px;
   border-radius: var(--radius-lg);
   background: var(--bg-card);
   border: 1px solid var(--border-glass);
@@ -117,12 +118,21 @@
 
 .kpi-icon {
   position: absolute;
-  right: 1rem;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 2.25rem;
-  opacity: 0.12;
+  font-size: 2rem;
+  opacity: 0.1;
   color: var(--orange);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.kpi-card .kpi-label,
+.kpi-card .kpi-value,
+.kpi-card .kpi-meta {
+  position: relative;
+  z-index: 1;
 }
 
 /* Chart panels */
@@ -152,10 +162,42 @@
 .chart-wrap {
   position: relative;
   height: 280px;
+  width: 100%;
+  min-height: 200px;
 }
 
 .chart-wrap.sm {
-  height: 240px;
+  height: 200px;
+  min-height: 180px;
+}
+
+.dash-charts-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dash-charts-sidebar .dash-panel {
+  flex: 0 0 auto;
+}
+
+.dash-panel--scroll {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.admin-content .row {
+  --bs-gutter-x: 1rem;
+  --bs-gutter-y: 1rem;
+}
+
+.admin-content .row.align-items-stretch > [class*="col-"] {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-content .row.align-items-stretch .dash-panel {
+  flex: 1 1 auto;
 }
 
 /* Mini system stats */

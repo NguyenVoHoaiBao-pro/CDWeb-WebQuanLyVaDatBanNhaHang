@@ -21,6 +21,10 @@ body.admin-body {
   overflow-y: auto;
 }
 
+.staff-sidebar h4 {
+  color: #38bdf8;
+}
+
 .admin-sidebar h4 {
   padding: 0 1.5rem 1.5rem;
   font-weight: 800;
@@ -52,8 +56,25 @@ body.admin-body {
 
 .admin-content {
   margin-left: 260px;
-  padding: 2rem;
+  padding: 2rem 2rem 3rem;
   min-height: 100vh;
+  position: relative;
+  z-index: 1;
+  width: calc(100% - 260px);
+  box-sizing: border-box;
+  overflow-x: auto;
+}
+
+.admin-sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 1035;
+}
+
+.admin-sidebar-backdrop.active {
+  display: block;
 }
 
 .admin-menu-btn {
@@ -77,17 +98,29 @@ body.admin-body {
 @media (max-width: 992px) {
   .admin-sidebar {
     transform: translateX(-100%);
+    z-index: 1045;
   }
   .admin-sidebar.active {
     transform: translateX(0);
   }
   .admin-content {
     margin-left: 0;
-    padding: 4rem 1rem 2rem;
+    width: 100%;
+    padding: 4.5rem 1rem 2rem;
   }
   .admin-menu-btn {
     display: flex;
   }
+}
+
+.admin-content .dash-header,
+.admin-content .kpi-grid,
+.admin-content .card-box {
+  max-width: 100%;
+}
+
+.dataTables_wrapper {
+  overflow-x: auto;
 }
 
 /* Admin cards */

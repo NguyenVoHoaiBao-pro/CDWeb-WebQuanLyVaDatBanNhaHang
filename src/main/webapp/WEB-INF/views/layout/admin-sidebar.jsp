@@ -9,9 +9,6 @@
     <a href="<%= ctx %>/admin" data-admin-nav="/admin">
         <i class="bi bi-speedometer2"></i> Dashboard
     </a>
-    <a href="<%= ctx %>/admin?month=5" data-admin-nav>
-        <i class="bi bi-bar-chart-line"></i> Báo cáo tháng 5
-    </a>
     <a href="<%= ctx %>/admin/products" data-admin-nav="/admin/products">
         <i class="bi bi-basket"></i> Sản phẩm
     </a>
@@ -23,6 +20,9 @@
     </a>
     <a href="<%= ctx %>/admin/reservations" data-admin-nav="/admin/reservations">
         <i class="bi bi-calendar-check"></i> Đặt bàn
+    </a>
+    <a href="<%= ctx %>/staff" data-admin-nav="/staff">
+        <i class="bi bi-person-workspace"></i> Khu vực nhân viên
     </a>
     <a href="<%= ctx %>/" data-admin-nav>
         <i class="bi bi-house"></i> Về trang chủ

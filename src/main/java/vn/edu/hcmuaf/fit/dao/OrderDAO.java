@@ -93,12 +93,11 @@ public class OrderDAO {
             orderPs.setInt(2, reservationId);
             orderPs.setDouble(3, total);
 
-            orderPs.setString(
-                    4,
-                    payment.equals("DEPOSIT")
-                            ? "PAID"
-                            : "UNPAID"
-            );
+            String payStatus = "UNPAID";
+            if (payment != null && (payment.startsWith("ONLINE_") || "DEPOSIT".equals(payment))) {
+                payStatus = "PAID";
+            }
+            orderPs.setString(4, payStatus);
 
             orderPs.executeUpdate();
 
@@ -116,6 +115,10 @@ public class OrderDAO {
                 conn.rollback();
 
                 return 0;
+            }
+
+            if ("STAFF_BILL".equals(payment)) {
+                attachStaffBillMeta(conn, orderId);
             }
 
             // =========================
@@ -162,34 +165,18 @@ public class OrderDAO {
             PreparedStatement reservationPs =
                     conn.prepareStatement(reservationSql);
 
-            reservationPs.setString(
-                    1,
-                    payment.equals("DEPOSIT")
-                            ? "CONFIRMED"
-                            : "WAITING_PAYMENT"
-            );
+            String resStatus = "WAITING_PAYMENT";
+            if ("DEPOSIT".equals(payment) || "STAFF_BILL".equals(payment)) {
+                resStatus = "CONFIRMED";
+            }
+            reservationPs.setString(1, resStatus);
 
-            reservationPs.setString(2, note);
-            reservationPs.setString(3, payment);
+            reservationPs.setString(2, note != null ? note : "");
+            reservationPs.setString(3, payment != null ? payment : "COD");
             reservationPs.setDouble(4, total);
             reservationPs.setInt(5, reservationId);
 
             reservationPs.executeUpdate();
-
-            // =========================
-            // UPDATE TABLE
-            // =========================
-
-            PreparedStatement tablePs =
-                    conn.prepareStatement(
-                            "UPDATE restaurant_tables " +
-                                    "SET status='RESERVED' " +
-                                    "WHERE id=?"
-                    );
-
-            tablePs.setInt(1, reservation.getTableId());
-
-            tablePs.executeUpdate();
 
             // =========================
             // CLEAR CART
@@ -236,6 +223,61 @@ public class OrderDAO {
 
         return 0;
     }
+
+    /** Nhân viên: không chọn hình thức thanh toán — chỉ xuất hóa đơn tại quầy. */
+    public int staffCheckout(int staffUserId, int reservationId, String note) {
+        return checkout(staffUserId, reservationId, "STAFF_BILL", note);
+    }
+
+    private void attachStaffBillMeta(Connection conn, int orderId) throws SQLException {
+        String code = "NHCT-" + orderId + "-" + System.currentTimeMillis() % 100000;
+        try (PreparedStatement ps = conn.prepareStatement(
+                "UPDATE orders SET bill_code=?, order_channel='STAFF' WHERE id=?")) {
+            ps.setString(1, code);
+            ps.setInt(2, orderId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "UPDATE orders SET bill_code=? WHERE id=?")) {
+                ps.setString(1, code);
+                ps.setInt(2, orderId);
+                ps.executeUpdate();
+            }
+        }
+    }
+
+    public Order findById(int orderId) {
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement("SELECT * FROM orders WHERE id=?")
+        ) {
+            ps.setInt(1, orderId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapOrder(rs);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Order mapOrder(ResultSet rs) throws SQLException {
+        Order order = new Order();
+        order.setId(rs.getInt("id"));
+        order.setUserId(rs.getInt("user_id"));
+        order.setReservationId(rs.getInt("reservation_id"));
+        order.setTotal(rs.getDouble("total"));
+        order.setPaymentStatus(rs.getString("payment_status"));
+        try {
+            order.setBillCode(rs.getString("bill_code"));
+            order.setOrderChannel(rs.getString("order_channel"));
+            order.setCreatedAt(rs.getString("created_at"));
+        } catch (SQLException ignored) {
+        }
+        return order;
+    }
+
     public Order getBill(int reservationId){
 
         Order order = null;
@@ -258,26 +300,7 @@ public class OrderDAO {
             ResultSet rs = ps.executeQuery();
 
             if(rs.next()){
-
-                order = new Order();
-
-                order.setId(rs.getInt("id"));
-
-                order.setUserId(
-                        rs.getInt("user_id")
-                );
-
-                order.setReservationId(
-                        rs.getInt("reservation_id")
-                );
-
-                order.setTotal(
-                        rs.getDouble("total")
-                );
-
-                order.setPaymentStatus(
-                        rs.getString("payment_status")
-                );
+                order = mapOrder(rs);
             }
 
         }catch(Exception e){

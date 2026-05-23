@@ -34,6 +34,7 @@ public class DashboardStats {
 
     private List<DailyRevenue> dailyRevenue = new ArrayList<>();
     private List<TopProductStat> topProducts = new ArrayList<>();
+    private ReservationAnalytics reservationAnalytics;
 
     public int getYear() { return year; }
     public void setYear(int year) { this.year = year; }
@@ -103,4 +104,9 @@ public class DashboardStats {
 
     public List<TopProductStat> getTopProducts() { return topProducts; }
     public void setTopProducts(List<TopProductStat> topProducts) { this.topProducts = topProducts; }
+
+    public ReservationAnalytics getReservationAnalytics() { return reservationAnalytics; }
+    public void setReservationAnalytics(ReservationAnalytics reservationAnalytics) {
+        this.reservationAnalytics = reservationAnalytics;
+    }
 }

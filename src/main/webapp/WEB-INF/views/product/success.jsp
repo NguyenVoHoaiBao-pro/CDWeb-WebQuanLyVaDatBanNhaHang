@@ -64,7 +64,13 @@
 
     <div class="mb-4">
 
-      <% if("DEPOSIT".equals(payment)){ %>
+      <% if(payment != null && payment.startsWith("ONLINE_")){ %>
+
+      <div class="alert alert-success">
+        Đã <b>thanh toán giả lập</b> thành công qua <%= payment.replace("ONLINE_", "") %>.
+      </div>
+
+      <% } else if("DEPOSIT".equals(payment)){ %>
 
       <div class="alert alert-warning">
         Bạn đã chọn <b>Đặt cọc trước</b>.

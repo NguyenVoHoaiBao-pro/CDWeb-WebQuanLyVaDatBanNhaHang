@@ -4,7 +4,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import vn.edu.hcmuaf.fit.dao.ReservationDAO;
-import vn.edu.hcmuaf.fit.dao.TableDAO;
 import vn.edu.hcmuaf.fit.model.Reservation;
 import vn.edu.hcmuaf.fit.model.User;
 
@@ -14,7 +13,6 @@ import javax.servlet.http.HttpSession;
 public class CancelBookingController {
 
     ReservationDAO reservationDAO = new ReservationDAO();
-    TableDAO tableDAO = new TableDAO();
 
     @GetMapping("/cancel-booking/{id}")
     public String cancel(@PathVariable int id,
@@ -33,7 +31,6 @@ public class CancelBookingController {
                 && "PENDING".equals(target.getStatus())) {
 
             reservationDAO.updateStatus(id, "CANCELLED");
-            tableDAO.updateStatus(target.getTableId(), "AVAILABLE");
 
             Integer current = (Integer) session.getAttribute("currentReservation");
             if (current != null && current == id) {

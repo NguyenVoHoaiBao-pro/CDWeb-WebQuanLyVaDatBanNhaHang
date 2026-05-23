@@ -3,6 +3,7 @@ package vn.edu.hcmuaf.fit.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import vn.edu.hcmuaf.fit.dao.ReservationDAO;
 import vn.edu.hcmuaf.fit.dao.TableDAO;
 import vn.edu.hcmuaf.fit.model.User;
 import vn.edu.hcmuaf.fit.util.AuthUtil;
@@ -14,7 +15,13 @@ public class TableController {
 
     private TableDAO dao = new TableDAO();
     @GetMapping("/tables")
-    public String tables(Model model) {
+    public String tables(Model model, HttpSession session) {
+        if (session.getAttribute("user") != null) {
+            AuthUtil.refreshSessionUser(session);
+        }
+        ReservationDAO reservationDAO = new ReservationDAO();
+        reservationDAO.expirePendingReservations();
+        dao.normalizeOperationalStatus();
 
         model.addAttribute(
                 "groundTables",

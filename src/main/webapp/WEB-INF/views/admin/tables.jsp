@@ -22,8 +22,8 @@
                 <th>Tên bàn</th>
                 <th>Sức chứa</th>
                 <th>Tầng</th>
-                <th>Trạng thái</th>
-                <th width="280">Thao tác</th>
+                <th>Vận hành</th>
+                <th width="300">Thao tác</th>
             </tr>
             </thead>
             <tbody>
@@ -43,16 +43,27 @@
                     %>
                 </td>
                 <td>
-                    <span class="badge <%= "AVAILABLE".equals(t.getStatus()) ? "bg-success" : "bg-warning text-dark" %>">
-                        <%= "AVAILABLE".equals(t.getStatus()) ? "Còn trống" : "Đã đặt" %>
-                    </span>
+                    <%
+                        String st = t.getStatus();
+                        String stLabel = "Hoạt động";
+                        String stClass = "bg-success";
+                        if ("MAINTENANCE".equals(st)) {
+                            stLabel = "Bảo trì";
+                            stClass = "bg-secondary";
+                        } else if ("RESERVED".equals(st)) {
+                            stLabel = "Legacy — nên đặt Hoạt động";
+                            stClass = "bg-warning text-dark";
+                        }
+                    %>
+                    <span class="badge <%= stClass %>"><%= stLabel %></span>
+                    <div class="small text-muted mt-1">Lịch đặt: bảng reservations</div>
                 </td>
                 <td>
                     <div class="d-flex gap-2 justify-content-center flex-wrap">
                         <a href="${pageContext.request.contextPath}/admin/change-table/<%= t.getId() %>/AVAILABLE"
-                           class="btn btn-success btn-sm">Còn trống</a>
-                        <a href="${pageContext.request.contextPath}/admin/change-table/<%= t.getId() %>/RESERVED"
-                           class="btn btn-warning btn-sm">Đã đặt</a>
+                           class="btn btn-success btn-sm">Hoạt động</a>
+                        <a href="${pageContext.request.contextPath}/admin/change-table/<%= t.getId() %>/MAINTENANCE"
+                           class="btn btn-secondary btn-sm">Bảo trì</a>
                         <a href="${pageContext.request.contextPath}/admin/tables/delete/<%= t.getId() %>"
                            class="btn btn-danger btn-sm"
                            onclick="return confirm('Bạn có chắc muốn xóa bàn này?')">

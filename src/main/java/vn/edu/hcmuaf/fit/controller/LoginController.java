@@ -27,11 +27,14 @@ public class LoginController {
         User user = userDAO.login(username, password);
 
         if (user != null) {
-
+            new UserDAO().ensureIdentityColumns();
             session.setAttribute("user", user);
 
             if ("ADMIN".equals(user.getRole())) {
                 return "redirect:/admin";
+            }
+            if ("STAFF".equals(user.getRole())) {
+                return "redirect:/staff";
             }
 
             return "redirect:/";

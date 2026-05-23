@@ -8,6 +8,9 @@ public class User {
     private String fullName;
     private String email;
     private String role;
+    /** Đã xác thực danh tính qua bài quiz */
+    private boolean identityVerified;
+    private String identityVerifiedAt;
 
     public User() {}
 
@@ -63,4 +66,19 @@ public class User {
         this.role = role;
     }
 
+    public boolean isIdentityVerified() {
+        return identityVerified;
+    }
+
+    public void setIdentityVerified(boolean identityVerified) {
+        this.identityVerified = identityVerified;
+    }
+
+    public String getIdentityVerifiedAt() {
+        return identityVerifiedAt;
+    }
+
+    public void setIdentityVerifiedAt(String identityVerifiedAt) {
+        this.identityVerifiedAt = identityVerifiedAt;
+    }
 }

@@ -170,6 +170,33 @@
       });
     }
 
+    var busyCtx = document.getElementById("busyHoursChart");
+    if (busyCtx && data.busyHourLabels && data.busyHourLabels.length > 0) {
+      new Chart(busyCtx, {
+        type: "bar",
+        data: {
+          labels: data.busyHourLabels,
+          datasets: [
+            {
+              label: "Lượt đặt",
+              data: data.busyHourCounts,
+              backgroundColor: "rgba(255, 107, 53, 0.8)",
+              borderRadius: 6,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1 } },
+            x: { grid: { display: false } },
+          },
+        },
+      });
+    }
+
     var topCtx = document.getElementById("topProductsChart");
     if (topCtx && data.topNames && data.topNames.length > 0) {
       new Chart(topCtx, {

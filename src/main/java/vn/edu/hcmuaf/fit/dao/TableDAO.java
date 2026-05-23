@@ -184,4 +184,18 @@ public class TableDAO {
 
         return list;
     }
+
+    public void normalizeOperationalStatus() {
+        String sql =
+                "UPDATE restaurant_tables SET status='AVAILABLE' " +
+                        "WHERE status='RESERVED' OR status IS NULL OR status=''";
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

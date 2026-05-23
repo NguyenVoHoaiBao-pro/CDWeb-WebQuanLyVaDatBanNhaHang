@@ -7,11 +7,18 @@
     request.setAttribute("pageTitle", "Sửa booking — Nhà Hàng Của Chúng Ta");
     Reservation booking = (Reservation) request.getAttribute("booking");
 
-    String datetimeValue = "";
-    if (booking != null && booking.getReservationTime() != null) {
-        datetimeValue = booking.getReservationTime().trim().replace(" ", "T");
-        if (datetimeValue.length() > 16) {
-            datetimeValue = datetimeValue.substring(0, 16);
+    String datetimeStart = "";
+    String datetimeEnd = "";
+    if (booking != null) {
+        String start = booking.getReservationStartTime();
+        if (start != null) {
+            datetimeStart = start.trim().replace(" ", "T");
+            if (datetimeStart.length() > 16) datetimeStart = datetimeStart.substring(0, 16);
+        }
+        String end = booking.getReservationEndTime();
+        if (end != null) {
+            datetimeEnd = end.trim().replace(" ", "T");
+            if (datetimeEnd.length() > 16) datetimeEnd = datetimeEnd.substring(0, 16);
         }
     }
 %>
@@ -37,6 +44,9 @@
             </div>
         </c:when>
         <c:otherwise>
+            <c:if test="${error != null}">
+                <div class="alert alert-danger text-center mb-4">${error}</div>
+            </c:if>
             <div class="booking-form-card">
                 <div class="glass-card p-4 p-md-5">
                     <div class="form-icon"><i class="bi bi-pencil-square"></i></div>
@@ -51,11 +61,20 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Thời gian đến</label>
+                            <label class="form-label">Giờ bắt đầu</label>
                             <input type="datetime-local"
                                    name="reservationTime"
                                    class="form-control"
-                                   value="<%= datetimeValue %>"
+                                   value="<%= datetimeStart %>"
+                                   required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Giờ kết thúc</label>
+                            <input type="datetime-local"
+                                   name="reservationEndTime"
+                                   class="form-control"
+                                   value="<%= datetimeEnd %>"
                                    required>
                         </div>
 

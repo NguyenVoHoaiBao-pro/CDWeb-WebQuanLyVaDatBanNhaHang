@@ -367,6 +367,36 @@ public class CartDAO {
 
         return false;
     }
+    public int getItemCount(int userId, int reservationId) {
+
+        if (reservationId <= 0) {
+            return 0;
+        }
+
+        String sql =
+                "SELECT COALESCE(SUM(quantity), 0) AS cnt " +
+                        "FROM cart WHERE user_id=? AND reservation_id=?";
+
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            ps.setInt(1, userId);
+            ps.setInt(2, reservationId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("cnt");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
     public double getTotal(int userId, int reservationId){
 
         double total = 0;

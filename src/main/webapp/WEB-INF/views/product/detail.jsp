@@ -43,10 +43,11 @@
                         <p class="text-muted mb-4" style="line-height:1.8">${product.description}</p>
 
                         <div class="d-grid gap-3">
-                            <a href="${pageContext.request.contextPath}/cart/add/${product.id}"
-                               class="btn btn-primary-custom btn-lg">
+                            <button type="button"
+                                    class="btn btn-primary-custom btn-lg"
+                                    data-add-cart="${product.id}">
                                 <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
-                            </a>
+                            </button>
                             <a href="${pageContext.request.contextPath}/products" class="btn btn-outline-custom">
                                 <i class="bi bi-arrow-left"></i> Quay lại thực đơn
                             </a>
@@ -76,7 +77,7 @@
                                 <div class="price mb-3" style="font-size:1rem;">${p.price} đ</div>
                                 <div class="d-grid gap-2 mt-auto">
                                     <a href="${pageContext.request.contextPath}/product/${p.id}" class="btn btn-dark btn-sm">Xem</a>
-                                    <a href="${pageContext.request.contextPath}/cart/add/${p.id}" class="btn btn-primary-custom btn-sm">Thêm</a>
+                                    <button type="button" class="btn btn-primary-custom btn-sm" data-add-cart="${p.id}">Thêm</button>
                                 </div>
                             </div>
                         </div>

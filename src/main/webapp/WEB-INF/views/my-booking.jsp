@@ -54,13 +54,18 @@
                         if ("PENDING".equals(r.getStatus())) statusLabel = "Chờ xác nhận";
                         else if ("CONFIRMED".equals(r.getStatus())) statusLabel = "Đã xác nhận";
                         else if ("CANCELLED".equals(r.getStatus())) statusLabel = "Đã hủy";
-                        else if ("DONE".equals(r.getStatus())) statusLabel = "Hoàn thành";
+                        else if ("DONE".equals(r.getStatus()) || "COMPLETED".equals(r.getStatus())) statusLabel = "Hoàn thành";
                         else if ("WAITING_PAYMENT".equals(r.getStatus())) statusLabel = "Chờ thanh toán";
                 %>
                 <tr>
                     <td>#<%= r.getId() %></td>
                     <td><i class="bi bi-grid"></i> Bàn #<%= r.getTableId() %></td>
-                    <td><%= r.getReservationTime() %></td>
+                    <td>
+                        <%= r.getReservationStartTime() != null ? r.getReservationStartTime() : r.getReservationTime() %>
+                        <% if (r.getReservationEndTime() != null) { %>
+                        <br><small class="text-muted">→ <%= r.getReservationEndTime() %></small>
+                        <% } %>
+                    </td>
                     <td><%= r.getNumberOfPeople() %></td>
                     <td>
                         <span class="booking-status <%= r.getStatus() %>"><%= statusLabel %></span>

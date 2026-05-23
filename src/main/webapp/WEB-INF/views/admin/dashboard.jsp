@@ -1,5 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="vn.edu.hcmuaf.fit.model.*" %>
+<%@ page import="vn.edu.hcmuaf.fit.model.ReservationAnalytics" %>
+<%@ page import="vn.edu.hcmuaf.fit.model.TableBookingStat" %>
 <%@ page import="java.util.*" %>
 <%!
     String fmtMoney(double v) {
@@ -106,7 +108,7 @@
 </div>
 
 <!-- Biểu đồ -->
-<div class="row g-3 mb-3">
+<div class="row g-3 mb-3 align-items-stretch">
     <div class="col-lg-8">
         <div class="dash-panel">
             <div class="dash-panel-title">
@@ -128,8 +130,8 @@
             <% } %>
         </div>
     </div>
-    <div class="col-lg-4">
-        <div class="dash-panel mb-3">
+    <div class="col-lg-4 dash-charts-sidebar">
+        <div class="dash-panel">
             <div class="dash-panel-title">
                 <span><i class="bi bi-credit-card me-2"></i>Thanh toán</span>
             </div>
@@ -148,9 +150,9 @@
     </div>
 </div>
 
-<div class="row g-3 mb-3">
+<div class="row g-3 mb-3 align-items-stretch">
     <div class="col-lg-5">
-        <div class="dash-panel h-100">
+        <div class="dash-panel dash-panel--scroll h-100">
             <div class="dash-panel-title">
                 <span><i class="bi bi-trophy me-2"></i>Top món bán chạy</span>
                 <span class="text-muted small">Tháng <%= selMonth %></span>
@@ -225,6 +227,65 @@
                     </tfoot>
                 </table>
             </div>
+        </div>
+    </div>
+</div>
+
+<%
+    ReservationAnalytics resAnalytics = stats.getReservationAnalytics();
+    if (resAnalytics == null) resAnalytics = new ReservationAnalytics();
+%>
+<p class="text-muted small text-uppercase fw-semibold mb-2 mt-4" style="letter-spacing:0.08em;">Đặt bàn &amp; vận hành hôm nay</p>
+<div class="kpi-grid mb-3">
+    <div class="kpi-card">
+        <i class="bi bi-calendar-plus kpi-icon"></i>
+        <div class="kpi-label">Đặt bàn hôm nay</div>
+        <div class="kpi-value"><%= resAnalytics.getReservationsToday() %></div>
+    </div>
+    <div class="kpi-card">
+        <i class="bi bi-lightning kpi-icon"></i>
+        <div class="kpi-label">Đang active</div>
+        <div class="kpi-value" style="color:#4ade80;"><%= resAnalytics.getActiveReservations() %></div>
+    </div>
+    <div class="kpi-card">
+        <i class="bi bi-x-circle kpi-icon"></i>
+        <div class="kpi-label">Hủy hôm nay</div>
+        <div class="kpi-value"><%= resAnalytics.getCancelledToday() %></div>
+    </div>
+    <div class="kpi-card">
+        <i class="bi bi-check2-circle kpi-icon"></i>
+        <div class="kpi-label">Hoàn thành hôm nay</div>
+        <div class="kpi-value"><%= resAnalytics.getCompletedToday() %></div>
+    </div>
+    <div class="kpi-card highlight">
+        <i class="bi bi-percent kpi-icon"></i>
+        <div class="kpi-label">Công suất bàn hôm nay</div>
+        <div class="kpi-value accent"><%= String.format("%.0f", resAnalytics.getTableUtilizationPercent()) %>%</div>
+    </div>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-lg-6">
+        <div class="dash-panel h-100">
+            <div class="dash-panel-title"><span><i class="bi bi-clock-history me-2"></i>Giờ đặt bàn cao điểm (30 ngày)</span></div>
+            <div class="chart-wrap sm"><canvas id="busyHoursChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="dash-panel h-100">
+            <div class="dash-panel-title"><span><i class="bi bi-grid me-2"></i>Bàn được đặt nhiều nhất</span></div>
+            <% if (resAnalytics.getTopTables().isEmpty()) { %>
+            <p class="text-muted small p-3 mb-0">Chưa có dữ liệu.</p>
+            <% } else { %>
+            <ul class="list-group list-group-flush admin-top-tables">
+                <% for (TableBookingStat tb : resAnalytics.getTopTables()) { %>
+                <li class="list-group-item bg-transparent d-flex justify-content-between text-light border-secondary">
+                    <span><%= tb.getTableName() != null ? tb.getTableName() : ("Bàn #" + tb.getTableId()) %></span>
+                    <span class="badge bg-warning text-dark"><%= tb.getBookingCount() %> lượt</span>
+                </li>
+                <% } %>
+            </ul>
+            <% } %>
         </div>
     </div>
 </div>

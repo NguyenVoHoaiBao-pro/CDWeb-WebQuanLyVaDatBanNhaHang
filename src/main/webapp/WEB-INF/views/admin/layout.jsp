@@ -19,6 +19,7 @@
 
 <body class="admin-body">
 
+<div class="admin-sidebar-backdrop" id="adminSidebarBackdrop" onclick="toggleAdminMenu()"></div>
 <jsp:include page="../layout/admin-sidebar.jsp"/>
 
 <div class="admin-content">

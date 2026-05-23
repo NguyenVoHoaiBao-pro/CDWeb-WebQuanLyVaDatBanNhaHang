@@ -38,6 +38,8 @@ public class AdminController {
 
         if (!AuthUtil.isAdmin(session)) return "redirect:/login";
 
+        new ReservationDAO().expirePendingReservations();
+
         LocalDate now = LocalDate.now();
         int reportYear = year != null ? year : now.getYear();
         int reportMonth = month != null ? month : now.getMonthValue();
@@ -79,6 +81,21 @@ public class AdminController {
         data.put("resConfirmed", stats.getReservationsConfirmed());
         data.put("resDone", stats.getReservationsDone());
         data.put("resCancelled", stats.getReservationsCancelled());
+
+        if (stats.getReservationAnalytics() != null) {
+            ReservationAnalytics ra = stats.getReservationAnalytics();
+            data.put("resToday", ra.getReservationsToday());
+            data.put("resActive", ra.getActiveReservations());
+            data.put("tableUtil", ra.getTableUtilizationPercent());
+            List<String> busyLabels = new ArrayList<>();
+            List<Integer> busyCounts = new ArrayList<>();
+            for (HourlyBookingStat h : ra.getBusiestHours()) {
+                busyLabels.add(h.getHour() + ":00");
+                busyCounts.add(h.getCount());
+            }
+            data.put("busyHourLabels", busyLabels);
+            data.put("busyHourCounts", busyCounts);
+        }
 
         return gson.toJson(data);
     }
@@ -252,6 +269,21 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
+    @GetMapping("/set-role/{id}/{role}")
+    public String setRole(
+            @PathVariable int id,
+            @PathVariable String role,
+            HttpSession session) {
+
+        if (!AuthUtil.isAdmin(session)) {
+            return "redirect:/login";
+        }
+        if ("USER".equals(role) || "STAFF".equals(role) || "ADMIN".equals(role)) {
+            userDAO.setRole(id, role);
+        }
+        return "redirect:/admin/users";
+    }
+
     @GetMapping("/tables")
     public String tables(Model model, HttpSession session) {
 
@@ -271,7 +303,9 @@ public class AdminController {
 
         if (!AuthUtil.isAdmin(session)) return "redirect:/login";
 
-        if (!status.equals("AVAILABLE") && !status.equals("RESERVED")) {
+        if (!status.equals("AVAILABLE")
+                && !status.equals("MAINTENANCE")
+                && !status.equals("RESERVED")) {
             return "redirect:/admin/tables";
         }
 
@@ -285,6 +319,7 @@ public class AdminController {
 
         if (!AuthUtil.isAdmin(session)) return "redirect:/login";
 
+        reservationDAO.expirePendingReservations();
         model.addAttribute("list", reservationDAO.getAll());
         model.addAttribute("page", "reservations.jsp");
 
@@ -319,6 +354,7 @@ public class AdminController {
         if (!status.equals("PENDING") &&
                 !status.equals("CONFIRMED") &&
                 !status.equals("DONE") &&
+                !status.equals("COMPLETED") &&
                 !status.equals("CANCELLED")) {
             return "redirect:/admin/reservations";
         }

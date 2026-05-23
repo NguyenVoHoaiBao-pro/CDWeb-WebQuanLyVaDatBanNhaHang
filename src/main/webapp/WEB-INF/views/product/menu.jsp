@@ -73,8 +73,9 @@
             <h2 class="fw-bold mb-0">Danh sách món ăn</h2>
             <small class="text-muted" id="menuResultCount"><%= list.size() %> món</small>
         </div>
-        <a href="<%= ctx %>/cart" class="btn btn-primary-custom">
+        <a href="<%= ctx %>/cart" class="btn btn-primary-custom position-relative" data-cart-target>
             <i class="bi bi-cart3"></i> Giỏ hàng
+            <span class="cart-nav-badge d-none" data-cart-count>0</span>
         </a>
     </div>
 
@@ -105,9 +106,11 @@
                         <div class="price mb-3"><%= String.format("%,.0f", p.getPrice()) %> đ</div>
                         <div class="d-grid gap-2">
                             <a href="<%= ctx %>/product/<%= p.getId() %>" class="btn btn-dark btn-sm">Xem chi tiết</a>
-                            <a href="<%= ctx %>/cart/add/<%= p.getId() %>" class="btn btn-primary-custom btn-sm">
+                            <button type="button"
+                                    class="btn btn-primary-custom btn-sm"
+                                    data-add-cart="<%= p.getId() %>">
                                 <i class="bi bi-cart-plus"></i> Thêm vào giỏ
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
