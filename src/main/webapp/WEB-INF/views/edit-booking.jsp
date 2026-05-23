@@ -1,185 +1,88 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ page import="java.util.*,vn.edu.hcmuaf.fit.model.Reservation" %>
+<%@ page import="vn.edu.hcmuaf.fit.model.Reservation" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%
     String ctx = request.getContextPath();
-    List<Reservation> list =
-            (List<Reservation>) request.getAttribute("list");
+    request.setAttribute("pageTitle", "Sửa booking — Nhà Hàng Của Chúng Ta");
+    Reservation booking = (Reservation) request.getAttribute("booking");
+
+    String datetimeValue = "";
+    if (booking != null && booking.getReservationTime() != null) {
+        datetimeValue = booking.getReservationTime().trim().replace(" ", "T");
+        if (datetimeValue.length() > 16) {
+            datetimeValue = datetimeValue.substring(0, 16);
+        }
+    }
 %>
 
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<jsp:include page="layout/header.jsp"/>
 
-    <title>Booking Của Tôi</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <style>
-
-        body{
-            background:#f8fafc;
-            font-family:Segoe UI;
-        }
-
-        .hero{
-            height:280px;
-            background:
-                    linear-gradient(rgba(0,0,0,.55),rgba(0,0,0,.55)),
-                    url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4') center/cover;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            text-align:center;
-            color:white;
-        }
-
-        .hero h1{
-            font-size:52px;
-            font-weight:900;
-        }
-
-        .box{
-            background:white;
-            padding:30px;
-            border-radius:24px;
-            box-shadow:0 15px 35px rgba(0,0,0,.08);
-        }
-
-        .status{
-            padding:8px 16px;
-            border-radius:30px;
-            font-size:14px;
-            font-weight:700;
-        }
-
-        .PENDING{
-            background:#fef3c7;
-            color:#92400e;
-        }
-
-        .CONFIRMED{
-            background:#dcfce7;
-            color:#166534;
-        }
-
-        .CANCELLED{
-            background:#fee2e2;
-            color:#991b1b;
-        }
-
-        .DONE{
-            background:#dbeafe;
-            color:#1d4ed8;
-        }
-
-    </style>
-</head>
-
-<body>
-
-<section class="hero">
-    <div>
-        <h1>📅 Booking Của Tôi</h1>
-        <p>Quản lý đặt bàn chuyên nghiệp</p>
+<section class="page-hero">
+    <div class="container">
+        <h1>✏️ Sửa đặt bàn</h1>
+        <p>Cập nhật thời gian hoặc số khách cho booking đang chờ</p>
     </div>
 </section>
 
 <div class="container py-5">
-
-    <div class="box">
-
-        <div class="d-flex justify-content-between mb-4">
-
-            <h2 class="fw-bold">Lịch Sử Booking</h2>
-
-            <div>
-                <a href="<%=ctx%>/tables" class="btn btn-warning">
-                    + Đặt thêm
+    <c:choose>
+        <c:when test="${booking == null}">
+            <div class="glass-card text-center p-5">
+                <i class="bi bi-exclamation-circle display-4 text-muted"></i>
+                <h4 class="mt-3">Không tìm thấy booking hoặc không thể chỉnh sửa</h4>
+                <a href="<%= ctx %>/my-booking" class="btn btn-primary-custom mt-3">
+                    Quay lại danh sách
                 </a>
             </div>
+        </c:when>
+        <c:otherwise>
+            <div class="booking-form-card">
+                <div class="glass-card p-4 p-md-5">
+                    <div class="form-icon"><i class="bi bi-pencil-square"></i></div>
+                    <h2 class="text-center fw-bold mb-4">Chỉnh sửa booking #${booking.id}</h2>
 
-        </div>
+                    <form action="<%= ctx %>/edit-booking" method="post">
+                        <input type="hidden" name="id" value="${booking.id}"/>
 
-        <table class="table table-bordered text-center align-middle">
+                        <div class="mb-3">
+                            <label class="form-label">Bàn</label>
+                            <input type="text" class="form-control" value="Bàn #${booking.tableId}" readonly>
+                        </div>
 
-            <tr class="table-dark">
-                <th>ID</th>
-                <th>Bàn</th>
-                <th>Thời Gian</th>
-                <th>Số Người</th>
-                <th>Trạng Thái</th>
-                <th width="260">Thao tác</th>
-            </tr>
+                        <div class="mb-3">
+                            <label class="form-label">Thời gian đến</label>
+                            <input type="datetime-local"
+                                   name="reservationTime"
+                                   class="form-control"
+                                   value="<%= datetimeValue %>"
+                                   required>
+                        </div>
 
-            <%
-                for(Reservation r : list){
-            %>
+                        <div class="mb-4">
+                            <label class="form-label">Số người</label>
+                            <input type="number"
+                                   name="numberOfPeople"
+                                   class="form-control"
+                                   min="1"
+                                   value="${booking.numberOfPeople}"
+                                   required>
+                        </div>
 
-            <tr>
+                        <button type="submit" class="btn btn-primary-custom w-100 btn-lg">
+                            <i class="bi bi-check-circle"></i> Lưu thay đổi
+                        </button>
+                    </form>
 
-                <td><%=r.getId()%></td>
-
-                <td>#<%=r.getTableId()%></td>
-
-                <td><%=r.getReservationTime()%></td>
-
-                <td><%=r.getNumberOfPeople()%></td>
-
-                <td>
-<span class="status <%=r.getStatus()%>">
-<%=r.getStatus()%>
-</span>
-                </td>
-
-                <td>
-
-                    <% if("PENDING".equals(r.getStatus())){ %>
-
-                    <a href="<%=ctx%>/edit-booking/<%=r.getId()%>"
-                       class="btn btn-primary btn-sm">
-                        Sửa
-                    </a>
-
-                    <a href="<%=ctx%>/cancel-booking/<%=r.getId()%>"
-                       class="btn btn-danger btn-sm"
-                       onclick="return confirm('Bạn muốn hủy booking này?')">
-                        Hủy
-                    </a>
-
-                    <% } else { %>
-
-                    <button class="btn btn-secondary btn-sm" disabled>
-                        Không thao tác
-                    </button>
-
-                    <% } %>
-
-                </td>
-
-            </tr>
-
-            <%
-                }
-            %>
-
-        </table>
-
-        <% if(list.size()==0){ %>
-
-        <div class="alert alert-info text-center mt-3">
-            Bạn chưa có booking nào.
-        </div>
-
-        <% } %>
-
-    </div>
-
+                    <div class="text-center mt-4">
+                        <a href="<%= ctx %>/my-booking" class="text-muted">
+                            <i class="bi bi-arrow-left"></i> Quay lại booking của tôi
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </c:otherwise>
+    </c:choose>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
+<jsp:include page="layout/footer.jsp"/>

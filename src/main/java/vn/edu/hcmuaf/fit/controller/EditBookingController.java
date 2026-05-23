@@ -55,8 +55,9 @@ public class EditBookingController {
             return "redirect:/login";
         }
 
-        reservationDAO.updateBooking(
+        reservationDAO.updateBookingForUser(
                 id,
+                user.getId(),
                 reservationTime,
                 numberOfPeople
         );

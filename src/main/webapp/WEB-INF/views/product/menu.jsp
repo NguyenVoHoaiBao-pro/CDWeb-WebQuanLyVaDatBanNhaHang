@@ -1,139 +1,143 @@
-<!-- FILE: WEB-INF/views/product/menu.jsp -->
-
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.*,vn.edu.hcmuaf.fit.model.Product" %>
 
-<jsp:include page="../layout/header.jsp"/>
-
 <%
-    List<Product> list =
-            (List<Product>) request.getAttribute("list");
+    String ctx = request.getContextPath();
+    request.setAttribute("pageTitle", "Thực đơn — Nhà Hàng Của Chúng Ta");
+    List<Product> list = (List<Product>) request.getAttribute("list");
+    if (list == null) list = new ArrayList<Product>();
 
-    if(list == null){
-        list = new ArrayList<Product>();
-    }
+    String keyword = (String) request.getAttribute("keyword");
+    if (keyword == null) keyword = "";
+    String category = (String) request.getAttribute("category");
+    if (category == null) category = "";
 %>
 
-<!-- HERO -->
-<section class="hero">
-    <div>
-        <h1>🍽 THỰC ĐƠN NHÀ HÀNG</h1>
+<jsp:include page="../layout/header.jsp"/>
+
+<section class="page-hero">
+    <div class="container">
+        <h1>🍽 Thực đơn nhà hàng</h1>
         <p>Chọn món ngon cho bữa ăn tuyệt vời của bạn</p>
     </div>
 </section>
 
 <div class="container py-5">
-
-    <!-- SEARCH / FILTER -->
-    <div class="filter-box mb-5">
-
-        <form action="<%=request.getContextPath()%>/menu" method="get">
-
-            <div class="row g-3">
-
+    <div class="filter-box glass-card mb-5" id="menuFilterBox">
+        <form id="menuSearchForm" action="<%= ctx %>/menu" method="get" data-ctx="<%= ctx %>">
+            <div class="row g-3 align-items-end">
                 <div class="col-md-5">
-                    <input type="text"
-                           name="keyword"
-                           class="form-control"
-                           placeholder="Tìm món ăn...">
+                    <label class="form-label" for="menuKeyword">Tìm kiếm</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-secondary text-muted">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text"
+                               id="menuKeyword"
+                               name="keyword"
+                               class="form-control"
+                               placeholder="Tìm món ăn..."
+                               value="<%= keyword.replace("\"", "&quot;") %>"
+                               autocomplete="off">
+                    </div>
                 </div>
-
                 <div class="col-md-4">
-                    <select name="category" class="form-select">
-
-                        <option value="">Tất cả danh mục</option>
-                        <option value="MÓN KHAI VỊ">Món khai vị</option>
-                        <option value="MÓN CHÍNH">Món chính</option>
-                        <option value="MÓN NƯỚC">Món nước</option>
-                        <option value="MÓN ĂN NHẸ">Món ăn nhẹ</option>
-                        <option value="MÓN TRÁNG MIÊNG & ĐỒ UỐNG">Tráng miệng</option>
-
+                    <label class="form-label" for="menuCategory">Danh mục</label>
+                    <select id="menuCategory" name="category" class="form-select">
+                        <option value="" <%= category.isEmpty() ? "selected" : "" %>>Tất cả danh mục</option>
+                        <option value="MÓN KHAI VỊ" <%= "MÓN KHAI VỊ".equals(category) ? "selected" : "" %>>Món khai vị</option>
+                        <option value="MÓN CHÍNH" <%= "MÓN CHÍNH".equals(category) ? "selected" : "" %>>Món chính</option>
+                        <option value="MÓN NƯỚC" <%= "MÓN NƯỚC".equals(category) ? "selected" : "" %>>Món nước</option>
+                        <option value="MÓN ĂN NHẸ" <%= "MÓN ĂN NHẸ".equals(category) ? "selected" : "" %>>Món ăn nhẹ</option>
+                        <option value="MÓN TRÁNG MIÊNG & ĐỒ UỐNG" <%= "MÓN TRÁNG MIÊNG & ĐỒ UỐNG".equals(category) ? "selected" : "" %>>Tráng miệng</option>
                     </select>
                 </div>
-
-                <div class="col-md-3 d-grid">
-                    <button class="btn btn-dark">
-                        Tìm kiếm
+                <div class="col-md-3 d-grid gap-2">
+                    <button type="submit" class="btn btn-primary-custom">
+                        <i class="bi bi-search"></i> Tìm kiếm
+                    </button>
+                    <button type="button" id="menuResetBtn" class="btn btn-outline-custom btn-sm">
+                        <i class="bi bi-arrow-counterclockwise"></i> Xóa bộ lọc
                     </button>
                 </div>
-
             </div>
-
         </form>
-
+        <div id="menuLoading" class="menu-loading d-none" aria-live="polite">
+            <span class="spinner-border spinner-border-sm text-warning" role="status"></span>
+            <span class="ms-2 text-muted">Đang tìm món...</span>
+        </div>
     </div>
 
-    <!-- TOP BAR -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
-        <h2 class="fw-bold">Danh sách món ăn</h2>
-
-        <a href="<%=request.getContextPath()%>/cart"
-           class="btn btn-danger">
-            🛒 Giỏ hàng
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-0">Danh sách món ăn</h2>
+            <small class="text-muted" id="menuResultCount"><%= list.size() %> món</small>
+        </div>
+        <a href="<%= ctx %>/cart" class="btn btn-primary-custom">
+            <i class="bi bi-cart3"></i> Giỏ hàng
         </a>
-
     </div>
 
-    <!-- PRODUCT LIST -->
-    <div class="row g-4">
-
-        <% if(list.isEmpty()){ %>
-
-        <div class="col-12 text-center py-5">
-            <h4>Không có món ăn phù hợp</h4>
+    <div class="row g-4" id="menuResults">
+        <% if (list.isEmpty()) { %>
+        <div class="col-12 text-center py-5 glass-card menu-empty-state">
+            <i class="bi bi-emoji-frown display-4 text-muted"></i>
+            <h4 class="mt-3">Không có món ăn phù hợp</h4>
         </div>
-
-        <% } %>
-
-        <% for(Product p : list){ %>
-
-<%--        <div class="col-lg-4 col-md-6">--%>
-        <div class="col-custom-5 col-md-6 col-sm-12">
-            <div class="food-card">
-
-                <img src="<%=p.getImage()%>"
-                     onerror="this.src='<%=request.getContextPath()%>/images/default.jpg'">
-
+        <% } else {
+            for (Product p : list) { %>
+        <div class="col-custom-5 col-md-6 col-sm-12 menu-item-col">
+            <div class="food-card glass-card">
+                <%
+                    String imgUrl = p.getImage();
+                    if (imgUrl != null && !imgUrl.startsWith("http")) {
+                        imgUrl = ctx + "/" + imgUrl;
+                    }
+                %>
+                <img src="<%= imgUrl %>"
+                     alt="<%= p.getName() %>"
+                     onerror="this.src='<%= ctx %>/images/default.jpg'">
                 <div class="card-body d-flex flex-column">
-
-                    <h5 class="fw-bold"><%=p.getName()%></h5>
-
-                    <p class="desc"><%=p.getDescription()%></p>
-
+                    <div class="badge-cat mb-2"><%= p.getCategory() %></div>
+                    <h5 class="fw-bold"><%= p.getName() %></h5>
+                    <p class="desc"><%= p.getDescription() %></p>
                     <div class="mt-auto">
-
-                        <div class="price mb-3">
-                            <%=String.format("%,.0f",p.getPrice())%> đ
-                        </div>
-
+                        <div class="price mb-3"><%= String.format("%,.0f", p.getPrice()) %> đ</div>
                         <div class="d-grid gap-2">
-
-                            <a href="<%=request.getContextPath()%>/product/<%=p.getId()%>"
-                               class="btn btn-dark">
-                                Xem chi tiết
+                            <a href="<%= ctx %>/product/<%= p.getId() %>" class="btn btn-dark btn-sm">Xem chi tiết</a>
+                            <a href="<%= ctx %>/cart/add/<%= p.getId() %>" class="btn btn-primary-custom btn-sm">
+                                <i class="bi bi-cart-plus"></i> Thêm vào giỏ
                             </a>
-
-                            <!-- FIX ĐÚNG ROUTE -->
-                            <a href="<%=request.getContextPath()%>/cart/add/<%=p.getId()%>"
-                               class="btn btn-danger">
-                                🛒 Thêm vào giỏ
-                            </a>
-
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
-        <% } %>
-
+        <% }} %>
     </div>
-
 </div>
+
+<script src="<%= ctx %>/js/menu-search.js"></script>
+<script>
+  window.menuReveal = function () {
+    if (!("IntersectionObserver" in window)) return;
+    document.querySelectorAll("#menuResults .food-card").forEach(function (el) {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(30px)";
+      el.style.transition = "opacity 0.5s ease, transform 0.5s ease";
+      var obs = new IntersectionObserver(function (entries, o) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = "1";
+            entry.target.style.transform = "translateY(0)";
+            o.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      obs.observe(el);
+    });
+  };
+  document.addEventListener("DOMContentLoaded", window.menuReveal);
+</script>
 
 <jsp:include page="../layout/footer.jsp"/>

@@ -334,6 +334,13 @@ public class CartDAO {
 
         return null;
     }
+    public boolean isReservationValid(Integer reservationId) {
+        if (reservationId == null) {
+            return false;
+        }
+        return isReservationValid(reservationId.intValue());
+    }
+
     public boolean isReservationValid(int reservationId){
 
         String sql =

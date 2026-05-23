@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import vn.edu.hcmuaf.fit.dao.ReservationDAO;
 import vn.edu.hcmuaf.fit.dao.RestaurantTableDAO;
+import vn.edu.hcmuaf.fit.dao.TableDAO;
 import vn.edu.hcmuaf.fit.model.Reservation;
 import vn.edu.hcmuaf.fit.model.RestaurantTable;
 import vn.edu.hcmuaf.fit.model.User;
@@ -16,9 +17,13 @@ import java.time.LocalDateTime;
 public class ReservationController {
 
     ReservationDAO dao = new ReservationDAO();
+    TableDAO tableDAO = new TableDAO();
 
     @GetMapping("/reserve")
-    public String showForm() {
+    public String showForm(HttpSession session) {
+        if (session.getAttribute("user") == null) {
+            return "redirect:/login";
+        }
         return "reserve";
     }
 
@@ -37,9 +42,14 @@ public class ReservationController {
         }
 
         LocalDateTime now = LocalDateTime.now();
+        LocalDateTime reservationTime;
 
-        LocalDateTime reservationTime =
-                LocalDateTime.parse(time);
+        try {
+            reservationTime = LocalDateTime.parse(time);
+        } catch (Exception e) {
+            model.addAttribute("error", "Định dạng thời gian không hợp lệ");
+            return "reserve";
+        }
 
         // =========================
         // CHECK QUÁ KHỨ
@@ -70,9 +80,9 @@ public class ReservationController {
         // =========================
         // CHECK BÀN ĐÃ ĐƯỢC ĐẶT
         // =========================
-        RestaurantTableDAO tableDAO = new RestaurantTableDAO();
+        RestaurantTableDAO restaurantTableDAO = new RestaurantTableDAO();
 
-        RestaurantTable table = tableDAO.findById(tableId);
+        RestaurantTable table = restaurantTableDAO.findById(tableId);
 
         if(table == null){
 
@@ -127,6 +137,8 @@ public class ReservationController {
         }
 
         // LƯU SESSION
+        tableDAO.updateStatus(tableId, "RESERVED");
+
         session.setAttribute(
                 "currentReservation",
                 reservationId

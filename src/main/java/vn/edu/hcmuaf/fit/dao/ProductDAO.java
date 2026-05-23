@@ -223,6 +223,23 @@ public class ProductDAO {
         return list;
     }
 
+    private String normalizeImagePath(String image) {
+        if (image == null || image.trim().isEmpty()) {
+            return "images/default.jpg";
+        }
+        image = image.trim();
+        if (image.startsWith("http://") || image.startsWith("https://")) {
+            return image;
+        }
+        if (image.startsWith("/")) {
+            image = image.substring(1);
+        }
+        if (image.startsWith("images/")) {
+            return image;
+        }
+        return "images/" + image;
+    }
+
     // MAP OBJECT
     private Product mapProduct(ResultSet rs) throws SQLException {
 
@@ -241,11 +258,7 @@ public class ProductDAO {
         p.setDescription(rs.getString("description"));
 
         String image = rs.getString("image");
-        if (image == null || image.trim().isEmpty()) {
-            image = "default.jpg";
-        }
-
-        p.setImage(image);
+        p.setImage(normalizeImagePath(image));
         p.setCategory(rs.getString("category"));
 
         return p;

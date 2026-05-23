@@ -3,6 +3,7 @@
 
 package vn.edu.hcmuaf.fit.controller;
 
+import com.google.gson.Gson;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,25 @@ import java.util.List;
 public class ProductController {
 
     private ProductDAO dao = new ProductDAO();
+    private final Gson gson = new Gson();
+
+    private List<Product> filterMenu(String category, String keyword) {
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return dao.search(keyword.trim());
+        }
+        if (category != null && !category.trim().isEmpty()) {
+            return dao.findByCategory(category);
+        }
+        return dao.getAll();
+    }
+
+    @GetMapping(value = "/api/menu", produces = "application/json;charset=UTF-8")
+    @ResponseBody
+    public String menuJson(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String keyword) {
+        return gson.toJson(filterMenu(category, keyword));
+    }
 
     @GetMapping("/menu")
     public String menu(
@@ -23,25 +43,7 @@ public class ProductController {
             @RequestParam(required = false) String keyword,
             Model model) {
 
-        List<Product> list;
-
-        // SEARCH
-        if(keyword != null && !keyword.trim().isEmpty()){
-
-            list = dao.search(keyword.trim());
-
-        }
-        // FILTER CATEGORY
-        else if(category != null && !category.trim().isEmpty()){
-
-            list = dao.findByCategory(category);
-
-        }
-        // ALL
-        else{
-
-            list = dao.getAll();
-        }
+        List<Product> list = filterMenu(category, keyword);
 
         model.addAttribute("list", list);
         model.addAttribute("category", category);

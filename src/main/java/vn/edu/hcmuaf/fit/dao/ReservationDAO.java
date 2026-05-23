@@ -132,6 +132,34 @@ public class ReservationDAO {
 
         return false;
     }
+
+    public boolean updateBookingForUser(
+            int id,
+            int userId,
+            String reservationTime,
+            int numberOfPeople) {
+
+        String sql =
+                "UPDATE reservations SET reservation_time=?, number_of_people=? " +
+                        "WHERE id=? AND user_id=? AND status='PENDING'";
+
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            ps.setString(1, reservationTime);
+            ps.setInt(2, numberOfPeople);
+            ps.setInt(3, id);
+            ps.setInt(4, userId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
     public List<Reservation> getByUser(int userId) {
 
         List<Reservation> list = new ArrayList<>();
@@ -167,24 +195,7 @@ public class ReservationDAO {
 
         return list;
     }
-//    public int getLastId() {
-//
-//        String sql = "SELECT MAX(id) FROM reservations";
-//
-//        try (Connection conn = DBConnection.getConnection();
-//             PreparedStatement ps = conn.prepareStatement(sql);
-//             ResultSet rs = ps.executeQuery()) {
-//
-//            if (rs.next()) {
-//                return rs.getInt(1);
-//            }
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        return 0;
-//    }
+
     public int insertAndGetId(Reservation r) {
 
 

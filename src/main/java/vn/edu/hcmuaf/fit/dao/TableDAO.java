@@ -150,7 +150,7 @@ public class TableDAO {
         String sql =
                 "SELECT * FROM restaurant_tables " +
                         "WHERE floor_number=? " +
-                        "ORDER BY id LIMIT 10";
+                        "ORDER BY id";
 
         try(
                 Connection conn = DBConnection.getConnection();

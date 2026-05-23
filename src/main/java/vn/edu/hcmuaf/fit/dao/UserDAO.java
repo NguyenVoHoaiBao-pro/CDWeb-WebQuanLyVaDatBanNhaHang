@@ -133,6 +133,26 @@ public class UserDAO {
 
         return false;
     }
+    public User findByUsername(String username) {
+
+        String sql = "SELECT * FROM users WHERE username=?";
+
+        try (
+                Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapUser(rs);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public User findByEmail(String email) {
 
         String sql = "SELECT * FROM users WHERE email=?";

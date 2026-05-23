@@ -1,121 +1,92 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ taglib prefix="c"
-           uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%
-  String ctx = request.getContextPath();
-  Integer tableId = (Integer) request.getAttribute("tableId");
+    String ctx = request.getContextPath();
+    request.setAttribute("pageTitle", "Đặt bàn — Nhà Hàng Của Chúng Ta");
+    Integer tableId = (Integer) request.getAttribute("tableId");
 %>
 
 <jsp:include page="layout/header.jsp"/>
 
-<style>
-  body{
-    background:#f8f9fa;
-  }
-
-  .booking-box{
-    background:#fff;
-    padding:35px;
-    border-radius:20px;
-    box-shadow:0 10px 30px rgba(0,0,0,.08);
-  }
-
-  .title{
-    font-weight:700;
-    margin-bottom:20px;
-  }
-
-  .form-control{
-    border-radius:10px;
-    padding:10px;
-  }
-
-  .btn-book{
-    border-radius:12px;
-    padding:12px;
-    font-weight:600;
-  }
-</style>
+<section class="page-hero">
+    <div class="container">
+        <h1>📅 Đặt bàn</h1>
+        <p>Hoàn tất thông tin để giữ chỗ cho bạn</p>
+    </div>
+</section>
 
 <div class="container py-5">
-
-  <div class="row justify-content-center">
-
-    <div class="col-lg-6">
-
-      <div class="booking-box">
-
-        <div class="text-center mb-4">
-          <h2 class="title">📅 Đặt bàn</h2>
-          <p class="text-muted">Hoàn tất thông tin để giữ chỗ</p>
-        </div>
-        <c:if test="${error != null}">
-          <div class="alert alert-danger text-center">
-              ${error}
-          </div>
-        </c:if>
-
-        <% if(tableId == null){ %>
-
-        <div class="alert alert-danger text-center">
-          Không tìm thấy bàn!
-        </div>
-
-        <% } else { %>
-
-        <form action="<%=ctx%>/book-table" method="post">
-
-          <input type="hidden" name="tableId" value="<%=tableId%>"/>
-
-          <!-- TABLE -->
-          <div class="mb-3">
-            <label class="form-label">Bàn đã chọn</label>
-            <input type="text" class="form-control"
-                   value="Bàn #<%=tableId%>" disabled>
-          </div>
-
-          <!-- TIME -->
-          <div class="mb-3">
-            <label class="form-label">Thời gian</label>
-            <input type="datetime-local"
-                   name="reservationTime"
-                   class="form-control"
-                   required>
-          </div>
-
-          <!-- PEOPLE -->
-          <div class="mb-4">
-            <label class="form-label">Số người</label>
-            <input type="number"
-                   name="numberOfPeople"
-                   class="form-control"
-                   min="1"
-                   required>
-          </div>
-
-          <!-- BUTTON -->
-          <button class="btn btn-danger w-100 btn-book">
-            ✔ Xác nhận đặt bàn
-          </button>
-
-        </form>
-
-        <% } %>
-
-        <!-- BACK -->
-        <div class="text-center mt-3">
-          <a href="<%=ctx%>/tables" class="text-decoration-none">
-            ← Quay lại chọn bàn
-          </a>
-        </div>
-
-      </div>
-
+    <div class="table-booking-steps mb-4">
+        <span class="step done"><i class="bi bi-check-circle-fill"></i> Chọn bàn</span>
+        <span class="step active"><i class="bi bi-2-circle-fill"></i> Thông tin</span>
+        <span class="step"><i class="bi bi-3-circle"></i> Gọi món</span>
     </div>
 
-  </div>
+    <div class="booking-form-card">
+        <div class="glass-card p-4 p-md-5">
+            <div class="form-icon"><i class="bi bi-calendar-event"></i></div>
+            <h2 class="text-center fw-bold mb-1">Xác nhận đặt bàn</h2>
+            <p class="text-center text-muted mb-4">Vui lòng điền thời gian và số khách</p>
 
+            <c:if test="${error != null}">
+                <div class="alert alert-danger text-center">
+                    <i class="bi bi-exclamation-triangle"></i> ${error}
+                </div>
+            </c:if>
+
+            <% if (tableId == null) { %>
+            <div class="alert alert-danger text-center">
+                Không tìm thấy bàn. Vui lòng chọn lại.
+            </div>
+            <div class="text-center mt-3">
+                <a href="<%= ctx %>/tables" class="btn btn-primary-custom">
+                    <i class="bi bi-arrow-left"></i> Quay lại chọn bàn
+                </a>
+            </div>
+            <% } else { %>
+
+            <form action="<%= ctx %>/book-table" method="post">
+                <input type="hidden" name="tableId" value="<%= tableId %>"/>
+
+                <div class="mb-3">
+                    <label class="form-label">Bàn đã chọn</label>
+                    <input type="text" class="form-control" value="Bàn #<%= tableId %>" readonly>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Thời gian đến</label>
+                    <input type="datetime-local"
+                           name="reservationTime"
+                           class="form-control"
+                           required>
+                    <small class="text-muted">Định dạng: ngày và giờ (tối đa 7 ngày trước)</small>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Số người</label>
+                    <input type="number"
+                           name="numberOfPeople"
+                           class="form-control"
+                           min="1"
+                           placeholder="VD: 4"
+                           required>
+                </div>
+
+                <button type="submit" class="btn btn-primary-custom w-100 btn-lg">
+                    <i class="bi bi-check-circle"></i> Xác nhận đặt bàn
+                </button>
+            </form>
+
+            <% } %>
+
+            <div class="text-center mt-4">
+                <a href="<%= ctx %>/tables" class="text-muted">
+                    <i class="bi bi-arrow-left"></i> Quay lại chọn bàn
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
 
 <jsp:include page="layout/footer.jsp"/>

@@ -1,113 +1,96 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.*,vn.edu.hcmuaf.fit.model.Reservation" %>
 
-<jsp:include page="layout/header.jsp"/>
-
 <%
     String ctx = request.getContextPath();
+    request.setAttribute("pageTitle", "Booking của tôi — Nhà Hàng Của Chúng Ta");
 
-    List<Reservation> list =
-            (List<Reservation>) request.getAttribute("list");
-
-    if(list == null){
-        list = new ArrayList<Reservation>();
-    }
+    List<Reservation> list = (List<Reservation>) request.getAttribute("list");
+    if (list == null) list = new ArrayList<Reservation>();
 %>
 
-<style>
-    body{
-        background:#f8f9fa;
-    }
+<jsp:include page="layout/header.jsp"/>
 
-    .box{
-        background:#fff;
-        border-radius:20px;
-        padding:30px;
-        box-shadow:0 10px 30px rgba(0,0,0,.08);
-    }
-</style>
+<section class="page-hero">
+    <div class="container">
+        <h1>📅 Booking của tôi</h1>
+        <p>Quản lý lịch đặt bàn và thao tác nhanh</p>
+    </div>
+</section>
 
 <div class="container py-5">
-
-    <div class="box">
-
-        <div class="d-flex justify-content-between align-items-center mb-4">
-
-            <h3 class="fw-bold">📅 Booking Của Tôi</h3>
-
-            <a href="<%=ctx%>/tables" class="btn btn-warning">
-                + Đặt thêm
+    <div class="booking-list-card glass-card p-4 p-md-5">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <h2 class="fw-bold mb-0"><i class="bi bi-journal-bookmark"></i> Lịch sử đặt bàn</h2>
+            <a href="<%= ctx %>/tables" class="btn btn-primary-custom">
+                <i class="bi bi-plus-lg"></i> Đặt thêm
             </a>
-
         </div>
 
-        <% if(list.isEmpty()){ %>
-
-        <div class="alert alert-info text-center">
-            Bạn chưa có lịch đặt bàn nào.
+        <% if (list.isEmpty()) { %>
+        <div class="text-center py-5">
+            <i class="bi bi-calendar-x display-4 text-muted"></i>
+            <p class="text-muted mt-3 mb-4">Bạn chưa có lịch đặt bàn nào.</p>
+            <a href="<%= ctx %>/tables" class="btn btn-primary-custom">Đặt bàn ngay</a>
         </div>
-
         <% } else { %>
 
-        <table class="table table-bordered text-center align-middle">
-
-            <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Bàn</th>
-                <th>Thời Gian</th>
-                <th>Số Người</th>
-                <th>Trạng Thái</th>
-                <th width="180">Thao tác</th>
-            </tr>
-            </thead>
-
-            <tbody>
-
-            <%
-                for(Reservation r : list){
-            %>
-
-            <tr>
-                <td><%=r.getId()%></td>
-                <td>#<%=r.getTableId()%></td>
-                <td><%=r.getReservationTime()%></td>
-                <td><%=r.getNumberOfPeople()%></td>
-
-                <td>
-                    <span class="badge bg-info">
-                        <%=r.getStatus()%>
-                    </span>
-                </td>
-
-                <td>
-                    <% if("PENDING".equals(r.getStatus())){ %>
-
-                    <a href="<%=ctx%>/cancel-booking/<%=r.getId()%>"
-                       class="btn btn-danger btn-sm"
-                       onclick="return confirm('Bạn muốn hủy đặt bàn này?')">
-                        Hủy
-                    </a>
-
-                    <% } else { %>
-
-                    <button class="btn btn-secondary btn-sm" disabled>
-                        Không thể hủy
-                    </button>
-
-                    <% } %>
-                </td>
-            </tr>
-
-            <% } %>
-
-            </tbody>
-        </table>
-
+        <div class="table-responsive">
+            <table class="table table-bordered text-center align-middle mb-0">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Bàn</th>
+                    <th>Thời gian</th>
+                    <th>Số người</th>
+                    <th>Trạng thái</th>
+                    <th width="200">Thao tác</th>
+                </tr>
+                </thead>
+                <tbody>
+                <%
+                    for (Reservation r : list) {
+                        String statusLabel = r.getStatus();
+                        if ("PENDING".equals(r.getStatus())) statusLabel = "Chờ xác nhận";
+                        else if ("CONFIRMED".equals(r.getStatus())) statusLabel = "Đã xác nhận";
+                        else if ("CANCELLED".equals(r.getStatus())) statusLabel = "Đã hủy";
+                        else if ("DONE".equals(r.getStatus())) statusLabel = "Hoàn thành";
+                        else if ("WAITING_PAYMENT".equals(r.getStatus())) statusLabel = "Chờ thanh toán";
+                %>
+                <tr>
+                    <td>#<%= r.getId() %></td>
+                    <td><i class="bi bi-grid"></i> Bàn #<%= r.getTableId() %></td>
+                    <td><%= r.getReservationTime() %></td>
+                    <td><%= r.getNumberOfPeople() %></td>
+                    <td>
+                        <span class="booking-status <%= r.getStatus() %>"><%= statusLabel %></span>
+                    </td>
+                    <td>
+                        <% if ("PENDING".equals(r.getStatus())) { %>
+                        <div class="d-flex gap-2 justify-content-center flex-wrap">
+                            <a href="<%= ctx %>/edit-booking/<%= r.getId() %>"
+                               class="btn btn-warning btn-sm">
+                                <i class="bi bi-pencil"></i> Sửa
+                            </a>
+                            <a href="<%= ctx %>/cancel-booking/<%= r.getId() %>"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Bạn muốn hủy đặt bàn này?')">
+                                <i class="bi bi-x-circle"></i> Hủy
+                            </a>
+                        </div>
+                        <% } else { %>
+                        <button type="button" class="btn btn-secondary btn-sm" disabled>
+                            Không thể sửa
+                        </button>
+                        <% } %>
+                    </td>
+                </tr>
+                <% } %>
+                </tbody>
+            </table>
+        </div>
         <% } %>
-
     </div>
-
 </div>
 
 <jsp:include page="layout/footer.jsp"/>

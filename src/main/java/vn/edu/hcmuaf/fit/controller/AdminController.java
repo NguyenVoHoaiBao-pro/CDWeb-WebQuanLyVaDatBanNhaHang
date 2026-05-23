@@ -7,8 +7,13 @@ import vn.edu.hcmuaf.fit.dao.*;
 import vn.edu.hcmuaf.fit.model.*;
 import vn.edu.hcmuaf.fit.util.AuthUtil;
 
+import com.google.gson.Gson;
+
 import javax.servlet.http.HttpSession;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -20,20 +25,62 @@ public class AdminController {
     TableDAO tableDAO = new TableDAO();
     ReservationDAO reservationDAO = new ReservationDAO();
     AdminDAO adminDAO = new AdminDAO();
+    DashboardDAO dashboardDAO = new DashboardDAO();
+    private final Gson gson = new Gson();
 
 
     @GetMapping("")
-    public String dashboard(Model model, HttpSession session) {
+    public String dashboard(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month,
+            Model model,
+            HttpSession session) {
 
         if (!AuthUtil.isAdmin(session)) return "redirect:/login";
 
-        model.addAttribute("totalUsers", adminDAO.countUsers());
-        model.addAttribute("totalProducts", adminDAO.countProducts());
-        model.addAttribute("totalTables", adminDAO.countTables());
-        model.addAttribute("totalReservations", adminDAO.countReservations());
+        LocalDate now = LocalDate.now();
+        int reportYear = year != null ? year : now.getYear();
+        int reportMonth = month != null ? month : now.getMonthValue();
 
+        DashboardStats stats = dashboardDAO.loadDashboard(reportYear, reportMonth);
+        model.addAttribute("stats", stats);
+        model.addAttribute("chartJson", buildChartJson(stats));
         model.addAttribute("page", "dashboard.jsp");
         return "admin/layout";
+    }
+
+    private String buildChartJson(DashboardStats stats) {
+        List<String> dayLabels = new ArrayList<>();
+        List<Double> revenues = new ArrayList<>();
+        List<Integer> orders = new ArrayList<>();
+
+        for (DailyRevenue d : stats.getDailyRevenue()) {
+            dayLabels.add(String.valueOf(d.getDay()));
+            revenues.add(d.getRevenue());
+            orders.add(d.getOrderCount());
+        }
+
+        List<String> topNames = new ArrayList<>();
+        List<Double> topRevenues = new ArrayList<>();
+        for (TopProductStat t : stats.getTopProducts()) {
+            topNames.add(t.getName());
+            topRevenues.add(t.getRevenue());
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("dayLabels", dayLabels);
+        data.put("revenues", revenues);
+        data.put("orders", orders);
+        data.put("topNames", topNames);
+        data.put("topRevenues", topRevenues);
+        data.put("paid", stats.getRevenuePaid());
+        data.put("unpaid", stats.getRevenueUnpaid());
+        data.put("resPending", stats.getReservationsPending());
+        data.put("resConfirmed", stats.getReservationsConfirmed());
+        data.put("resDone", stats.getReservationsDone());
+        data.put("resCancelled", stats.getReservationsCancelled());
+
+        return gson.toJson(data);
     }
 
     @GetMapping("/products")
@@ -43,9 +90,9 @@ public class AdminController {
 
         model.addAttribute("list", productDAO.getAll());
 
-        model.addAttribute("page", "products.jsp"); // 🔥 QUAN TRỌNG
+        model.addAttribute("page", "products.jsp");
 
-        return "admin/layout"; // 🔥 CHỈ TRẢ VỀ LAYOUT
+        return "admin/layout";
     }
 
     @GetMapping("/add-product")
@@ -124,8 +171,11 @@ public class AdminController {
 
         Product p = productDAO.findById(id);
 
-        model.addAttribute("product", p);
+        if (p == null) {
+            return "redirect:/admin/products";
+        }
 
+        model.addAttribute("product", p);
         model.addAttribute("page", "edit-product.jsp");
 
         return "admin/layout";
@@ -237,10 +287,7 @@ public class AdminController {
 
         model.addAttribute("list", reservationDAO.getAll());
         model.addAttribute("page", "reservations.jsp");
-        model.addAttribute(
-                "foods",
-                reservationDAO
-        );
+
         OrderDAO orderDAO = new OrderDAO();
 
         Map<Integer, Order> orderMap = new HashMap<>();

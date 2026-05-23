@@ -163,6 +163,7 @@ public class TableBookingController {
             return "redirect:/tables?error=insert";
         }
 
+        tableDAO.updateStatus(tableId, "RESERVED");
 
         session.setAttribute(
                 "currentReservation",

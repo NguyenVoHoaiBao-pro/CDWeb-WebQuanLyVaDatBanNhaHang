@@ -6,10 +6,13 @@ import org.springframework.web.bind.annotation.*;
 import vn.edu.hcmuaf.fit.dao.CartDAO;
 import vn.edu.hcmuaf.fit.dao.OrderDAO;
 import vn.edu.hcmuaf.fit.dao.ReservationDAO;
+import vn.edu.hcmuaf.fit.model.Product;
 import vn.edu.hcmuaf.fit.model.Reservation;
 import vn.edu.hcmuaf.fit.model.User;
 import vn.edu.hcmuaf.fit.dao.RestaurantTableDAO;
+
 import javax.servlet.http.HttpSession;
+import java.util.List;
 
 @Controller
 public class CheckoutController {
@@ -52,13 +55,17 @@ public class CheckoutController {
             return "redirect:/tables";
         }
 
+        List<Product> cart = cartDAO.getCart(u.getId(), reservationId);
+
+        if (cart == null || cart.isEmpty()) {
+            model.addAttribute("error", "Giỏ hàng trống — vui lòng chọn món trước khi thanh toán");
+            return "redirect:/cart";
+        }
+
         Reservation reservation =
                 reservationDAO.findById(reservationId);
 
-        model.addAttribute(
-                "list",
-                cartDAO.getCart(u.getId(), reservationId)
-        );
+        model.addAttribute("list", cart);
         model.addAttribute(
                 "tables",
                 tableDAO.getAll()
@@ -109,12 +116,12 @@ public class CheckoutController {
                         note
                 );
 
-        if(orderId == 0){
-            return "redirect:/checkout";
+        if (orderId == 0) {
+            return "redirect:/cart?error=checkout";
         }
 
         session.setAttribute("orderId", orderId);
-
+        session.setAttribute("payment", payment);
         session.removeAttribute("currentReservation");
 
         return "redirect:/success";

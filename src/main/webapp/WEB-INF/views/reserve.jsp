@@ -1,21 +1,49 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+    String ctx = request.getContextPath();
+    request.setAttribute("pageTitle", "Đặt bàn — Nhà Hàng Của Chúng Ta");
+%>
 
-<div class="container mt-5">
-    <h2>Đặt bàn</h2>
+<jsp:include page="layout/header.jsp"/>
 
-    <form action="reserve" method="post" class="card p-4 shadow">
+<section class="page-hero">
+    <div class="container">
+        <h1>📅 Đặt bàn</h1>
+        <p>Điền thông tin đặt bàn (yêu cầu đăng nhập)</p>
+    </div>
+</section>
 
-        <input class="form-control mb-2" name="userId" placeholder="User ID">
+<div class="container py-5">
+    <div class="booking-form-card">
+        <div class="glass-card p-4 p-md-5">
+            <c:if test="${error != null}">
+                <div class="alert alert-danger">${error}</div>
+            </c:if>
 
-        <input class="form-control mb-2" name="tableId" placeholder="Table ID">
+            <form action="<%= ctx %>/reserve" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Mã bàn</label>
+                    <input class="form-control" name="tableId" placeholder="Table ID" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Thời gian</label>
+                    <input type="datetime-local" class="form-control" name="time" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Số người</label>
+                    <input class="form-control" name="people" type="number" min="1" placeholder="Số người" required>
+                </div>
+                <button type="submit" class="btn btn-primary-custom w-100">Đặt bàn</button>
+            </form>
 
-        <input class="form-control mb-2" name="time" placeholder="YYYY-MM-DD HH:MM:SS">
-
-        <input class="form-control mb-2" name="people" placeholder="Số người">
-
-        <button class="btn btn-success">Đặt bàn</button>
-
-        <p class="text-danger">${error}</p>
-    </form>
+            <div class="text-center mt-4">
+                <a href="<%= ctx %>/tables" class="text-muted">
+                    <i class="bi bi-arrow-left"></i> Chọn bàn trên sơ đồ
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
+
+<jsp:include page="layout/footer.jsp"/>

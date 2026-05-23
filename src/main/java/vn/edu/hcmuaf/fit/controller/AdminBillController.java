@@ -4,13 +4,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
 import vn.edu.hcmuaf.fit.dao.OrderDAO;
 import vn.edu.hcmuaf.fit.dao.ReservationDAO;
 import vn.edu.hcmuaf.fit.model.Order;
 import vn.edu.hcmuaf.fit.model.OrderDetail;
 import vn.edu.hcmuaf.fit.model.Reservation;
+import vn.edu.hcmuaf.fit.util.AuthUtil;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
@@ -22,26 +23,25 @@ public class AdminBillController {
     @GetMapping("/admin/bill/{reservationId}")
     public String bill(
             @PathVariable int reservationId,
-            Model model
-    ){
+            Model model,
+            HttpSession session
+    ) {
 
-        // lấy reservation
+        if (!AuthUtil.isAdmin(session)) {
+            return "redirect:/login";
+        }
+
         Reservation reservation =
                 reservationDAO.findById(reservationId);
 
-        // lấy bill
         Order bill =
                 orderDAO.getBill(reservationId);
 
-        // lấy chi tiết món ăn
         List<OrderDetail> details =
                 orderDAO.getBillDetails(reservationId);
 
-        // gửi sang jsp
         model.addAttribute("reservation", reservation);
-
         model.addAttribute("bill", bill);
-
         model.addAttribute("details", details);
 
         return "admin/bill";
