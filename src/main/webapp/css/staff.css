@@ -1,0 +1,162 @@
+/* Khu vực nhân viên — UI/UX riêng */
+
+.staff-body {
+  background: linear-gradient(160deg, #0c1222 0%, #111827 40%, #0f172a 100%);
+}
+
+.staff-sidebar {
+  border-right-color: rgba(56, 189, 248, 0.25);
+  background: rgba(12, 18, 34, 0.97);
+}
+
+.staff-sidebar a:hover,
+.staff-sidebar a.active {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+  border-left-color: #38bdf8;
+}
+
+.staff-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.staff-topbar h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.staff-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(56, 189, 248, 0.15);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  backdrop-filter: blur(12px);
+}
+
+.staff-card--accent {
+  border-color: rgba(56, 189, 248, 0.35);
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.08);
+}
+
+.staff-btn-primary {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  border: none;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.staff-btn-primary:hover {
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.35);
+}
+
+.staff-btn-print {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border: none;
+  color: #fff;
+  font-weight: 700;
+}
+
+.staff-table-list .list-group-item.active {
+  background: rgba(14, 165, 233, 0.2);
+  border-color: #0ea5e9;
+  color: #fff;
+}
+
+.staff-cart-summary {
+  position: sticky;
+  top: 1rem;
+}
+
+.staff-action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+/* Hóa đơn in */
+.staff-bill-page {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.staff-bill-paper {
+  background: #fff;
+  color: #111;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.staff-bill-header {
+  background: linear-gradient(135deg, #0ea5e9, #0369a1);
+  color: #fff;
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+}
+
+.staff-bill-header h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: 0.05em;
+}
+
+.staff-bill-body {
+  padding: 1.25rem 1.5rem;
+  font-size: 0.9rem;
+}
+
+.staff-bill-qr {
+  text-align: center;
+  padding: 1rem;
+  border-top: 1px dashed #ccc;
+  margin-top: 1rem;
+}
+
+.staff-bill-qr img {
+  width: 140px;
+  height: 140px;
+  border: 4px solid #f1f5f9;
+  border-radius: 8px;
+}
+
+.staff-bill-qr .qr-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+@media print {
+  .admin-sidebar,
+  .admin-menu-btn,
+  .staff-no-print,
+  .admin-sidebar-backdrop {
+    display: none !important;
+  }
+  .admin-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+  .staff-bill-paper {
+    box-shadow: none;
+    border-radius: 0;
+  }
+  body.staff-body {
+    background: #fff;
+  }
+}
