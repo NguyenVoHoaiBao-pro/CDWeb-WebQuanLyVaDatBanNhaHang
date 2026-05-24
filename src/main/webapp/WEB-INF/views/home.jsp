@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
     String ctx = request.getContextPath();
     request.setAttribute("pageTitle", "Trang chủ — Nhà Hàng Của Chúng Ta");
@@ -52,7 +52,7 @@
                 <div class="col-lg-4 col-md-6">
                     <div class="product-card glass-card">
                         <c:choose>
-                            <c:when test="${p.image != null && p.image.startsWith('http')}">
+                            <c:when test="${p.image != null and fn:startsWith(p.image, 'http')}">
                                 <img src="${p.image}" alt="${p.name}" onerror="this.src='${pageContext.request.contextPath}/images/default.jpg'">
                             </c:when>
                             <c:otherwise>
