@@ -28,13 +28,26 @@
         <form action="<%= ctx %>/login" method="post">
             <div class="mb-3">
                 <label class="form-label">Tên đăng nhập</label>
-                <input class="form-control" name="username" placeholder="Username" required>
+                <input class="form-control"
+                       name="username"
+                       placeholder="Username"
+                       autocomplete="username"
+                       required>
             </div>
+
             <div class="mb-3">
                 <label class="form-label">Mật khẩu</label>
-                <input type="password" class="form-control" name="password" placeholder="Password" required>
+                <input type="password"
+                       class="form-control"
+                       name="password"
+                       placeholder="Password"
+                       autocomplete="current-password"
+                       required>
             </div>
-            <button type="submit" class="btn btn-primary-custom w-100 mb-3">Đăng nhập</button>
+
+            <button type="submit" class="btn btn-primary-custom w-100 mb-3">
+                Đăng nhập
+            </button>
         </form>
 
         <div class="auth-divider">Hoặc đăng nhập với</div>
