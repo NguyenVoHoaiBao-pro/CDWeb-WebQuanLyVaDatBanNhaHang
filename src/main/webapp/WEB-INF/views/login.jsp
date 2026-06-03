@@ -2,6 +2,7 @@
 <%
     String ctx = request.getContextPath();
     String error = (String) request.getAttribute("error");
+    String registered = request.getParameter("registered");
 %>
 
 <!DOCTYPE html>
@@ -23,6 +24,10 @@
 
         <% if (error != null) { %>
         <div class="alert alert-danger"><%= error %></div>
+        <% } %>
+
+        <% if ("true".equals(registered)) { %>
+        <div class="alert alert-success">Đăng ký thành công! Bạn có thể đăng nhập ngay.</div>
         <% } %>
 
         <form action="<%= ctx %>/login" method="post">

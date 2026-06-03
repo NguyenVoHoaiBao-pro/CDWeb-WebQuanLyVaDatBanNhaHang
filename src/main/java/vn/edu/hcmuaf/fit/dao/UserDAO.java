@@ -2,6 +2,7 @@ package vn.edu.hcmuaf.fit.dao;
 
 import vn.edu.hcmuaf.fit.model.User;
 import vn.edu.hcmuaf.fit.util.UserRoles;
+import vn.edu.hcmuaf.fit.util.PasswordUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -56,20 +57,9 @@ public class UserDAO {
     // LOGIN
     public User login(String username, String password) {
         prepareSchema();
-        String sql = "SELECT * FROM users WHERE username=? AND password=?";
-
-        try (
-                Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
-            ps.setString(1, username);
-            ps.setString(2, password);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return mapUser(rs);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        User u = findByUsername(username);
+        if (u != null && PasswordUtils.checkPassword(password, u.getPassword())) {
+            return u;
         }
         return null;
     }
@@ -85,7 +75,7 @@ public class UserDAO {
                 PreparedStatement ps = conn.prepareStatement(sql)
         ) {
             ps.setString(1, u.getUsername());
-            ps.setString(2, u.getPassword());
+            ps.setString(2, PasswordUtils.hashPassword(u.getPassword()));
             ps.setString(3, u.getFullName());
             ps.setString(4, u.getEmail());
             ps.setString(5, "USER");

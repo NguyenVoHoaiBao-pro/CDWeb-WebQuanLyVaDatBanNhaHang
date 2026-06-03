@@ -67,7 +67,7 @@ public class LoginController {
         boolean result = userDAO.register(user);
 
         if (result) {
-            return "redirect:/login";
+            return "redirect:/login?registered=true";
         } else {
             model.addAttribute("error", "Đăng ký thất bại!");
             return "register";
