@@ -4,12 +4,14 @@ import vn.edu.hcmuaf.fit.dao.ReservationDAO;
 import vn.edu.hcmuaf.fit.model.Reservation;
 import vn.edu.hcmuaf.fit.model.ReservationValidationResult;
 import vn.edu.hcmuaf.fit.util.ReservationRules;
+import vn.edu.hcmuaf.fit.dao.TableDAO;
 
 import java.time.LocalDateTime;
 
 public class StaffReservationService {
 
     private final ReservationDAO reservationDAO = new ReservationDAO();
+    private final TableDAO tableDAO = new TableDAO();
     private final ReservationAvailabilityService availabilityService = new ReservationAvailabilityService();
 
     public ReservationValidationResult validateWalkIn(
@@ -34,13 +36,20 @@ public class StaffReservationService {
         if (!check.isValid()) {
             return 0;
         }
+
+        double totalPrice = 0;
+        vn.edu.hcmuaf.fit.model.RestaurantTable table = tableDAO.findById(tableId);
+        if (table != null) {
+            totalPrice = table.getPrice();
+        }
+
         LocalDateTime start = ReservationRules.parseDateTime(startRaw);
         LocalDateTime end = ReservationRules.parseDateTime(endRaw);
         if (end == null && start != null) {
             end = start.plusHours(ReservationRules.SLOT_DURATION_HOURS);
         }
         return reservationDAO.insertStaffRange(
-                staffUserId, tableId, start, end, numberOfPeople, guestName);
+                staffUserId, tableId, start, end, numberOfPeople, guestName, totalPrice);
     }
 
 

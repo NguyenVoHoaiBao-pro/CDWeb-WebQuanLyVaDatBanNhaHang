@@ -15,6 +15,7 @@ public class PasswordUtils {
         if (password == null || hashed == null) {
             return false;
         }
+        hashed = hashed.trim();
         if (hashed.startsWith("$2a$") || hashed.startsWith("$2b$") || hashed.startsWith("$2y$")) {
             try {
                 return BCrypt.checkpw(password, hashed);

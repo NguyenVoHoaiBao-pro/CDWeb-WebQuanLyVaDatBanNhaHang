@@ -255,8 +255,12 @@ public class TableBookingController {
 
         session.setAttribute("currentReservation", reservationId);
 
-        return "redirect:/cart";
+        Reservation r = reservationDAO.findById(reservationId);
+        if (r.getTotalPrice() > 0) {
+            return "redirect:/reservation/payment?id=" + reservationId;
+        }
 
+        return "redirect:/cart";
     }
 
 

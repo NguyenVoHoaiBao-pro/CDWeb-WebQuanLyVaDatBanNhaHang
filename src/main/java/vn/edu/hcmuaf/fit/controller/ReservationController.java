@@ -72,6 +72,6 @@ public class ReservationController {
         }
 
         session.setAttribute("currentReservation", reservationId);
-        return "redirect:/cart";
+        return "redirect:/reservation/payment?id=" + reservationId;
     }
 }

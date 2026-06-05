@@ -377,6 +377,7 @@ public class AdminController {
             @RequestParam String name,
             @RequestParam int capacity,
             @RequestParam int floorNumber,
+            @RequestParam double price,
             Model model,
             HttpSession session
     ) {
@@ -387,7 +388,7 @@ public class AdminController {
             return "admin/layout";
         }
 
-        tableDAO.insert(name, capacity, floorNumber);
+        tableDAO.insert(name, capacity, floorNumber, price);
 
         return "redirect:/admin/tables";
     }

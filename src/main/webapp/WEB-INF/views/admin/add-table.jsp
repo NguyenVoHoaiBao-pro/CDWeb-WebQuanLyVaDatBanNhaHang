@@ -24,6 +24,15 @@
                    required>
         </div>
         <div class="mb-3">
+            <label class="form-label">Giá đặt bàn (VNĐ)</label>
+            <input type="number"
+                   name="price"
+                   class="form-control"
+                   min="0"
+                   placeholder="VD: 100000"
+                   required>
+        </div>
+        <div class="mb-3">
 
             <label class="form-label">
                 Tầng

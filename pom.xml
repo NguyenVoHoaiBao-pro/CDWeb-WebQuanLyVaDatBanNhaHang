@@ -73,6 +73,12 @@
             <version>0.4</version>
         </dependency>
 
+        <!-- Java Mail -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.6.2</version>
+        </dependency>
 
     </dependencies>
 

@@ -17,9 +17,36 @@ public class Reservation {
     private Integer staffAdjustedBy;
     private String customerUsername;
     private String tableName;
+    private double totalPrice;
+    private double paidAmount;
+    private String vnpTxnRef;
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public double getPaidAmount() {
+        return paidAmount;
+    }
+
+    public void setPaidAmount(double paidAmount) {
+        this.paidAmount = paidAmount;
+    }
+
+    public String getVnpTxnRef() {
+        return vnpTxnRef;
+    }
+
+    public void setVnpTxnRef(String vnpTxnRef) {
+        this.vnpTxnRef = vnpTxnRef;
+    }
 
     public int getUserId() { return userId; }
     public void setUserId(int userId) { this.userId = userId; }

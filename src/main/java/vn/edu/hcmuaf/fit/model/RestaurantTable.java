@@ -10,6 +10,7 @@ public class RestaurantTable {
     private int floorNumber;
     private int positionX;
     private int positionY;
+    private double price;
 
     public RestaurantTable() {
     }
@@ -17,11 +18,21 @@ public class RestaurantTable {
     public RestaurantTable(int id,
                            String name,
                            int capacity,
-                           String status) {
+                           String status,
+                           double price) {
         this.id = id;
         this.name = name;
         this.capacity = capacity;
         this.status = status;
+        this.price = price;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public int getId() {

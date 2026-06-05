@@ -44,6 +44,7 @@
                     <th>Thời gian</th>
                     <th>Số người</th>
                     <th>Trạng thái</th>
+                    <th>Thanh toán</th>
                     <th width="200">Thao tác</th>
                 </tr>
                 </thead>
@@ -69,6 +70,19 @@
                     <td><%= r.getNumberOfPeople() %></td>
                     <td>
                         <span class="booking-status <%= r.getStatus() %>"><%= statusLabel %></span>
+                    </td>
+                    <td>
+                        <% if (r.getTotalPrice() > 0) { %>
+                            <% if (r.getPaidAmount() >= r.getTotalPrice() * 0.5) { %>
+                                <span class="badge bg-success">Đã cọc</span>
+                            <% } else { %>
+                                <span class="badge bg-warning text-dark">Chưa cọc</span>
+                                <br>
+                                <a href="<%= ctx %>/reservation/payment?id=<%= r.getId() %>" class="btn btn-link btn-sm p-0 mt-1">Thanh toán ngay</a>
+                            <% } %>
+                        <% } else { %>
+                            <span class="text-muted">N/A</span>
+                        <% } %>
                     </td>
                     <td>
                         <% if ("PENDING".equals(r.getStatus())) { %>

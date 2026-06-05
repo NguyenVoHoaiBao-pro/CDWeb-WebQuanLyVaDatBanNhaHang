@@ -35,6 +35,13 @@ public class ReservationDAO {
         r.setNumberOfPeople(rs.getInt("number_of_people"));
         r.setStatus(rs.getString("status"));
 
+        try {
+            r.setTotalPrice(rs.getDouble("total_price"));
+            r.setPaidAmount(rs.getDouble("paid_amount"));
+            r.setVnpTxnRef(rs.getString("vnp_txn_ref"));
+        } catch (SQLException ignored) {
+        }
+
         String start = getColumnString(rs, "reservation_start_time");
         if (start == null || start.isEmpty()) {
             start = rs.getString("reservation_time");
@@ -92,7 +99,7 @@ public class ReservationDAO {
         if (end == null && start != null) {
             end = start.plusHours(ReservationRules.SLOT_DURATION_HOURS);
         }
-        return insertRange(r.getUserId(), r.getTableId(), start, end, r.getNumberOfPeople()) > 0;
+        return insertRange(r.getUserId(), r.getTableId(), start, end, r.getNumberOfPeople(), r.getTotalPrice(), r.getPaidAmount()) > 0;
     }
 
     public List<Reservation> getAll() {
@@ -262,7 +269,7 @@ public class ReservationDAO {
         if (start == null || end == null) {
             return 0;
         }
-        return insertRange(r.getUserId(), r.getTableId(), start, end, r.getNumberOfPeople());
+        return insertRange(r.getUserId(), r.getTableId(), start, end, r.getNumberOfPeople(), r.getTotalPrice(), r.getPaidAmount());
     }
 
     public int insertRange(
@@ -270,8 +277,11 @@ public class ReservationDAO {
             int tableId,
             LocalDateTime start,
             LocalDateTime end,
-            int numberOfPeople) {
+            int numberOfPeople,
+            double totalPrice,
+            double paidAmount) {
 
+        ensureColumns();
         LocalDateTime buffer = ReservationRules.cleaningBufferUntil(end);
         String startDb = ReservationRules.toDbString(start);
         String endDb = ReservationRules.toDbString(end);
@@ -280,8 +290,9 @@ public class ReservationDAO {
         String sql =
                 "INSERT INTO reservations(" +
                         "user_id, table_id, reservation_time, reservation_start_time, " +
-                        "reservation_end_time, cleaning_buffer_until, number_of_people, status, expired_at" +
-                        ") VALUES(?,?,?,?,?,?,?,'PENDING', DATE_ADD(NOW(), INTERVAL 1 DAY))";
+                        "reservation_end_time, cleaning_buffer_until, number_of_people, status, " +
+                        "total_price, paid_amount, expired_at" +
+                        ") VALUES(?,?,?,?,?,?,?,'PENDING',?,?, DATE_ADD(NOW(), INTERVAL 1 DAY))";
 
         Connection conn = null;
         try {
@@ -303,6 +314,8 @@ public class ReservationDAO {
                 ps.setString(5, endDb);
                 ps.setString(6, bufferDb);
                 ps.setInt(7, numberOfPeople);
+                ps.setDouble(8, totalPrice);
+                ps.setDouble(9, paidAmount);
                 ps.executeUpdate();
 
                 ResultSet keys = ps.getGeneratedKeys();
@@ -331,6 +344,39 @@ public class ReservationDAO {
             }
         }
         return 0;
+    }
+
+    private void ensureColumns() {
+        try (Connection conn = DBConnection.getConnection()) {
+            DatabaseMetaData meta = conn.getMetaData();
+            String[] cols = {"total_price", "paid_amount", "vnp_txn_ref"};
+            String[] types = {"DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "VARCHAR(255)"};
+            for (int i = 0; i < cols.length; i++) {
+                try (ResultSet rs = meta.getColumns(null, null, "reservations", cols[i])) {
+                    if (!rs.next()) {
+                        try (Statement st = conn.createStatement()) {
+                            st.executeUpdate("ALTER TABLE reservations ADD COLUMN " + cols[i] + " " + types[i]);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean updatePaidAmount(int reservationId, double amount, String txnRef) {
+        String sql = "UPDATE reservations SET paid_amount=?, vnp_txn_ref=?, status='CONFIRMED' WHERE id=?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDouble(1, amount);
+            ps.setString(2, txnRef);
+            ps.setInt(3, reservationId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /** Legacy point-in-time check */
@@ -512,18 +558,77 @@ public class ReservationDAO {
     }
 
     public int insertStaffRange(
-            int staffUserId,
+            int staffId,
             int tableId,
             LocalDateTime start,
             LocalDateTime end,
             int numberOfPeople,
-            String guestName) {
+            String guestName,
+            double totalPrice) {
 
-        int id = insertRange(staffUserId, tableId, start, end, numberOfPeople);
-        if (id > 0) {
-            finalizeStaffBooking(id, guestName);
+        ensureColumns();
+        LocalDateTime buffer = ReservationRules.cleaningBufferUntil(end);
+        String startDb = ReservationRules.toDbString(start);
+        String endDb = ReservationRules.toDbString(end);
+        String bufferDb = ReservationRules.toDbString(buffer);
+
+        String sql =
+                "INSERT INTO reservations(" +
+                        "user_id, table_id, reservation_time, reservation_start_time, " +
+                        "reservation_end_time, cleaning_buffer_until, number_of_people, " +
+                        "status, booking_source, guest_name, total_price, paid_amount, expired_at" +
+                        ") VALUES(?,?,?,?,?,?,?,'CONFIRMED','STAFF',?,?,0, DATE_ADD(NOW(), INTERVAL 1 YEAR))";
+
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false);
+
+            lockTableForBooking(conn, tableId);
+
+            if (hasOverlap(conn, tableId, start, end, 0)) {
+                conn.rollback();
+                return 0;
+            }
+
+            try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setInt(1, staffId);
+                ps.setInt(2, tableId);
+                ps.setString(3, startDb);
+                ps.setString(4, startDb);
+                ps.setString(5, endDb);
+                ps.setString(6, bufferDb);
+                ps.setInt(7, numberOfPeople);
+                ps.setString(8, guestName);
+                ps.setDouble(9, totalPrice);
+                ps.executeUpdate();
+
+                ResultSet keys = ps.getGeneratedKeys();
+                if (keys.next()) {
+                    int id = keys.getInt(1);
+                    conn.commit();
+                    return id;
+                }
+            }
+            conn.rollback();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ignored) {
+                }
+            }
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException ignored) {
+                }
+            }
         }
-        return id;
+        return 0;
     }
 
     private void finalizeStaffBooking(int reservationId, String guestName) {

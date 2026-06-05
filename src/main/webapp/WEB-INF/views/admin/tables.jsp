@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ page import="java.util.*,vn.edu.hcmuaf.fit.model.RestaurantTable" %>
 
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <% List<RestaurantTable> list = (List<RestaurantTable>) request.getAttribute("list"); %>
 
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
@@ -22,6 +23,7 @@
                 <th>Tên bàn</th>
                 <th>Sức chứa</th>
                 <th>Tầng</th>
+                <th>Giá</th>
                 <th>Vận hành</th>
                 <th width="300">Thao tác</th>
             </tr>
@@ -41,6 +43,9 @@
                             out.print("Tầng " + t.getFloorNumber());
                         }
                     %>
+                </td>
+                <td>
+                    <fmt:formatNumber value="<%= t.getPrice() %>" type="currency" currencySymbol="₫"/>
                 </td>
                 <td>
                     <%

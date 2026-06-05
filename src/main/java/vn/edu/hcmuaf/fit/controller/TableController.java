@@ -46,6 +46,7 @@ public class TableController {
             @RequestParam String name,
             @RequestParam int capacity,
             @RequestParam int floorNumber,
+            @RequestParam double price,
             HttpSession session
     ) {
 
@@ -57,7 +58,7 @@ public class TableController {
             return "redirect:/admin/tables?error=1";
         }
 
-        dao.insert(name, capacity, floorNumber);
+        dao.insert(name, capacity, floorNumber, price);
 
         return "redirect:/admin/tables?success=1";
     }

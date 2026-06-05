@@ -17,6 +17,12 @@ public class UserDAO {
             return true;
         }
         try (Connection conn = DBConnection.getConnection()) {
+    
+            try (Statement st = conn.createStatement()) {
+                st.executeUpdate("ALTER TABLE users MODIFY COLUMN password VARCHAR(255)");
+            } catch (Exception ignored) {
+            }
+
             if (columnExists(conn, "users", "identity_verified")) {
                 identitySchemaReady = true;
                 return true;

@@ -95,13 +95,17 @@ public class ReservationAvailabilityService {
             return 0;
         }
 
+        RestaurantTable table = tableDAO.findById(tableId);
+        double totalPrice = table.getPrice();
+        double initialPaid = 0; // Sẽ thanh toán sau
+
         LocalDateTime start = ReservationRules.parseDateTime(startRaw);
         LocalDateTime end = ReservationRules.parseDateTime(endRaw);
         if (end == null) {
             end = start.plusHours(ReservationRules.SLOT_DURATION_HOURS);
         }
 
-        return reservationDAO.insertRange(userId, tableId, start, end, numberOfPeople);
+        return reservationDAO.insertRange(userId, tableId, start, end, numberOfPeople, totalPrice, initialPaid);
     }
 
     public boolean updateBookingForUser(

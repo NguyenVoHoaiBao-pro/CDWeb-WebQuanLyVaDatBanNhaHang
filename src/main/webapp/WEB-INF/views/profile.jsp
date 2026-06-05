@@ -74,7 +74,7 @@
                 <% } else { %>
                 <p class="text-warning">Chưa xác thực — bắt buộc trước khi đặt bàn / gọi món.</p>
                 <a href="<%= ctx %>/verify-identity" class="btn btn-warning w-100 mt-2">
-                    <i class="bi bi-patch-question"></i> Xác thực ngay (5 câu hỏi)
+                    <i class="bi bi-patch-check"></i> Xác thực qua Email
                 </a>
                 <% } %>
             </div>

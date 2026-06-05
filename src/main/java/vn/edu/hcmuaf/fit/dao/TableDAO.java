@@ -9,6 +9,7 @@ public class TableDAO {
 
     public List<RestaurantTable> getAll() {
 
+        ensurePriceColumn();
         List<RestaurantTable> list = new ArrayList<>();
 
         String sql =
@@ -29,6 +30,7 @@ public class TableDAO {
                 t.setCapacity(rs.getInt("capacity"));
                 t.setStatus(rs.getString("status"));
                 t.setFloorNumber(rs.getInt("floor_number"));
+                t.setPrice(rs.getDouble("price"));
 
                 list.add(t);
             }
@@ -42,6 +44,7 @@ public class TableDAO {
 
     public RestaurantTable findById(int id) {
 
+        ensurePriceColumn();
         String sql =
                 "SELECT * FROM restaurant_tables WHERE id=?";
 
@@ -63,6 +66,7 @@ public class TableDAO {
                 t.setCapacity(rs.getInt("capacity"));
                 t.setStatus(rs.getString("status"));
                 t.setFloorNumber(rs.getInt("floor_number"));
+                t.setPrice(rs.getDouble("price"));
 
                 return t;
             }
@@ -74,12 +78,29 @@ public class TableDAO {
         return null;
     }
 
+    private void ensurePriceColumn() {
+        try (Connection conn = DBConnection.getConnection()) {
+            DatabaseMetaData meta = conn.getMetaData();
+            try (ResultSet rs = meta.getColumns(null, null, "restaurant_tables", "price")) {
+                if (!rs.next()) {
+                    try (Statement st = conn.createStatement()) {
+                        st.executeUpdate("ALTER TABLE restaurant_tables ADD COLUMN price DOUBLE DEFAULT 0");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public boolean insert(String name,
                           int capacity,
-                          int floorNumber) {
+                          int floorNumber,
+                          double price) {
 
+        ensurePriceColumn();
         String sql =
-                "INSERT INTO restaurant_tables(name,capacity,status,floor_number) VALUES(?,?,?,?)";
+                "INSERT INTO restaurant_tables(name,capacity,status,floor_number,price) VALUES(?,?,?,?,?)";
 
         try (
                 Connection conn = DBConnection.getConnection();
@@ -90,6 +111,7 @@ public class TableDAO {
             ps.setInt(2, capacity);
             ps.setString(3, "AVAILABLE");
             ps.setInt(4, floorNumber);
+            ps.setDouble(5, price);
 
             return ps.executeUpdate() > 0;
 
