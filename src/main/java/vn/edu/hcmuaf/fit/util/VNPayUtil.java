@@ -9,9 +9,9 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 public class VNPayUtil {
-    public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_TmnCode = "2QXUI4J4"; // Sandbox code
-    public static String vnp_HashSecret = "JNCKNCKNCKNCKNCKNCKNCKNCKNCKNCKN"; // Placeholder Sandbox secret
+    public static String vnp_PayUrl = ConfigLoader.get("vnpay.pay.url", "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html");
+    public static String vnp_TmnCode = ConfigLoader.get("vnpay.tmn.code", "2QXUI4J4");
+    public static String vnp_HashSecret = ConfigLoader.get("vnpay.hash.secret", "JNCKNCKNCKNCKNCKNCKNCKNCKNCKNCKN");
     
     public static String hashAllFields(Map<String, String> fields) {
         List<String> fieldNames = new ArrayList<>(fields.keySet());

@@ -7,10 +7,10 @@ import java.util.Properties;
 
 public class MailUtil {
 
-    private static final String HOST = "smtp.gmail.com";
-    private static final String PORT = "587";
-    private static final String USERNAME = "lbkduy4504@gmail.com";
-    private static final String PASSWORD = "hzso ssgt lrsj izga";
+    private static final String HOST = ConfigLoader.get("mail.host", "smtp.gmail.com");
+    private static final String PORT = ConfigLoader.get("mail.port", "587");
+    private static final String USERNAME = ConfigLoader.get("mail.username");
+    private static final String PASSWORD = ConfigLoader.get("mail.password");
 
     public static boolean sendEmail(String to, String subject, String content) {
         Properties props = new Properties();

@@ -3,9 +3,11 @@ package vn.edu.hcmuaf.fit.controller;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import vn.edu.hcmuaf.fit.dao.UserDAO;
 import vn.edu.hcmuaf.fit.model.User;
+import vn.edu.hcmuaf.fit.util.ConfigLoader;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -20,16 +22,18 @@ import java.util.UUID;
 @Controller
 public class OAuthController {
 
-    private final String GG_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID";
-    private final String GG_CLIENT_SECRET = "YOUR_GOOGLE_CLIENT_SECRET";
+    private final String GG_CLIENT_ID = ConfigLoader.get("google.client.id");
+    private final String GG_CLIENT_SECRET = ConfigLoader.get("google.client.secret");
 
-    private final String FB_APP_ID = "...";
-    private final String FB_APP_SECRET = "...";
+    private final String HARDCODED_REDIRECT_URI = ConfigLoader.get("google.redirect.uri");
+
+    private final String FB_APP_ID = ConfigLoader.get("facebook.app.id");
+    private final String FB_APP_SECRET = ConfigLoader.get("facebook.app.secret");
 
     UserDAO userDAO = new UserDAO();
 
     private String googleRedirect(HttpServletRequest request) {
-        return baseUrl(request) + "/oauth/google/callback";
+        return baseUrl(request) + "/login/oauth2/code/google";
     }
 
     private String facebookRedirect(HttpServletRequest request) {
@@ -64,7 +68,11 @@ public class OAuthController {
     }
 
     @GetMapping("/oauth/google")
-    public String googleLogin(HttpServletRequest request) throws Exception {
+    public String googleLogin(HttpServletRequest request, Model model) throws Exception {
+
+        if ("YOUR_GOOGLE_CLIENT_ID".equals(GG_CLIENT_ID)) {
+            return "redirect:/login?error=google_config_missing";
+        }
 
         String redirect = googleRedirect(request);
         String url = "https://accounts.google.com/o/oauth2/v2/auth?"
@@ -77,7 +85,7 @@ public class OAuthController {
         return "redirect:" + url;
     }
 
-    @GetMapping("/oauth/google/callback")
+    @GetMapping("/login/oauth2/code/google")
     public String googleCallback(String code, HttpServletRequest request, HttpSession session) {
 
         if (code == null || code.trim().isEmpty()) {

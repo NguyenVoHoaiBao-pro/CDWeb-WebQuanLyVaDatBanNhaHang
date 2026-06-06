@@ -1,17 +1,15 @@
 package vn.edu.hcmuaf.fit.dao;
 
+import vn.edu.hcmuaf.fit.util.ConfigLoader;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class DBConnection {
 
-    private static final String URL =
-            "jdbc:mysql://localhost:3306/nhahang"
-                    + "?serverTimezone=Asia/Ho_Chi_Minh"
-                    + "&useSSL=false"
-                    + "&allowPublicKeyRetrieval=true";
-    private static final String USER = "root";
-    private static final String PASSWORD = "";
+    private static final String URL = ConfigLoader.get("db.url");
+    private static final String USER = ConfigLoader.get("db.user");
+    private static final String PASSWORD = ConfigLoader.get("db.password");
 
     public static Connection getConnection() {
         try {
