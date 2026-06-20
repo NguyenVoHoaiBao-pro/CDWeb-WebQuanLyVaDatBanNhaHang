@@ -75,7 +75,7 @@
     var form = document.getElementById("menuSearchForm");
     var grid = document.getElementById("menuResults");
     var keywordInput = document.getElementById("menuKeyword");
-    var categorySelect = document.getElementById("menuCategory");
+    var categoryInput = document.getElementById("menuCategory");
     var loadingEl = document.getElementById("menuLoading");
     var countEl = document.getElementById("menuResultCount");
 
@@ -98,7 +98,7 @@
 
     function fetchMenu() {
       var keyword = keywordInput ? keywordInput.value.trim() : "";
-      var category = categorySelect ? categorySelect.value : "";
+      var category = categoryInput ? categoryInput.value : "";
 
       var params = new URLSearchParams();
       if (keyword) params.set("keyword", keyword);
@@ -149,18 +149,13 @@
       keywordInput.addEventListener("input", scheduleSearch);
     }
 
-    if (categorySelect) {
-      categorySelect.addEventListener("change", function () {
-        clearTimeout(debounceTimer);
-        fetchMenu();
-      });
-    }
-
     var resetBtn = document.getElementById("menuResetBtn");
     if (resetBtn) {
       resetBtn.addEventListener("click", function () {
         if (keywordInput) keywordInput.value = "";
-        if (categorySelect) categorySelect.value = "";
+        if (categoryInput) categoryInput.value = "";
+        var categoryDisplay = document.getElementById("menuCategoryDisplay");
+        if (categoryDisplay) categoryDisplay.textContent = "Tất cả danh mục";
         fetchMenu();
       });
     }

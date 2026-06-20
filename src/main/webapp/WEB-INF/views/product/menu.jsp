@@ -43,14 +43,21 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label" for="menuCategory">Danh mục</label>
-                    <select id="menuCategory" name="category" class="form-select">
-                        <option value="" <%= category.isEmpty() ? "selected" : "" %>>Tất cả danh mục</option>
-                        <option value="MÓN KHAI VỊ" <%= "MÓN KHAI VỊ".equals(category) ? "selected" : "" %>>Món khai vị</option>
-                        <option value="MÓN CHÍNH" <%= "MÓN CHÍNH".equals(category) ? "selected" : "" %>>Món chính</option>
-                        <option value="MÓN NƯỚC" <%= "MÓN NƯỚC".equals(category) ? "selected" : "" %>>Món nước</option>
-                        <option value="MÓN ĂN NHẸ" <%= "MÓN ĂN NHẸ".equals(category) ? "selected" : "" %>>Món ăn nhẹ</option>
-                        <option value="MÓN TRÁNG MIÊNG & ĐỒ UỐNG" <%= "MÓN TRÁNG MIÊNG & ĐỒ UỐNG".equals(category) ? "selected" : "" %>>Tráng miệng</option>
-                    </select>
+                    <div class="custom-dropdown" style="position: relative; z-index: 10000;">
+                        <input type="hidden" id="menuCategory" name="category" value="<%= category %>">
+                        <button type="button" class="custom-dropdown-btn w-100 text-start p-2 rounded" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #f1f5f9;">
+                            <span id="menuCategoryDisplay"><%= category.isEmpty() ? "Tất cả danh mục" : category %></span>
+                            <i class="bi bi-chevron-down float-end"></i>
+                        </button>
+                        <div class="custom-dropdown-menu d-none" style="position: absolute; top: 100%; left: 0; right: 0; background: #1a1a26; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; margin-top: 4px; z-index: 10001; box-shadow: 0 8px 32px rgba(0,0,0,0.4); max-height: 300px; overflow-y: auto;">
+                            <div class="dropdown-option p-2" style="cursor: pointer; color: #f1f5f9; padding: 0.6rem 1rem;" data-value="">Tất cả danh mục</div>
+                            <div class="dropdown-option p-2" style="cursor: pointer; color: #f1f5f9; padding: 0.6rem 1rem;" data-value="MÓN KHAI VỊ">Món khai vị</div>
+                            <div class="dropdown-option p-2" style="cursor: pointer; color: #f1f5f9; padding: 0.6rem 1rem;" data-value="MÓN CHÍNH">Món chính</div>
+                            <div class="dropdown-option p-2" style="cursor: pointer; color: #f1f5f9; padding: 0.6rem 1rem;" data-value="MÓN NƯỚC">Món nước</div>
+                            <div class="dropdown-option p-2" style="cursor: pointer; color: #f1f5f9; padding: 0.6rem 1rem;" data-value="MÓN ĂN NHẸ">Món ăn nhẹ</div>
+                            <div class="dropdown-option p-2" style="cursor: pointer; color: #f1f5f9; padding: 0.6rem 1rem;" data-value="MÓN TRÁNG MIÊNG & ĐỒ UỐNG">Tráng miệng</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-3 d-grid gap-2">
                     <button type="submit" class="btn btn-primary-custom">
@@ -122,6 +129,69 @@
 
 <script src="<%= ctx %>/js/menu-search.js"></script>
 <script>
+  // Custom dropdown handler
+  document.addEventListener("DOMContentLoaded", function() {
+    var dropdownBtn = document.querySelector(".custom-dropdown-btn");
+    var dropdownMenu = document.querySelector(".custom-dropdown-menu");
+    var dropdownOptions = document.querySelectorAll(".dropdown-option");
+    var categoryInput = document.getElementById("menuCategory");
+    var categoryDisplay = document.getElementById("menuCategoryDisplay");
+
+    if (!dropdownBtn || !dropdownMenu) return;
+
+    // Toggle dropdown
+    dropdownBtn.addEventListener("click", function(e) {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle("d-none");
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", function(e) {
+      if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+        dropdownMenu.classList.add("d-none");
+      }
+    });
+
+    // Handle option selection
+    dropdownOptions.forEach(function(option) {
+      option.addEventListener("click", function(e) {
+        e.stopPropagation();
+        var value = this.getAttribute("data-value");
+        var text = this.textContent;
+
+        categoryInput.value = value;
+        categoryDisplay.textContent = text;
+        dropdownMenu.classList.add("d-none");
+
+        // Trigger form submission
+        var form = document.getElementById("menuSearchForm");
+        if (form) {
+          form.dispatchEvent(new Event("submit"));
+        }
+      });
+
+      // Hover effect
+      option.addEventListener("mouseenter", function() {
+        this.style.background = "rgba(255, 107, 53, 0.2)";
+        this.style.color = "#ff8c5a";
+      });
+      option.addEventListener("mouseleave", function() {
+        this.style.background = "transparent";
+        this.style.color = "#f1f5f9";
+      });
+    });
+
+    // Set initial state
+    var initialValue = categoryInput.value;
+    if (initialValue) {
+      dropdownOptions.forEach(function(option) {
+        if (option.getAttribute("data-value") === initialValue) {
+          categoryDisplay.textContent = option.textContent;
+        }
+      });
+    }
+  });
+
   window.menuReveal = function () {
     if (!("IntersectionObserver" in window)) return;
     document.querySelectorAll("#menuResults .food-card").forEach(function (el) {

@@ -180,6 +180,9 @@
   border: 1px solid var(--border-glass);
   border-radius: var(--radius);
   padding: 1.5rem;
+  overflow: visible;
+  position: relative;
+  z-index: 1000;
 }
 
 /* Product detail */

@@ -17,18 +17,16 @@
 %>
 
 <style>
-  body{
-    background:#f8f9fa;
-  }
-
   .success-box{
-    background:#fff;
+    background: var(--bg-card);
     max-width:760px;
     margin:auto;
     padding:50px;
     border-radius:24px;
-    box-shadow:0 15px 40px rgba(0,0,0,.08);
+    box-shadow:0 15px 40px rgba(0,0,0,.4);
     text-align:center;
+    border: 1px solid var(--border-glass);
+    backdrop-filter: blur(16px);
   }
 
   .icon{
@@ -36,11 +34,13 @@
   }
 
   .code{
-    background:#f1f3f5;
+    background: rgba(255,255,255,0.1);
     padding:14px 20px;
     border-radius:12px;
     display:inline-block;
     font-weight:700;
+    color: var(--text);
+    border: 1px solid var(--border-glass);
   }
 </style>
 
@@ -50,11 +50,11 @@
 
     <div class="icon mb-3">✅</div>
 
-    <h1 class="fw-bold mb-3">
+    <h1 class="fw-bold mb-3" style="color: var(--text);">
       Đặt bàn thành công!
     </h1>
 
-    <p class="text-muted mb-4">
+    <p class="mb-4" style="color: var(--text-muted);">
       Cảm ơn bạn đã đặt bàn tại nhà hàng của chúng tôi.
     </p>
 
@@ -90,12 +90,12 @@
     <div class="d-grid gap-3">
 
       <a href="<%=request.getContextPath()%>/menu"
-         class="btn btn-danger btn-lg">
+         class="btn btn-primary-custom btn-lg">
         🍽 Tiếp tục gọi món
       </a>
 
       <a href="<%=request.getContextPath()%>/"
-         class="btn btn-outline-dark">
+         class="btn btn-outline-custom">
         🏠 Về trang chủ
       </a>
 
