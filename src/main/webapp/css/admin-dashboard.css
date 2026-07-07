@@ -28,28 +28,29 @@
   align-items: center;
 }
 
-.dash-filter select {
-  min-width: 100px;
-}
-
 /* KPI cards */
+.dash-kpi-grid,
 .kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 1.5rem !important;
+  margin-bottom: 2rem;
+  width: 100% !important;
 }
 
 .kpi-card {
   position: relative;
   overflow: hidden;
-  padding: 1.35rem 3.25rem 1.35rem 1.25rem;
-  min-height: 118px;
+  padding: 1.5rem 1.25rem;
+  min-height: 130px;
   border-radius: var(--radius-lg);
   background: var(--bg-card);
   border: 1px solid var(--border-glass);
   backdrop-filter: blur(16px);
   transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .kpi-card::before {
@@ -118,13 +119,11 @@
 
 .kpi-icon {
   position: absolute;
-  right: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 2rem;
-  opacity: 0.1;
-  color: var(--orange);
-  pointer-events: none;
+  top: 1.25rem;
+  right: 1.25rem;
+  font-size: 1.75rem;
+  opacity: 0.15;
+  color: var(--text);
   z-index: 0;
 }
 
@@ -344,6 +343,13 @@
   padding: 1rem;
 }
 
+@media (max-width: 992px) {
+  .dash-kpi-grid,
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
 @media (max-width: 768px) {
   .chart-wrap {
     height: 220px;
@@ -351,6 +357,13 @@
 
   .kpi-icon {
     display: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .dash-kpi-grid,
+  .kpi-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 
@@ -381,19 +394,45 @@
   color: var(--text);
 }
 
+.dash-filter .dash-select-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.dash-filter .dash-select-wrap i {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  transition: var(--transition);
+}
+
 .dash-filter .form-select {
-  background-color: rgba(255, 255, 255, 0.07);
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23aaa' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
-  border: 1px solid var(--border-glass);
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.06) !important;
+  background-image: none !important; /* Force remove all background images */
+  border: 1px solid var(--border-glass) !important;
+  color: var(--text) !important;
   border-radius: 10px;
+  padding: 0.45rem 2rem 0.45rem 0.75rem !important;
+  min-width: 120px;
+  cursor: pointer;
+  appearance: none !important; /* Use none to use our custom arrow */
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+}
+
+.dash-filter .dash-select-wrap:focus-within i {
+  color: var(--orange);
 }
 
 .dash-filter .form-select:focus {
-  background-color: rgba(255, 255, 255, 0.10);
-  border-color: var(--orange);
-  box-shadow: 0 0 0 3px var(--orange-glow);
-  color: var(--text);
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: var(--orange) !important;
+  box-shadow: 0 0 0 3px var(--orange-glow) !important;
+  outline: none;
 }
 
 .dash-filter .form-select option {

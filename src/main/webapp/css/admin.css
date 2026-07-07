@@ -114,7 +114,7 @@ body.admin-body {
 }
 
 .admin-content .dash-header,
-.admin-content .kpi-grid,
+.admin-content .dash-kpi-grid,
 .admin-content .card-box {
   max-width: 100%;
 }

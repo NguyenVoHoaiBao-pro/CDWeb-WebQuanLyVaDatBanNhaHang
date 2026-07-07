@@ -38,16 +38,22 @@
     </div>
     <form class="dash-filter glass-card p-2 px-3" method="get" action="<%= ctx %>/admin">
         <label class="form-label mb-0 small text-muted">Kỳ báo cáo</label>
-        <select name="month" class="form-select form-select-sm">
-            <% for (int m = 1; m <= 12; m++) { %>
-            <option value="<%= m %>" <%= m == selMonth ? "selected" : "" %>>Tháng <%= m %></option>
-            <% } %>
-        </select>
-        <select name="year" class="form-select form-select-sm">
-            <% for (int y = selYear - 2; y <= selYear + 1; y++) { %>
-            <option value="<%= y %>" <%= y == selYear ? "selected" : "" %>><%= y %></option>
-            <% } %>
-        </select>
+        <div class="dash-select-wrap">
+            <select name="month" class="form-select form-select-sm">
+                <% for (int m = 1; m <= 12; m++) { %>
+                <option value="<%= m %>" <%= m == selMonth ? "selected" : "" %>>Tháng <%= m %></option>
+                <% } %>
+            </select>
+            <i class="bi bi-chevron-down"></i>
+        </div>
+        <div class="dash-select-wrap">
+            <select name="year" class="form-select form-select-sm">
+                <% for (int y = selYear - 2; y <= selYear + 1; y++) { %>
+                <option value="<%= y %>" <%= y == selYear ? "selected" : "" %>><%= y %></option>
+                <% } %>
+            </select>
+            <i class="bi bi-chevron-down"></i>
+        </div>
         <button type="submit" class="btn btn-primary-custom btn-sm">
             <i class="bi bi-funnel"></i> Áp dụng
         </button>
@@ -55,7 +61,7 @@
 </div>
 
 <!-- KPI doanh thu & bán hàng -->
-<div class="kpi-grid">
+<div class="dash-kpi-grid">
     <div class="kpi-card highlight">
         <i class="bi bi-currency-dollar kpi-icon"></i>
         <div class="kpi-label">Tổng doanh thu tháng <%= selMonth %></div>
@@ -236,7 +242,7 @@
     if (resAnalytics == null) resAnalytics = new ReservationAnalytics();
 %>
 <p class="text-muted small text-uppercase fw-semibold mb-2 mt-4" style="letter-spacing:0.08em;">Đặt bàn &amp; vận hành hôm nay</p>
-<div class="kpi-grid mb-3">
+<div class="dash-kpi-grid mb-3">
     <div class="kpi-card">
         <i class="bi bi-calendar-plus kpi-icon"></i>
         <div class="kpi-label">Đặt bàn hôm nay</div>

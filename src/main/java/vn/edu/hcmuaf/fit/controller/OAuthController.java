@@ -27,17 +27,10 @@ public class OAuthController {
 
     private final String HARDCODED_REDIRECT_URI = ConfigLoader.get("google.redirect.uri");
 
-    private final String FB_APP_ID = ConfigLoader.get("facebook.app.id");
-    private final String FB_APP_SECRET = ConfigLoader.get("facebook.app.secret");
-
     UserDAO userDAO = new UserDAO();
 
     private String googleRedirect(HttpServletRequest request) {
         return baseUrl(request) + "/login/oauth2/code/google";
-    }
-
-    private String facebookRedirect(HttpServletRequest request) {
-        return baseUrl(request) + "/oauth/facebook/callback";
     }
 
     private String baseUrl(HttpServletRequest request) {
@@ -160,96 +153,5 @@ public class OAuthController {
         }
 
         return "redirect:/login?error=google_failed";
-    }
-
-    @GetMapping("/oauth/facebook")
-    public String facebookLogin(HttpServletRequest request) throws Exception {
-
-        String redirect = facebookRedirect(request);
-        String url = "https://www.facebook.com/v18.0/dialog/oauth?"
-                + "client_id=" + URLEncoder.encode(FB_APP_ID, "UTF-8")
-                + "&redirect_uri=" + URLEncoder.encode(redirect, "UTF-8")
-                + "&scope=email,public_profile";
-
-        return "redirect:" + url;
-    }
-
-    @GetMapping("/oauth/facebook/callback")
-    public String facebookCallback(String code, HttpServletRequest request, HttpSession session) {
-
-        if (code == null || code.trim().isEmpty()) {
-            return "redirect:/login?error=facebook_denied";
-        }
-
-        try {
-            String redirect = facebookRedirect(request);
-            String tokenUrl = "https://graph.facebook.com/v18.0/oauth/access_token?"
-                    + "client_id=" + URLEncoder.encode(FB_APP_ID, "UTF-8")
-                    + "&redirect_uri=" + URLEncoder.encode(redirect, "UTF-8")
-                    + "&client_secret=" + URLEncoder.encode(FB_APP_SECRET, "UTF-8")
-                    + "&code=" + URLEncoder.encode(code, "UTF-8");
-
-            URL url = new URL(tokenUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8)
-            );
-
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-
-            JsonObject json = JsonParser.parseString(response.toString()).getAsJsonObject();
-            String accessToken = json.get("access_token").getAsString();
-
-            String userInfoUrl =
-                    "https://graph.facebook.com/me?fields=id,name,email&access_token=" + accessToken;
-
-            URL url2 = new URL(userInfoUrl);
-            HttpURLConnection conn2 = (HttpURLConnection) url2.openConnection();
-
-            BufferedReader reader2 = new BufferedReader(
-                    new InputStreamReader(conn2.getInputStream(), StandardCharsets.UTF_8)
-            );
-
-            StringBuilder userInfo = new StringBuilder();
-            while ((line = reader2.readLine()) != null) {
-                userInfo.append(line);
-            }
-
-            JsonObject userJson = JsonParser.parseString(userInfo.toString()).getAsJsonObject();
-
-            String email = userJson.has("email") && !userJson.get("email").isJsonNull()
-                    ? userJson.get("email").getAsString() : null;
-            String name = userJson.get("name").getAsString();
-            String fbId = userJson.get("id").getAsString();
-            String username = email != null ? email : "fb_" + fbId;
-
-            User user = email != null ? userDAO.findByEmail(email) : userDAO.findByUsername(username);
-
-            if (user == null) {
-                User draft = new User();
-                draft.setUsername(username);
-                draft.setPassword(UUID.randomUUID().toString());
-                draft.setFullName(name);
-                draft.setEmail(email);
-                if (userDAO.register(draft)) {
-                    user = reloadAfterRegister(draft);
-                }
-            }
-
-            if (user != null && user.getId() > 0) {
-                putUserInSession(session, user);
-                return "redirect:/";
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return "redirect:/login?error=facebook_failed";
     }
 }

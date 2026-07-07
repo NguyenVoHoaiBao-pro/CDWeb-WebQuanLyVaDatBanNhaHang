@@ -73,10 +73,30 @@
 
   function initActiveNav() {
     var path = window.location.pathname;
+    if (path.length > 1 && path.endsWith("/")) {
+      path = path.slice(0, -1);
+    }
+
     document.querySelectorAll(".nav-link[data-nav]").forEach(function (link) {
-      var href = link.getAttribute("href");
-      if (href && path.indexOf(href.replace(/^\//, "")) !== -1) {
+      var href = link.pathname;
+      if (href.length > 1 && href.endsWith("/")) {
+        href = href.slice(0, -1);
+      }
+
+      var originalHref = link.getAttribute("href");
+      var isHome = originalHref.endsWith("/");
+      var isActive = false;
+
+      if (isHome) {
+        isActive = path === href;
+      } else {
+        isActive = path === href || path.startsWith(href + "/");
+      }
+
+      if (isActive) {
         link.classList.add("active");
+      } else {
+        link.classList.remove("active");
       }
     });
   }

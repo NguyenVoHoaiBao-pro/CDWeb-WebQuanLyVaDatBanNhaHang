@@ -47,13 +47,9 @@
 
         <div class="auth-divider">Hoặc đăng ký nhanh với</div>
 
-        <a href="<%= ctx %>/oauth/google" class="btn btn-dark w-100 mb-2 social-btn">
+        <a href="<%= ctx %>/oauth/google" class="btn btn-dark w-100 social-btn">
             <img src="https://cdn-icons-png.flaticon.com/512/300/300221.png" width="20" alt="">
             Google
-        </a>
-        <a href="<%= ctx %>/oauth/facebook" class="btn btn-primary w-100 social-btn">
-            <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" width="20" alt="">
-            Facebook
         </a>
 
         <div class="text-center mt-4 text-muted">

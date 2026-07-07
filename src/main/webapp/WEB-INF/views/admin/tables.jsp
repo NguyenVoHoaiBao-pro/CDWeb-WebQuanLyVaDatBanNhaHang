@@ -61,7 +61,6 @@
                         }
                     %>
                     <span class="badge <%= stClass %>"><%= stLabel %></span>
-                    <div class="small text-muted mt-1">Lịch đặt: bảng reservations</div>
                 </td>
                 <td>
                     <div class="d-flex gap-2 justify-content-center flex-wrap">

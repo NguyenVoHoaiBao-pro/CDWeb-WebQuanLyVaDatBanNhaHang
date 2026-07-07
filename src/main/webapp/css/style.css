@@ -3,7 +3,7 @@
 @import url("components.css");
 @import url("pages.css");
 @import url("admin.css");
-@import url("admin-dashboard.css");
+@import url("admin-dashboard.css?v=1.1");
 
 /* Bootstrap overrides for dark theme */
 .text-muted {
