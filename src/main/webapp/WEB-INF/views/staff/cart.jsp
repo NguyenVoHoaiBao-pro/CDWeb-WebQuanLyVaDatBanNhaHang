@@ -12,6 +12,8 @@
     String timeRange = reservation != null
             ? DateUtil.formatDateTimeRange(reservation.getReservationStartTime(), reservation.getReservationEndTime())
             : "";
+    List<Reservation> activeCarts = (List<Reservation>) request.getAttribute("activeCarts");
+    if (activeCarts == null) activeCarts = new ArrayList<>();
 %>
 <div class="staff-topbar staff-no-print">
     <div>
@@ -19,6 +21,38 @@
         <p class="text-muted small mb-0">Thanh toán tại quầy — chỉ xuất bill / QR cho khách</p>
     </div>
     <a href="<%= ctx %>/staff/walk-in" class="btn btn-outline-info btn-sm"><i class="bi bi-plus-lg"></i> Đặt bàn mới</a>
+</div>
+
+<div class="row g-3 mb-4 staff-no-print">
+    <div class="col-12">
+        <div class="staff-card border-info" style="border-left: 4px solid var(--bs-info);">
+            <h5 class="text-info mb-3"><i class="bi bi-bell-fill"></i> Bàn đang gọi món qua QR / Cần phục vụ</h5>
+            <% if (activeCarts.isEmpty()) { %>
+                <p class="text-muted mb-0 small"><i class="bi bi-info-circle"></i> Không có bàn nào đang có món trong giỏ.</p>
+            <% } else { %>
+                <div class="row g-2">
+                <% for (Reservation r : activeCarts) { 
+                    String sourceLabel = "QR_ORDER_SUBMITTED".equals(r.getBookingSource()) 
+                        ? "<span class='badge bg-warning text-dark'><i class='bi bi-check-circle-fill'></i> Khách đã gửi Order</span>" 
+                        : "<span class='badge bg-secondary'><i class='bi bi-pencil'></i> Khách đang chọn món</span>";
+                %>
+                    <div class="col-md-4 col-sm-6">
+                        <div class="p-2 border border-secondary rounded bg-dark d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="text-light"><%= r.getTableName() != null ? r.getTableName() : ("Bàn #" + r.getTableId()) %></strong>
+                                <div class="small text-muted mt-1">Mã đặt: #<%= r.getId() %></div>
+                                <div class="mt-1"><%= sourceLabel %></div>
+                            </div>
+                            <a href="<%= ctx %>/staff/cart/select/<%= r.getId() %>" class="btn btn-sm btn-info text-dark fw-bold">
+                                <i class="bi bi-cart-check"></i> Xem giỏ
+                            </a>
+                        </div>
+                    </div>
+                <% } %>
+                </div>
+            <% } %>
+        </div>
+    </div>
 </div>
 
 <% if (request.getAttribute("error") != null) { %>

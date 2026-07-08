@@ -80,6 +80,22 @@ public class TableDAO {
 
     private void ensurePriceColumn() {
         try (Connection conn = DBConnection.getConnection()) {
+            // 1. Create table if not exists
+            try (Statement st = conn.createStatement()) {
+                st.executeUpdate("CREATE TABLE IF NOT EXISTS restaurant_tables (" +
+                        "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                        "name VARCHAR(100) NOT NULL, " +
+                        "capacity INT DEFAULT 2, " +
+                        "status VARCHAR(50) DEFAULT 'AVAILABLE', " +
+                        "floor_number INT DEFAULT 1, " +
+                        "position_x INT DEFAULT 0, " +
+                        "position_y INT DEFAULT 0" +
+                        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // 2. Ensure price column exists
             DatabaseMetaData meta = conn.getMetaData();
             try (ResultSet rs = meta.getColumns(null, null, "restaurant_tables", "price")) {
                 if (!rs.next()) {

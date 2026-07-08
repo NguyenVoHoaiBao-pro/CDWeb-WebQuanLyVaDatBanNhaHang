@@ -27,6 +27,9 @@ public class AuthUtil {
         if (user == null) {
             return false;
         }
+        if (user.isGuest() || UserRoles.isGuestRole(user.getRole())) {
+            return true;
+        }
         if (UserRoles.isAdminRole(user.getRole()) || UserRoles.isStaffRole(user.getRole())) {
             return true;
         }
@@ -81,6 +84,9 @@ public class AuthUtil {
             return login;
         }
         User u = refreshSessionUser(session);
+        if (u.isGuest() || UserRoles.isGuestRole(u.getRole())) {
+            return null;
+        }
         if (UserRoles.isStaffRole(u.getRole()) || UserRoles.isAdminRole(u.getRole())) {
             return null;
         }

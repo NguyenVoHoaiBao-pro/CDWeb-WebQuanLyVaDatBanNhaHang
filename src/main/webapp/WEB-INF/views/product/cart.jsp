@@ -40,7 +40,7 @@
     <% } %>
 
     <div class="d-flex justify-content-end mb-4">
-        <a href="<%= ctx %>/menu" class="btn btn-outline-custom btn-sm">
+        <a href="<%= ctx %><%= request.getAttribute("backUrl") != null ? request.getAttribute("backUrl") : "/menu" %>" class="btn btn-outline-custom btn-sm">
             <i class="bi bi-arrow-left"></i> Tiếp tục gọi món
         </a>
     </div>
@@ -63,7 +63,7 @@
                 <div class="text-center py-5">
                     <i class="bi bi-cart-x display-4 text-muted"></i>
                     <h4 class="mt-3">Chưa có món nào</h4>
-                    <a href="<%= ctx %>/menu" class="btn btn-primary-custom mt-3">Chọn món ngay</a>
+                    <a href="<%= ctx %><%= request.getAttribute("backUrl") != null ? request.getAttribute("backUrl") : "/menu" %>" class="btn btn-primary-custom mt-3">Chọn món ngay</a>
                 </div>
                 <%
                         }
@@ -145,10 +145,17 @@
                     <span class="price"><%= String.format("%,.0f", total) %> đ</span>
                 </div>
 
+                <% if (Boolean.TRUE.equals(request.getAttribute("isQrOrder"))) { %>
+                <a href="<%= ctx %>/qr-order/submit"
+                   class="btn btn-warning w-100 mb-2 fw-bold text-dark">
+                    <i class="bi bi-send-fill"></i> Gửi yêu cầu gọi món (Order)
+                </a>
+                <% } else { %>
                 <a href="<%= ctx %>/checkout"
                    class="btn btn-primary-custom w-100 mb-2">
                     <i class="bi bi-calendar-check"></i> Đặt bàn & Thanh toán
                 </a>
+                <% } %>
 
                 <a href="<%= ctx %>/cart/clear" class="btn btn-outline-light w-100 btn-sm">
                     Xóa toàn bộ

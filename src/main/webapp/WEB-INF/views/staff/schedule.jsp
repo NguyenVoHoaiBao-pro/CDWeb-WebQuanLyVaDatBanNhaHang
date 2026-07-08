@@ -18,15 +18,24 @@
         <h1><i class="bi bi-calendar-week"></i> Tra cứu lịch bàn</h1>
         <p class="text-muted small mb-0">Ngày <%= DateUtil.formatDate(selectedDate) %></p>
     </div>
-    <form class="dash-filter glass-card p-2 px-3" method="get" action="<%= ctx %>/staff/schedule">
-        <input type="date" name="date" class="form-control form-control-sm" value="<%= selectedDate %>">
-        <select name="tableId" class="form-select form-select-sm">
-            <option value="">— Tất cả bàn —</option>
-            <% for (RestaurantTable t : tables) { %>
-            <option value="<%= t.getId() %>" <%= tableId != null && tableId == t.getId() ? "selected" : "" %>><%= t.getName() %></option>
-            <% } %>
-        </select>
-        <button type="submit" class="btn btn-primary-custom btn-sm">Xem</button>
+    <form class="dash-filter glass-card p-2 px-3" method="get" action="<%= ctx %>/staff/schedule" data-bs-theme="dark">
+        <label class="form-label mb-0 small text-muted">Chọn ngày</label>
+        <div class="dash-select-wrap">
+            <input type="date" name="date" class="form-control form-control-sm" value="<%= selectedDate %>">
+        </div>
+
+        <div class="dash-select-wrap">
+            <select name="tableId" class="form-control form-control-sm" data-bs-theme="dark">
+                <option value="">— Tất cả bàn —</option>
+                <% for (RestaurantTable t : tables) { %>
+                <option value="<%= t.getId() %>" <%= tableId != null && tableId == t.getId() ? "selected" : "" %>><%= t.getName() %></option>
+                <% } %>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary-custom btn-sm">
+            <i class="bi bi-funnel"></i> Áp dụng
+        </button>
     </form>
 </div>
 

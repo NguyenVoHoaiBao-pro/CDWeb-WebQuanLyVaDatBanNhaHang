@@ -10,8 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 import vn.edu.hcmuaf.fit.dao.ProductDAO;
 import vn.edu.hcmuaf.fit.model.Product;
+import vn.edu.hcmuaf.fit.model.User;
 
 import java.util.List;
+
+import javax.servlet.http.HttpSession;
 
 @Controller
 public class ProductController {
@@ -52,6 +55,21 @@ public class ProductController {
         return "product/menu";
     }
 
+    @GetMapping("/menu-guest")
+    public String menuGuest(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String keyword,
+            Model model) {
+
+        List<Product> list = filterMenu(category, keyword);
+
+        model.addAttribute("list", list);
+        model.addAttribute("category", category);
+        model.addAttribute("keyword", keyword);
+
+        return "product/menu_guest";
+    }
+
     @GetMapping("/products")
     public String products(
             @RequestParam(required = false) String category,
@@ -63,6 +81,7 @@ public class ProductController {
 
     @GetMapping("/product/{id}")
     public String detail(@PathVariable int id,
+                         HttpSession session,
                          Model model) {
 
         Product p = dao.findById(id);
@@ -70,6 +89,10 @@ public class ProductController {
         if (p == null) {
             return "redirect:/menu";
         }
+
+        User u = (User) session.getAttribute("user");
+        String backUrl = (u != null && u.isGuest()) ? "/menu-guest" : "/menu";
+        model.addAttribute("backUrl", backUrl);
 
         model.addAttribute("product", p);
 

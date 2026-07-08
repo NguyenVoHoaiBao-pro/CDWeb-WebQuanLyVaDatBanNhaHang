@@ -93,6 +93,54 @@
   margin: 0 auto;
 }
 
+/* Fix for dash-filter and select-wrap in staff area */
+.dash-filter .dash-select-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.dash-filter .dash-select-wrap i {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  z-index: 5;
+}
+
+.dash-filter .form-control {
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: var(--border-glass);
+  color: var(--text);
+  color-scheme: dark;
+}
+
+.dash-filter .form-control:focus {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--orange);
+  color: var(--text);
+  box-shadow: 0 0 0 3px var(--orange-glow);
+}
+
+/* Make the select look identical to the date input (no native arrow) */
+.dash-filter select.form-control {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 2rem;
+  /* room for the chevron icon */
+  cursor: pointer;
+}
+
+/* Dark background for dropdown option list */
+.dash-filter select.form-control option {
+  background: #1a1a26;
+  color: var(--text);
+}
+
+
 .staff-bill-paper {
   background: #fff;
   color: #111;
@@ -141,21 +189,25 @@
 }
 
 @media print {
+
   .admin-sidebar,
   .admin-menu-btn,
   .staff-no-print,
   .admin-sidebar-backdrop {
     display: none !important;
   }
+
   .admin-content {
     margin: 0 !important;
     padding: 0 !important;
     width: 100% !important;
   }
+
   .staff-bill-paper {
     box-shadow: none;
     border-radius: 0;
   }
+
   body.staff-body {
     background: #fff;
   }

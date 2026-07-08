@@ -3,6 +3,7 @@ package vn.edu.hcmuaf.fit.util;
 public final class UserRoles {
 
     public static final String USER = "USER";
+    public static final String GUEST = "GUEST";
     public static final String STAFF = "STAFF";
     public static final String ADMIN = "ADMIN";
 
@@ -17,8 +18,12 @@ public final class UserRoles {
         return ADMIN.equals(role);
     }
 
+    public static boolean isGuestRole(String role) {
+        return GUEST.equals(role);
+    }
+
     public static boolean isCustomerRole(String role) {
-        return USER.equals(role) || role == null;
+        return USER.equals(role) || GUEST.equals(role) || role == null;
     }
 
     public static String nextRole(String current) {

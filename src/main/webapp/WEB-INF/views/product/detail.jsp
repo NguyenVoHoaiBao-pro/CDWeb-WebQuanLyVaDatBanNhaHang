@@ -14,7 +14,7 @@
             <div class="text-center py-5 glass-card">
                 <i class="bi bi-exclamation-circle display-1 text-muted"></i>
                 <h2 class="mt-3">Không tìm thấy món ăn</h2>
-                <a href="${pageContext.request.contextPath}/products" class="btn btn-primary-custom mt-3">
+                <a href="${pageContext.request.contextPath}${backUrl != null ? backUrl : '/menu'}" class="btn btn-primary-custom mt-3">
                     Quay lại thực đơn
                 </a>
             </div>
@@ -48,7 +48,7 @@
                                     data-add-cart="${product.id}">
                                 <i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng
                             </button>
-                            <a href="${pageContext.request.contextPath}/products" class="btn btn-outline-custom">
+                            <a href="${pageContext.request.contextPath}${backUrl != null ? backUrl : '/menu'}" class="btn btn-outline-custom">
                                 <i class="bi bi-arrow-left"></i> Quay lại thực đơn
                             </a>
                         </div>

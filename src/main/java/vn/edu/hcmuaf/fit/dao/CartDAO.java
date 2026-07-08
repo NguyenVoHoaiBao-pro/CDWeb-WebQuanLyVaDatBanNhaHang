@@ -426,4 +426,59 @@ public class CartDAO {
 
         return total;
     }
+
+    public List<Product> getCartByReservation(int reservationId) {
+        List<Product> list = new ArrayList<>();
+        String sql =
+                "SELECT " +
+                        "p.id AS product_id, " +
+                        "p.name, " +
+                        "p.price, " +
+                        "p.image, " +
+                        "p.description, " +
+                        "p.category, " +
+                        "c.quantity " +
+                        "FROM cart c " +
+                        "JOIN products p " +
+                        "ON c.product_id = p.id " +
+                        "WHERE c.reservation_id=?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, reservationId);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                Product p = new Product();
+                p.setId(rs.getInt("product_id"));
+                p.setName(rs.getString("name"));
+                p.setPrice(rs.getDouble("price"));
+                p.setImage(rs.getString("image"));
+                p.setQuantity(rs.getInt("quantity"));
+                list.add(p);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public double getTotalByReservation(int reservationId){
+        double total = 0;
+        try(Connection conn = DBConnection.getConnection()){
+            String sql =
+                    "SELECT SUM(c.quantity * p.price) total " +
+                            "FROM cart c " +
+                            "JOIN products p ON c.product_id = p.id " +
+                            "WHERE c.reservation_id=?";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, reservationId);
+            ResultSet rs = ps.executeQuery();
+            if(rs.next()){
+                total = rs.getDouble("total");
+            }
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+        return total;
+    }
 }

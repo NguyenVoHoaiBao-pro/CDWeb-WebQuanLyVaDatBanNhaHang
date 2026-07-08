@@ -13,13 +13,11 @@ import java.util.*;
 public class ReservationDAO {
 
     public int expirePendingReservations() {
-        String sql =
-                "UPDATE reservations SET status = 'CANCELLED' " +
-                        "WHERE status = 'PENDING' AND expired_at IS NOT NULL AND expired_at < NOW()";
+        String sql = "UPDATE reservations SET status = 'CANCELLED' " +
+                "WHERE status = 'PENDING' AND expired_at IS NOT NULL AND expired_at < NOW()";
         try (
                 Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             return ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
@@ -99,7 +97,8 @@ public class ReservationDAO {
         if (end == null && start != null) {
             end = start.plusHours(ReservationRules.SLOT_DURATION_HOURS);
         }
-        return insertRange(r.getUserId(), r.getTableId(), start, end, r.getNumberOfPeople(), r.getTotalPrice(), r.getPaidAmount()) > 0;
+        return insertRange(r.getUserId(), r.getTableId(), start, end, r.getNumberOfPeople(), r.getTotalPrice(),
+                r.getPaidAmount()) > 0;
     }
 
     public List<Reservation> getAll() {
@@ -108,8 +107,7 @@ public class ReservationDAO {
                 Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(
                         "SELECT * FROM reservations ORDER BY id DESC");
-                ResultSet rs = ps.executeQuery()
-        ) {
+                ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(mapRow(rs));
             }
@@ -126,8 +124,7 @@ public class ReservationDAO {
         try (
                 Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(
-                        "UPDATE reservations SET status=? WHERE id=?")
-        ) {
+                        "UPDATE reservations SET status=? WHERE id=?")) {
             ps.setString(1, status);
             ps.setInt(2, id);
             return ps.executeUpdate() > 0;
@@ -141,8 +138,7 @@ public class ReservationDAO {
         try (
                 Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(
-                        "DELETE FROM reservations WHERE id=?")
-        ) {
+                        "DELETE FROM reservations WHERE id=?")) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
@@ -212,11 +208,10 @@ public class ReservationDAO {
         String endDb = ReservationRules.toDbString(end);
         String bufferDb = ReservationRules.toDbString(buffer);
 
-        String sql =
-                "UPDATE reservations SET " +
-                        "reservation_time=?, reservation_start_time=?, reservation_end_time=?, " +
-                        "cleaning_buffer_until=?, number_of_people=? " +
-                        "WHERE id=? AND status='PENDING'";
+        String sql = "UPDATE reservations SET " +
+                "reservation_time=?, reservation_start_time=?, reservation_end_time=?, " +
+                "cleaning_buffer_until=?, number_of_people=? " +
+                "WHERE id=? AND status='PENDING'";
 
         if (userIdOrZero > 0) {
             sql += " AND user_id=?";
@@ -224,8 +219,7 @@ public class ReservationDAO {
 
         try (
                 Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, startDb);
             ps.setString(2, startDb);
             ps.setString(3, endDb);
@@ -247,8 +241,7 @@ public class ReservationDAO {
         String sql = "SELECT * FROM reservations WHERE user_id = ? ORDER BY id DESC";
         try (
                 Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -269,7 +262,8 @@ public class ReservationDAO {
         if (start == null || end == null) {
             return 0;
         }
-        return insertRange(r.getUserId(), r.getTableId(), start, end, r.getNumberOfPeople(), r.getTotalPrice(), r.getPaidAmount());
+        return insertRange(r.getUserId(), r.getTableId(), start, end, r.getNumberOfPeople(), r.getTotalPrice(),
+                r.getPaidAmount());
     }
 
     public int insertRange(
@@ -287,12 +281,11 @@ public class ReservationDAO {
         String endDb = ReservationRules.toDbString(end);
         String bufferDb = ReservationRules.toDbString(buffer);
 
-        String sql =
-                "INSERT INTO reservations(" +
-                        "user_id, table_id, reservation_time, reservation_start_time, " +
-                        "reservation_end_time, cleaning_buffer_until, number_of_people, status, " +
-                        "total_price, paid_amount, expired_at" +
-                        ") VALUES(?,?,?,?,?,?,?,'PENDING',?,?, DATE_ADD(NOW(), INTERVAL 1 DAY))";
+        String sql = "INSERT INTO reservations(" +
+                "user_id, table_id, reservation_time, reservation_start_time, " +
+                "reservation_end_time, cleaning_buffer_until, number_of_people, status, " +
+                "total_price, paid_amount, expired_at" +
+                ") VALUES(?,?,?,?,?,?,?,'PENDING',?,?, DATE_ADD(NOW(), INTERVAL 1 DAY))";
 
         Connection conn = null;
         try {
@@ -348,9 +341,32 @@ public class ReservationDAO {
 
     private void ensureColumns() {
         try (Connection conn = DBConnection.getConnection()) {
+            // 1. Create table if not exists
+            try (Statement st = conn.createStatement()) {
+                st.executeUpdate("CREATE TABLE IF NOT EXISTS reservations (" +
+                        "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                        "user_id INT, " +
+                        "table_id INT, " +
+                        "reservation_time DATETIME, " +
+                        "number_of_people INT DEFAULT 2, " +
+                        "status VARCHAR(50) DEFAULT 'PENDING'" +
+                        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // 2. Ensure all columns exist
             DatabaseMetaData meta = conn.getMetaData();
-            String[] cols = {"total_price", "paid_amount", "vnp_txn_ref"};
-            String[] types = {"DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "VARCHAR(255)"};
+            String[] cols = {
+                    "total_price", "paid_amount", "vnp_txn_ref",
+                    "guest_name", "booking_source", "expired_at",
+                    "reservation_start_time", "reservation_end_time", "cleaning_buffer_until"
+            };
+            String[] types = {
+                    "DOUBLE DEFAULT 0", "DOUBLE DEFAULT 0", "VARCHAR(255)",
+                    "VARCHAR(255)", "VARCHAR(50)", "DATETIME",
+                    "DATETIME", "DATETIME", "DATETIME"
+            };
             for (int i = 0; i < cols.length; i++) {
                 try (ResultSet rs = meta.getColumns(null, null, "reservations", cols[i])) {
                     if (!rs.next()) {
@@ -368,7 +384,7 @@ public class ReservationDAO {
     public boolean updatePaidAmount(int reservationId, double amount, String txnRef) {
         String sql = "UPDATE reservations SET paid_amount=?, vnp_txn_ref=?, status='CONFIRMED' WHERE id=?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDouble(1, amount);
             ps.setString(2, txnRef);
             ps.setInt(3, reservationId);
@@ -430,10 +446,9 @@ public class ReservationDAO {
         String newStart = ReservationRules.toDbString(start);
         String newBufferStr = ReservationRules.toDbString(newBuffer);
 
-        String sql =
-                "SELECT id FROM reservations WHERE table_id = ? AND " + ReservationSql.ACTIVE_WHERE +
-                        " AND ? < " + ReservationSql.EFFECTIVE_BUFFER +
-                        " AND " + ReservationSql.EFFECTIVE_START + " < ?";
+        String sql = "SELECT id FROM reservations WHERE table_id = ? AND " + ReservationSql.ACTIVE_WHERE +
+                " AND ? < " + ReservationSql.EFFECTIVE_BUFFER +
+                " AND " + ReservationSql.EFFECTIVE_START + " < ?";
 
         if (excludeReservationId > 0) {
             sql += " AND id <> ?";
@@ -457,8 +472,7 @@ public class ReservationDAO {
         try (
                 Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(
-                        "SELECT * FROM reservations WHERE id=?")
-        ) {
+                        "SELECT * FROM reservations WHERE id=?")) {
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -471,38 +485,33 @@ public class ReservationDAO {
     }
 
     public void clearFinishedTables() {
-        String sql =
-                "UPDATE restaurant_tables t " +
-                        "JOIN reservations r ON t.id = r.table_id " +
-                        "SET t.status='AVAILABLE' " +
-                        "WHERE r.status IN ('DONE','COMPLETED')";
+        String sql = "UPDATE restaurant_tables t " +
+                "JOIN reservations r ON t.id = r.table_id " +
+                "SET t.status='AVAILABLE' " +
+                "WHERE r.status IN ('DONE','COMPLETED')";
         try (
                 Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.executeUpdate();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-
     public List<ScheduleBlock> getScheduleBlocks(int tableId, int daysAhead) {
         List<ScheduleBlock> blocks = new ArrayList<>();
 
-        String sql =
-                "SELECT id, " + ReservationSql.EFFECTIVE_START + " AS eff_start, " +
-                        ReservationSql.EFFECTIVE_END + " AS eff_end, " +
-                        ReservationSql.EFFECTIVE_BUFFER + " AS eff_buffer " +
-                        "FROM reservations " +
-                        "WHERE table_id = ? AND " + ReservationSql.ACTIVE_WHERE +
-                        " AND " + ReservationSql.EFFECTIVE_START + " < DATE_ADD(NOW(), INTERVAL ? DAY) " +
-                        "ORDER BY eff_start";
+        String sql = "SELECT id, " + ReservationSql.EFFECTIVE_START + " AS eff_start, " +
+                ReservationSql.EFFECTIVE_END + " AS eff_end, " +
+                ReservationSql.EFFECTIVE_BUFFER + " AS eff_buffer " +
+                "FROM reservations " +
+                "WHERE table_id = ? AND " + ReservationSql.ACTIVE_WHERE +
+                " AND " + ReservationSql.EFFECTIVE_START + " < DATE_ADD(NOW(), INTERVAL ? DAY) " +
+                "ORDER BY eff_start";
 
         try (
                 Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, tableId);
             ps.setInt(2, daysAhead);
             ResultSet rs = ps.executeQuery();
@@ -537,12 +546,11 @@ public class ReservationDAO {
     public List<String> getFoodsByReservation(int reservationId) {
         List<String> list = new ArrayList<>();
         try (Connection conn = DBConnection.getConnection()) {
-            String sql =
-                    "SELECT p.name, od.quantity " +
-                            "FROM order_details od " +
-                            "JOIN orders o ON od.order_id = o.id " +
-                            "JOIN products p ON od.product_id = p.id " +
-                            "WHERE o.reservation_id=?";
+            String sql = "SELECT p.name, od.quantity " +
+                    "FROM order_details od " +
+                    "JOIN orders o ON od.order_id = o.id " +
+                    "JOIN products p ON od.product_id = p.id " +
+                    "WHERE o.reservation_id=?";
 
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setInt(1, reservationId);
@@ -572,12 +580,11 @@ public class ReservationDAO {
         String endDb = ReservationRules.toDbString(end);
         String bufferDb = ReservationRules.toDbString(buffer);
 
-        String sql =
-                "INSERT INTO reservations(" +
-                        "user_id, table_id, reservation_time, reservation_start_time, " +
-                        "reservation_end_time, cleaning_buffer_until, number_of_people, " +
-                        "status, booking_source, guest_name, total_price, paid_amount, expired_at" +
-                        ") VALUES(?,?,?,?,?,?,?,'CONFIRMED','STAFF',?,?,0, DATE_ADD(NOW(), INTERVAL 1 YEAR))";
+        String sql = "INSERT INTO reservations(" +
+                "user_id, table_id, reservation_time, reservation_start_time, " +
+                "reservation_end_time, cleaning_buffer_until, number_of_people, " +
+                "status, booking_source, guest_name, total_price, paid_amount, expired_at" +
+                ") VALUES(?,?,?,?,?,?,?,'CONFIRMED','STAFF',?,?,0, DATE_ADD(NOW(), INTERVAL 1 YEAR))";
 
         Connection conn = null;
         try {
@@ -637,8 +644,7 @@ public class ReservationDAO {
                 Connection conn = DBConnection.getConnection();
                 PreparedStatement ps = conn.prepareStatement(
                         "UPDATE reservations SET status='CONFIRMED', booking_source='STAFF', guest_name=? " +
-                                "WHERE id=?")
-        ) {
+                                "WHERE id=?")) {
             ps.setString(1, guest.isEmpty() ? null : guest);
             ps.setInt(2, reservationId);
             ps.executeUpdate();
@@ -646,8 +652,7 @@ public class ReservationDAO {
             try (
                     Connection conn = DBConnection.getConnection();
                     PreparedStatement ps = conn.prepareStatement(
-                            "UPDATE reservations SET status='CONFIRMED' WHERE id=?")
-            ) {
+                            "UPDATE reservations SET status='CONFIRMED' WHERE id=?")) {
                 ps.setInt(1, reservationId);
                 ps.executeUpdate();
             } catch (Exception e2) {
@@ -655,7 +660,6 @@ public class ReservationDAO {
             }
         }
     }
-
 
     public boolean adjustReservationEnd(int reservationId, LocalDateTime newEnd, int staffUserId) {
         Reservation existing = findById(reservationId);
@@ -694,8 +698,7 @@ public class ReservationDAO {
                 PreparedStatement ps = conn.prepareStatement(
                         "UPDATE reservations SET reservation_end_time=?, cleaning_buffer_until=?, " +
                                 "staff_adjusted_at=NOW(), staff_adjusted_by=? " +
-                                "WHERE id=? AND status NOT IN ('CANCELLED')")
-        ) {
+                                "WHERE id=? AND status NOT IN ('CANCELLED')")) {
             ps.setString(1, endDb);
             ps.setString(2, bufferDb);
             ps.setInt(3, staffUserId);
@@ -706,8 +709,7 @@ public class ReservationDAO {
                     Connection conn = DBConnection.getConnection();
                     PreparedStatement ps = conn.prepareStatement(
                             "UPDATE reservations SET reservation_end_time=?, cleaning_buffer_until=? " +
-                                    "WHERE id=? AND status NOT IN ('CANCELLED')")
-            ) {
+                                    "WHERE id=? AND status NOT IN ('CANCELLED')")) {
                 ps.setString(1, endDb);
                 ps.setString(2, bufferDb);
                 ps.setInt(3, reservationId);
@@ -721,19 +723,17 @@ public class ReservationDAO {
 
     public List<Reservation> findByDate(String dateYmd) {
         List<Reservation> list = new ArrayList<>();
-        String sql =
-                "SELECT r.*, u.username AS customer_username, t.name AS table_name " +
-                        "FROM reservations r " +
-                        "LEFT JOIN users u ON r.user_id = u.id " +
-                        "LEFT JOIN restaurant_tables t ON r.table_id = t.id " +
-                        "WHERE DATE(r.reservation_start_time) = ? " +
-                        "AND r.status <> 'CANCELLED' " +
-                        "ORDER BY r.reservation_start_time, r.table_id";
+        String sql = "SELECT r.*, u.username AS customer_username, t.name AS table_name " +
+                "FROM reservations r " +
+                "LEFT JOIN users u ON r.user_id = u.id " +
+                "LEFT JOIN restaurant_tables t ON r.table_id = t.id " +
+                "WHERE DATE(r.reservation_start_time) = ? " +
+                "AND r.status <> 'CANCELLED' " +
+                "ORDER BY r.reservation_start_time, r.table_id";
 
         try (
                 Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, dateYmd);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
@@ -747,19 +747,17 @@ public class ReservationDAO {
 
     public List<Reservation> findByTableAndDate(int tableId, String dateYmd) {
         List<Reservation> list = new ArrayList<>();
-        String sql =
-                "SELECT r.*, u.username AS customer_username, t.name AS table_name " +
-                        "FROM reservations r " +
-                        "LEFT JOIN users u ON r.user_id = u.id " +
-                        "LEFT JOIN restaurant_tables t ON r.table_id = t.id " +
-                        "WHERE r.table_id = ? AND DATE(r.reservation_start_time) = ? " +
-                        "AND r.status <> 'CANCELLED' " +
-                        "ORDER BY r.reservation_start_time";
+        String sql = "SELECT r.*, u.username AS customer_username, t.name AS table_name " +
+                "FROM reservations r " +
+                "LEFT JOIN users u ON r.user_id = u.id " +
+                "LEFT JOIN restaurant_tables t ON r.table_id = t.id " +
+                "WHERE r.table_id = ? AND DATE(r.reservation_start_time) = ? " +
+                "AND r.status <> 'CANCELLED' " +
+                "ORDER BY r.reservation_start_time";
 
         try (
                 Connection conn = DBConnection.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, tableId);
             ps.setString(2, dateYmd);
             ResultSet rs = ps.executeQuery();
@@ -770,5 +768,94 @@ public class ReservationDAO {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public Reservation getActiveReservationNow(int tableId) {
+        String sql = "SELECT * FROM reservations " +
+                "WHERE table_id = ? " +
+                "AND status NOT IN ('CANCELLED') " +
+                "AND NOW() >= reservation_start_time " +
+                "AND NOW() <= reservation_end_time " +
+                "ORDER BY id DESC LIMIT 1";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, tableId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapRow(rs);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public int insertQrWalkIn(int guestUserId, int tableId, LocalDateTime start, LocalDateTime end, String tableName) {
+        ensureColumns();
+        String startDb = ReservationRules.toDbString(start);
+        String endDb = ReservationRules.toDbString(end);
+        String bufferDb = ReservationRules.toDbString(ReservationRules.cleaningBufferUntil(end));
+
+        String insertSql = "INSERT INTO reservations(" +
+                "user_id, table_id, reservation_time, reservation_start_time, " +
+                "reservation_end_time, cleaning_buffer_until, number_of_people, " +
+                "status, booking_source, guest_name, total_price, paid_amount, expired_at" +
+                ") VALUES(?,?,NOW(),?,?,?,?,'CONFIRMED','STAFF',?,0,0, DATE_ADD(NOW(), INTERVAL 1 YEAR))";
+
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, guestUserId);
+            ps.setInt(2, tableId);
+            ps.setString(3, startDb);
+            ps.setString(4, endDb);
+            ps.setString(5, bufferDb);
+            ps.setInt(6, 2);
+            ps.setString(7, "Khách " + tableName);
+            ps.executeUpdate();
+
+            ResultSet keys = ps.getGeneratedKeys();
+            if (keys.next()) {
+                int newId = keys.getInt(1);
+                return newId;
+            }
+        } catch (Exception e) {
+            System.err.println("[QR] insertQrWalkIn failed for tableId=" + tableId + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<Reservation> getReservationsWithCarts() {
+        List<Reservation> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT r.*, t.name AS table_name, u.username AS customer_username " +
+                "FROM reservations r " +
+                "JOIN cart c ON r.id = c.reservation_id " +
+                "JOIN restaurant_tables t ON r.table_id = t.id " +
+                "LEFT JOIN users u ON r.user_id = u.id " +
+                "WHERE r.status = 'CONFIRMED' " +
+                "ORDER BY r.id DESC";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapRow(rs));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public boolean submitQrOrder(int reservationId) {
+        String sql = "UPDATE reservations SET booking_source='QR_ORDER_SUBMITTED' WHERE id=?";
+        try (Connection conn = DBConnection.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, reservationId);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

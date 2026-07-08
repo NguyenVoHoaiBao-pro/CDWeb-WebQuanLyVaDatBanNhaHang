@@ -47,7 +47,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="<%= ctx %>/my-booking" data-nav>Lịch đặt</a>
                 </li>
-                <% if (u != null) { %>
+                <% if (u != null && !u.isGuest()) { %>
                 <li class="nav-item">
                     <a class="nav-link" href="<%= ctx %>/profile" data-nav>Hồ sơ</a>
                 </li>
@@ -64,16 +64,22 @@
                 <a href="<%= ctx %>/login" class="btn btn-outline-custom btn-nav btn-sm">Đăng nhập</a>
                 <a href="<%= ctx %>/register" class="btn btn-primary-custom btn-nav btn-sm">Đăng ký</a>
                 <% } else { %>
+                <% if (u.isGuest()) { %>
+                <div class="user-badge d-none d-md-flex text-decoration-none text-light" style="cursor: default;">
+                    <i class="bi bi-person-circle me-1"></i> <%= u.getFullName() %>
+                </div>
+                <% } else { %>
                 <a href="<%= ctx %>/profile" class="user-badge d-none d-md-flex text-decoration-none">
                     <i class="bi bi-person-circle me-1"></i> <%= u.getUsername() %>
                     <% if (!vn.edu.hcmuaf.fit.util.AuthUtil.isIdentityVerified(u)) { %>
                     <span class="badge bg-warning text-dark ms-1" title="Chưa xác thực">!</span>
                     <% } %>
                 </a>
-                <% if ("STAFF".equals(u.getRole())) { %>
+                <% } %>
+                <% if (vn.edu.hcmuaf.fit.util.UserRoles.isStaffRole(u.getRole())) { %>
                 <a href="<%= ctx %>/staff" class="btn btn-info btn-nav btn-sm text-dark">Nhân viên</a>
                 <% } %>
-                <% if ("ADMIN".equals(u.getRole())) { %>
+                <% if (vn.edu.hcmuaf.fit.util.UserRoles.isAdminRole(u.getRole())) { %>
                 <a href="<%= ctx %>/admin" class="btn btn-danger btn-nav btn-sm">Admin</a>
                 <% } %>
                 <a href="<%= ctx %>/logout" class="btn btn-outline-custom btn-nav btn-sm">Đăng xuất</a>

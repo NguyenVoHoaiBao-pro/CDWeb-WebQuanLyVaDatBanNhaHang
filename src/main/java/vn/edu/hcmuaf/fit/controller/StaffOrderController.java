@@ -32,6 +32,10 @@ public class StaffOrderController {
         }
         User staff = (User) session.getAttribute("user");
         Integer reservationId = (Integer) session.getAttribute("currentReservation");
+        
+        List<Reservation> activeCarts = reservationDAO.getReservationsWithCarts();
+        model.addAttribute("activeCarts", activeCarts);
+
         if (reservationId == null) {
             model.addAttribute("error", "Chưa chọn bàn — vào Khách walk-in hoặc chọn đặt bàn trước.");
             model.addAttribute("list", new ArrayList<Product>());
@@ -43,15 +47,26 @@ public class StaffOrderController {
             session.removeAttribute("currentReservation");
             return "redirect:/staff/walk-in";
         }
-        List<Product> cart = cartDAO.getCart(staff.getId(), reservationId);
+        List<Product> cart = cartDAO.getCartByReservation(reservationId);
         Reservation reservation = reservationDAO.findById(reservationId);
         model.addAttribute("list", cart);
-        model.addAttribute("total", cartDAO.getTotal(staff.getId(), reservationId));
+        model.addAttribute("total", cartDAO.getTotalByReservation(reservationId));
         model.addAttribute("reservationId", reservationId);
         model.addAttribute("reservation", reservation);
         model.addAttribute("table", reservation != null ? tableDAO.findById(reservation.getTableId()) : null);
         model.addAttribute("page", "cart.jsp");
         return "staff/layout";
+    }
+
+    @GetMapping("/cart/select/{resId}")
+    public String selectCart(@PathVariable int resId, HttpSession session) {
+        String gate = AuthUtil.requireStaff(session);
+        if (gate != null) {
+            return gate;
+        }
+        session.setAttribute("currentReservation", resId);
+        session.setAttribute("staffWalkIn", Boolean.TRUE);
+        return "redirect:/staff/cart";
     }
 
     @PostMapping("/order/complete")

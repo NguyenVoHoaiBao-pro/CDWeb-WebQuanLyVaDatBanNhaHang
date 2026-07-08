@@ -8,6 +8,7 @@ public class User {
     private String fullName;
     private String email;
     private String role;
+    private boolean guest;
     /** Đã xác thực danh tính qua bài quiz */
     private boolean identityVerified;
     private String identityVerifiedAt;
@@ -64,6 +65,14 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public boolean isGuest() {
+        return guest;
+    }
+
+    public void setGuest(boolean guest) {
+        this.guest = guest;
     }
 
     public boolean isIdentityVerified() {

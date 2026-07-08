@@ -113,6 +113,14 @@ public class CartController {
                 reservationId
         );
 
+        model.addAttribute(
+                "isQrOrder",
+                session.getAttribute("qrOrderTableId") != null
+        );
+
+        String backUrl = (u != null && u.isGuest()) ? "/menu-guest" : "/menu";
+        model.addAttribute("backUrl", backUrl);
+
         return "product/cart";
     }
 

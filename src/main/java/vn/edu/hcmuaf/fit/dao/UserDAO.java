@@ -17,29 +17,45 @@ public class UserDAO {
             return true;
         }
         try (Connection conn = DBConnection.getConnection()) {
-    
+            // 1. Create table if not exists
             try (Statement st = conn.createStatement()) {
-                st.executeUpdate("ALTER TABLE users MODIFY COLUMN password VARCHAR(255)");
+                st.executeUpdate("CREATE TABLE IF NOT EXISTS users (" +
+                        "id INT AUTO_INCREMENT PRIMARY KEY, " +
+                        "username VARCHAR(100) NOT NULL UNIQUE, " +
+                        "password VARCHAR(255) NOT NULL, " +
+                        "full_name VARCHAR(255), " +
+                        "email VARCHAR(255), " +
+                        "role VARCHAR(50) DEFAULT 'USER'" +
+                        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            // 2. Ensure identity columns exist
+            String[] cols = { "is_guest", "identity_verified", "identity_verified_at" };
+            String[] types = {
+                    "TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = guest/walk-in'",
+                    "TINYINT(1) NOT NULL DEFAULT 0 COMMENT '1 = da xac thuc danh tinh'",
+                    "DATETIME NULL COMMENT 'Thoi diem xac thuc'"
+            };
+
+            for (int i = 0; i < cols.length; i++) {
+                if (!columnExists(conn, "users", cols[i])) {
+                    try (Statement st = conn.createStatement()) {
+                        st.executeUpdate("ALTER TABLE users ADD COLUMN " + cols[i] + " " + types[i]);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            // 3. Special initialization for existing staff/admin
+            try (Statement st = conn.createStatement()) {
+                st.executeUpdate("UPDATE users SET identity_verified=1, identity_verified_at=NOW() " +
+                        "WHERE (role='ADMIN' OR role='STAFF') AND identity_verified=0");
             } catch (Exception ignored) {
             }
 
-            if (columnExists(conn, "users", "identity_verified")) {
-                identitySchemaReady = true;
-                return true;
-            }
-            try (Statement st = conn.createStatement()) {
-                st.executeUpdate(
-                        "ALTER TABLE users " +
-                                "ADD COLUMN identity_verified TINYINT(1) NOT NULL DEFAULT 0 " +
-                                "COMMENT '1 = da xac thuc danh tinh' AFTER role");
-                st.executeUpdate(
-                        "ALTER TABLE users " +
-                                "ADD COLUMN identity_verified_at DATETIME NULL " +
-                                "COMMENT 'Thoi diem xac thuc' AFTER identity_verified");
-                st.executeUpdate(
-                        "UPDATE users SET identity_verified=1, identity_verified_at=NOW() " +
-                                "WHERE role IN ('ADMIN','STAFF')");
-            }
             identitySchemaReady = true;
             return true;
         } catch (Exception e) {
@@ -84,7 +100,7 @@ public class UserDAO {
             ps.setString(2, PasswordUtils.hashPassword(u.getPassword()));
             ps.setString(3, u.getFullName());
             ps.setString(4, u.getEmail());
-            ps.setString(5, "USER");
+            ps.setString(5, UserRoles.USER);
             return ps.executeUpdate() > 0;
         } catch (Exception e) {
             e.printStackTrace();
@@ -274,6 +290,48 @@ public class UserDAO {
         return false;
     }
 
+    public User getOrCreateGuestUser(int tableId, String tableName) {
+        prepareSchema();
+        String username = "guest_table_" + tableId;
+        User u = findByUsername(username);
+        if (u != null) {
+            return u;
+        }
+
+        // Create new guest user
+        u = new User();
+        u.setUsername(username);
+        u.setPassword(PasswordUtils.hashPassword("guest123")); // default password
+        u.setFullName(tableName);
+        u.setEmail(username + "@restaurant.com");
+        u.setRole(UserRoles.GUEST);
+        u.setIdentityVerified(true);
+        u.setGuest(true);
+
+        String sql = "INSERT INTO users(username, password, full_name, email, role, is_guest, identity_verified, identity_verified_at) VALUES(?,?,?,?,?,1,1,NOW())";
+        try (
+            Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+        ) {
+            ps.setString(1, u.getUsername());
+            ps.setString(2, u.getPassword());
+            ps.setString(3, u.getFullName());
+            ps.setString(4, u.getEmail());
+            ps.setString(5, u.getRole());
+            ps.executeUpdate();
+
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    u.setId(keys.getInt(1));
+                    return u;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return findByUsername(username); // fallback
+    }
+
     private User mapUser(ResultSet rs) throws SQLException {
         User u = new User();
         u.setId(rs.getInt("id"));
@@ -282,6 +340,11 @@ public class UserDAO {
         u.setFullName(rs.getString("full_name"));
         u.setEmail(rs.getString("email"));
         u.setRole(rs.getString("role"));
+
+        try {
+            u.setGuest(rs.getInt("is_guest") == 1);
+        } catch (SQLException ignored) {
+        }
 
         try {
             int verified = rs.getInt("identity_verified");
