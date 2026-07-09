@@ -67,7 +67,7 @@
       <% if(payment != null && payment.startsWith("ONLINE_")){ %>
 
       <div class="alert alert-success">
-        Đã <b>thanh toán giả lập</b> thành công qua <%= payment.replace("ONLINE_", "") %>.
+        Đã thanh toán thành công qua <%= payment.replace("ONLINE_", "") %>.
       </div>
 
       <% } else if("DEPOSIT".equals(payment)){ %>

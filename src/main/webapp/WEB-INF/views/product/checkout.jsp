@@ -65,10 +65,8 @@
                         <select name="payment" class="form-select" id="paymentMethod">
                             <option value="COD">Trả sau khi ăn (tại quầy)</option>
                             <option value="DEPOSIT">Đặt cọc trước (tại quầy)</option>
-                            <option value="SIMULATE_MOMO">MoMo — thanh toán giả lập</option>
-                            <option value="SIMULATE_VNPAY">VNPay — thanh toán giả lập</option>
+                            <option value="VNPAY">Thanh toán qua VNPay</option>
                         </select>
-                        <small class="text-muted d-block mt-1">MoMo/VNPay chỉ mô phỏng giao diện, không trừ tiền thật.</small>
                     </div>
 
                     <div class="mb-4">

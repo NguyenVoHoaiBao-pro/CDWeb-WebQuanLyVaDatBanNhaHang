@@ -166,7 +166,7 @@ public class OrderDAO {
                     conn.prepareStatement(reservationSql);
 
             String resStatus = "WAITING_PAYMENT";
-            if ("DEPOSIT".equals(payment) || "STAFF_BILL".equals(payment)) {
+            if ("DEPOSIT".equals(payment) || "STAFF_BILL".equals(payment) || (payment != null && payment.startsWith("ONLINE_"))) {
                 resStatus = "CONFIRMED";
             }
             reservationPs.setString(1, resStatus);
