@@ -1,5 +1,6 @@
 /* Dark + orange restaurant theme */
 :root {
+  color-scheme: dark;
   --bg-dark: #0a0a0f;
   --bg-dark-2: #12121a;
   --bg-card: rgba(22, 22, 32, 0.72);
@@ -59,6 +60,11 @@ img {
 ::selection {
   background: var(--orange);
   color: #fff;
+}
+
+option {
+  background-color: #12121a;
+  color: #f1f5f9;
 }
 
 ::-webkit-scrollbar {

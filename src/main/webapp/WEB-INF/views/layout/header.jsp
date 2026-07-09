@@ -13,6 +13,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
     <meta name="app-context" content="<%= ctx %>">
     <title><%= pageTitle %></title>
 

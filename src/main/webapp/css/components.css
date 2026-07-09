@@ -217,7 +217,8 @@
 /* Form controls (dark theme) */
 .form-control,
 .form-select {
-  background-color: rgba(255, 255, 255, 0.06);
+  color-scheme: dark;
+  background-color: #161620; /* Solid dark background to help browser detect dark mode */
   border: 1px solid var(--border-glass);
   color: var(--text);
   border-radius: 12px;
@@ -226,7 +227,7 @@
 
 .form-control:focus,
 .form-select:focus {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: #1c1c28;
   border-color: var(--orange);
   color: var(--text);
   box-shadow: 0 0 0 3px var(--orange-glow);
@@ -236,6 +237,10 @@
   color: var(--text-muted);
 }
 
+.form-select option {
+  background-color: #12121a !important;
+  color: #f1f5f9 !important;
+}
 
 .form-label {
   color: var(--text-muted);
